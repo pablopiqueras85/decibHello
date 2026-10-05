@@ -1,6 +1,6 @@
 # DecibHello — Direcciones del piloto (Barcelona)
 
-Estado: propuesta para revisar. Las 20 direcciones existen y se han geolocalizado con OpenStreetMap (Nominatim). La columna "Hipótesis" es lo que **esperamos** antes de mirar los datos: el piloto sirve para comprobar si la nota 0–100 (100 = muy ruidoso) confirma o desmiente cada hipótesis.
+Estado: propuesta para revisar. Las 24 direcciones existen y se han geolocalizado con OpenStreetMap (Nominatim). La columna "Hipótesis" es lo que **esperamos** antes de mirar los datos: el piloto sirve para comprobar si la nota 0–100 (100 = muy ruidoso) confirma o desmiente cada hipótesis.
 
 Criterios de selección:
 - Los 10 distritos tienen al menos una dirección.
@@ -41,6 +41,21 @@ Criterios de selección:
 | 18 | Carrer de Campoamor, 30 | Horta, Horta-Guinardó | Calle residencial de barrio |
 | 19 | Carrer de la Mare de Déu del Coll, 50 | El Coll, Gràcia | Residencial junto a la montaña |
 | 20 | Carrer de les Agudes, 20 | Ciutat Meridiana, Nou Barris | Periferia junto a Collserola; comprobar si llega ruido de vías cercanas |
+
+## Calles de control (validación sobre el terreno)
+
+Un vecino de la zona puede confirmar o desmentir cómo suenan de verdad estas calles. Es la primera prueba real de la nota.
+
+Travessera de Gràcia es larga y cambia mucho de un tramo a otro: tráfico de día, repartos, y afluencia de gente cerca de Tuset. Por eso entra con tres puntos, para ver si la nota detecta esa variación dentro de una misma calle.
+
+| # | Dirección | Barrio / distrito | Hipótesis |
+|---|---|---|---|
+| 21 | Carrer de Tuset, 20 | Sant Gervasi-Galvany, Sarrià-Sant Gervasi | Ruidosa: ocio y mucha gente |
+| 22 | Travessera de Gràcia, 30 | Sant Gervasi-Galvany, Sarrià-Sant Gervasi | Ruidosa: tramo junto a Tuset |
+| 23 | Travessera de Gràcia, 150 | Vila de Gràcia, Gràcia | Por confirmar con el vecino |
+| 24 | Travessera de Gràcia, 300 | Camp d'en Grassot, Gràcia | Por confirmar con el vecino |
+
+Para la validación, el vecino puntúa cada calle de control en su propia escala (0–100, de día y de noche) **antes** de ver la nota calculada.
 
 ## Qué se calculará para cada dirección
 
