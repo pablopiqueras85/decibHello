@@ -30,21 +30,21 @@ Diferencial buscado: traducir datos técnicos (dB) a un lenguaje cotidiano ("equ
 
 ## 4. Escala de puntuación (0–100)
 
-Convención: **100 = muy tranquilo, 0 = muy ruidoso**. Así "más es mejor", como en otras notas que el usuario ya conoce.
+Convención: **0 = muy tranquilo, 100 = muy ruidoso**. La nota funciona como un medidor de ruido: cuanto más alta, más ruido.
 
 | Rango | Etiqueta | Lectura para el usuario |
 |---|---|---|
-| 85–100 | Muy tranquilo | Se duerme con la ventana abierta |
-| 70–84 | Tranquilo | Ruido puntual, poco molesto |
-| 50–69 | Moderado | Tráfico o actividad notable en algunas franjas |
-| 30–49 | Ruidoso | Molesto a menudo; conviene buen aislamiento |
-| 0–29 | Muy ruidoso | Ruido intenso y frecuente, también de noche |
+| 0–15 | Muy tranquilo | Se duerme con la ventana abierta |
+| 16–30 | Tranquilo | Ruido puntual, poco molesto |
+| 31–50 | Moderado | Tráfico o actividad notable en algunas franjas |
+| 51–70 | Ruidoso | Molesto a menudo; conviene buen aislamiento |
+| 71–100 | Muy ruidoso | Ruido intenso y frecuente, también de noche |
 
 Cómo se calcula (propuesta a validar):
 - Se calcula una nota por franja (día 7–19 h, tarde 19–23 h, noche 23–7 h) y una nota global ponderada.
 - La noche pesa más que el día, porque es la franja que más afecta al descanso.
-- Referencia para calibrar: las guías de ruido ambiental de la OMS (2018) recomiendan para tráfico rodado menos de 53 dB Lden y menos de 45 dB Lnight. Por encima de esos niveles la nota debería quedar por debajo de 50.
-- Además de los dB, la nota penaliza los focos intermitentes (bares, terrazas, obras), que molestan más de lo que indica una media anual.
+- Referencia para calibrar: las guías de ruido ambiental de la OMS (2018) recomiendan para tráfico rodado menos de 53 dB Lden y menos de 45 dB Lnight. Por encima de esos niveles la nota debería superar 50.
+- Además de los dB, la nota sube por los focos intermitentes (bares, terrazas, obras), que molestan más de lo que indica una media anual.
 - Cada informe muestra el nivel de confianza de la nota (alto, medio o bajo) según los datos disponibles en esa calle.
 
 ## 5. Público objetivo
@@ -154,7 +154,7 @@ Ventaja a construir: cobertura local buena, lenguaje claro, integración con el 
 ## 13. Decisiones pendientes
 
 - ~~Ciudad de partida~~: Barcelona (decidido).
-- ~~Escala de puntuación~~: 0–100, 100 = muy tranquilo (decidido). Pendiente: pesos exactos por franja.
+- ~~Escala de puntuación~~: 0–100, 100 = muy ruidoso (decidido). Pendiente: pesos exactos por franja.
 - Idiomas del producto: `[castellano / catalán / inglés]`.
 - Nombre y marca: confirmar que DecibHello está libre (dominio y marca).
 - Quién construye qué: `[...]`
