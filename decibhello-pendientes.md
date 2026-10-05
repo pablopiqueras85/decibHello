@@ -53,7 +53,11 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Orden de contacto**: primero Fotocasa y Habitaclia (mismo grupo, competidores de Idealista, Habitaclia fuerte en Cataluña); en paralelo agencias, gestoras de alquiler, tasadoras y aseguradoras; Idealista cuando haya un piloto que enseñar.
 - [ ] **Canales**: LinkedIn (producto, alianzas, desarrollo de negocio, innovación), contactos que te presenten, eventos (SIMA, Barcelona Meeting Point, PropTech Spain), programas para startups de los propios grupos.
 - [ ] **Oferta**: piloto gratuito de 3 meses en los anuncios de Barcelona, midiendo visitas al recuadro, tiempo en el anuncio y peticiones de visita; después licencia mensual o por volumen. Sin exclusividad al principio salvo que se pague.
-- [ ] **Mensaje inicial**: borrador en la conversación; adaptarlo a cada portal cuando toque.
+- [ ] **Mensaje inicial** (adaptarlo a cada portal cuando toque):
+
+  > Hola, [nombre]. Soy [tu nombre], fundador de DecibHello: una nota de ruido de 0 a 100 para cada portal de Barcelona, que cambia según la hora y el día de la semana y explica de dónde viene el ruido (tráfico, ocio nocturno, camiones de recogida, piso exterior o interior). Es lo que los compradores e inquilinos no pueden ver en las fotos y descubren después de mudarse.
+  >
+  > Me gustaría proponeros un piloto de 3 meses en vuestros anuncios de Barcelona, sin coste, para medir el efecto en el interés por los anuncios. ¿Tienes 20 minutos para enseñártelo? Demo: [enlace]
 
 ## Orden recomendado
 
