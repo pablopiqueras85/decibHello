@@ -4,7 +4,9 @@ Para cada portal de la ciudad (listado oficial de adreces d'edificis) busca:
 - el tramo del mapa estratégico de ruido 2017 que da a su calle (fachada exterior);
 - el tramo de patio interior de manzana más cercano (fachada interior);
 - los focos intermitentes a menos de 100 m (ocio nocturno, bares y restaurantes, quejas por ruido, pisos turísticos);
-- la distancia al sensor municipal de ruido activo más cercano.
+- la distancia al sensor municipal de ruido activo más cercano;
+- la anchura de la calle (distancia entre portales de lados opuestos) y las quejas por ruido de la limpieza y la
+  recogida de residuos (IRIS 2023-2026) a menos de 100 m, para el aviso de picos nocturnos.
 Los portales consecutivos de una calle con el mismo resultado se agrupan en rangos de números.
 
 Uso: python3 piloto/indice.py   ->  piloto/cache/indice.json (lo incrusta construir_visor en visor.html)
@@ -32,6 +34,8 @@ UA = {"User-Agent": "DecibHello-pilot/0.1 (research)"}
 RES_TRAMER_2017 = "3ef70228-789c-47f7-8712-d3789b01a82e"
 RES_CENS_2024 = "38babeec-5c47-43d3-84e7-b13a4b89004f"
 RES_IRIS_2025 = "efc9fd4d-a812-427c-846d-a086d22012a4"
+RES_IRIS = {2023: "1ff71f84-20dc-4fc0-9f83-01eecabea330", 2024: "3e988471-ee40-4431-9095-8081fdd651ff",
+            2025: "efc9fd4d-a812-427c-846d-a086d22012a4", 2026: "eae9a19a-4543-45db-bc13-3e3073b58324"}
 RES_HUT = "b32fa7f6-d464-403b-8a02-0292a64883bf"
 RES_SENSORS = "f4562942-1fd8-48fb-9e9d-d41088f97a03"
 RES_ADRECES = "661fe190-67c8-423a-b8eb-8140f547fde2"
@@ -116,6 +120,12 @@ def direcciones_calle(xy):
     return out
 
 
+def ancho_rango(valores):
+    """Anchura típica del tramo en metros (mediana), o -1 si no hay portales al otro lado (plaza, frente a un parque...)."""
+    v = [x for x in valores if not np.isnan(x) and 3 <= x <= 120]  # < 3 m: portales con la misma posición (plazas)
+    return int(round(float(np.median(v)))) if v else -1
+
+
 def main():
     tramer = sql("tramer2017_v2", f'SELECT "TRAM","TOTAL_D","TOTAL_E","TOTAL_N","TRANSIT_D","TRANSIT_E","TRANSIT_N","OCI_N","GEOM_WKT" FROM "{RES_TRAMER_2017}"')
     adreces = todo("adreces_edificis", RES_ADRECES, ["codi_carrer", "numpost_i", "numpost_f", "nom_barri", "x_etrs89", "y_etrs89"])
@@ -124,8 +134,10 @@ def main():
     bars = puntos(sql("cens_bars", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "Nom_Grup_Activitat" ILIKE \'Restaurants, bars%\''), "Latitud", "Longitud")
     queixes = puntos(sql("iris2025_soroll", f'SELECT "LATITUD","LONGITUD" FROM "{RES_IRIS_2025}" WHERE "ELEMENT"=\'Molèsties soroll a la via pública\''), "LATITUD", "LONGITUD")
     hut = puntos(sql("hut", f'SELECT "LATITUD_Y","LONGITUD_X" FROM "{RES_HUT}"'), "LATITUD_Y", "LONGITUD_X")
+    recogida = np.vstack([puntos(sql(f"iris{a}_recogida", f'SELECT "LATITUD","LONGITUD" FROM "{r}" WHERE "DETALL"=\'Serveis neteja i recollida\''), "LATITUD", "LONGITUD")
+                          for a, r in RES_IRIS.items()])
     sensors = puntos(sql("sensors_actius", f'SELECT "Latitud","Longitud" FROM "{RES_SENSORS}" WHERE "Data_DesInstalacio" IS NULL'), "Latitud", "Longitud")
-    print(f"tramos {len(tramer)} · portales {len(adreces)} · calles {len(carrerer)}")
+    print(f"tramos {len(tramer)} · portales {len(adreces)} · calles {len(carrerer)} · quejas recogida {len(recogida)}")
 
     geoms = [wkt.loads(t["GEOM_WKT"]) for t in tramer]
     es_patio = np.array([t["TRAM"].startswith("P") for t in tramer])
@@ -156,6 +168,27 @@ def main():
     for codi, ps in por_calle.items():
         n = len(ps)
         dir_calle[inicio:inicio + n] = direcciones_calle(xy[inicio:inicio + n])
+        inicio += n
+    # Anchura: distancia de cada portal al portal más cercano del otro lado de la misma calle (par / impar), contando
+    # solo los que quedan enfrente (a más de 60° de la dirección de la calle), no los que siguen por el mismo lado.
+    ancho = np.full(len(xy), np.nan)
+    inicio = 0
+    for codi, ps in por_calle.items():
+        n = len(ps)
+        bloque, direc = xy[inicio:inicio + n], dir_calle[inicio:inicio + n]
+        par = np.array([p[0] % 2 for p in ps])
+        for i in range(n):
+            if np.isnan(direc[i][0]):
+                continue
+            otros = bloque[par != par[i]]
+            if not len(otros):
+                continue
+            v = otros - bloque[i]
+            d = np.hypot(v[:, 0], v[:, 1])
+            a_lo_largo = np.abs(v @ direc[i])
+            enfrente = (d > 0) & (a_lo_largo < 0.5 * d)
+            if enfrente.any():
+                ancho[inicio + i] = d[enfrente].min()
         inicio += n
     pts = [Point(x, y) for x, y in xy]
     pares = arbol.query(pts, predicate="dwithin", distance=max(RADIO_TRAMO, RADIO_PATIO))
@@ -200,17 +233,20 @@ def main():
         for k, p in enumerate(ps):
             j = pos + k
             if mejor[j] >= 0:
-                filas.append((p[0] % 2, p[0], p[1], int(mejor[j]), int(patio[j]), xy[j], p[4]))
+                # Anchura robusta: mediana de los portales de la misma calle a menos de 80 m (ambos lados).
+                cerca = np.hypot(*(xy[pos:pos + len(ps)] - xy[j]).T) <= 80
+                filas.append((p[0] % 2, p[0], p[1], int(mejor[j]), int(patio[j]), xy[j], p[4], ancho_rango(ancho[pos:pos + len(ps)][cerca])))
         pos += len(ps)
         filas.sort(key=lambda f: (f[0], f[1]))
         rangos = []
-        for par, ni, nf, t, pt, punto, barrio in filas:
+        for par, ni, nf, t, pt, punto, barrio, an in filas:
             r = rangos[-1] if rangos else None
             if r and r["par"] == par and r["t"] == t and r["p"] == pt:
                 r["fin"] = max(r["fin"], nf)
                 r["xy"].append(punto)
+                r["ancho"].append(an)
             else:
-                rangos.append({"par": par, "ini": ni, "fin": nf, "t": t, "p": pt, "xy": [punto], "barrio": barrio})
+                rangos.append({"par": par, "ini": ni, "fin": nf, "t": t, "p": pt, "xy": [punto], "barrio": barrio, "ancho": [an]})
         if rangos:
             rangos_calle[codi] = rangos
 
@@ -229,6 +265,7 @@ def main():
         return out
 
     n_oci, n_bar, n_quej, n_hut = contar(oci), contar(bars), contar(queixes), contar(hut)
+    n_recog = contar(recogida)
     d_sens = np.min(np.hypot(centros[:, None, 0] - sensors[None, :, 0], centros[:, None, 1] - sensors[None, :, 1]), axis=1)
     lon, lat = a_wgs.transform(centros[:, 0], centros[:, 1])
 
@@ -239,7 +276,9 @@ def main():
         for r in rs:
             planos += [r["ini"], r["fin"], idx_tramo(r["t"]), idx_tramo(r["p"]), idx_barrio(r["barrio"]),
                        int(n_oci[k]), int(n_bar[k]), int(n_quej[k]), int(n_hut[k]), int(round(d_sens[k] / 10)),
-                       int(round((lat[k] - 41.3) * 1e5)), int(round((lon[k] - 2.0) * 1e5))]
+                       int(round((lat[k] - 41.3) * 1e5)), int(round((lon[k] - 2.0) * 1e5)),
+                       int(round(float(np.median([a for a in r["ancho"] if a >= 0])))) if any(a >= 0 for a in r["ancho"]) else -1,
+                       int(n_recog[k])]
             k += 1
         salida_calles.append([nombres[codi], planos])
 
@@ -248,7 +287,7 @@ def main():
         tramos[j] = "".join(str(BANDAS.index(tramer[i][c])) for c in CAMPOS_TRAMO)
 
     indice = {"bandas": BANDAS, "campos_tramo": CAMPOS_TRAMO, "tramos": tramos, "barrios": barrios,
-              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5"],
+              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida"],
               "origen": {"lat": 41.3, "lon": 2.0}, "calles": salida_calles}
     (CACHE / "indice.json").write_text(json.dumps(indice, ensure_ascii=False, separators=(",", ":")))
     print(f"calles {len(salida_calles)} · rangos {len(todos_r)} · tramos usados {len(tramos)} · "

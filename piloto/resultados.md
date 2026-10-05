@@ -47,6 +47,7 @@ El visor interactivo (`visor.html`) tiene un buscador para cualquier portal de B
 | 77 | 71 | 79 | 79 | 37 | Travessera de Gràcia 300 | control | 60–65 | 0 / 7 / 0 / 25 | media |
 | 74 | 54 | 79 | 84 | 46 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 29 / 2 / 16 | alta |
 | 74 | 63 | 75 | 81 | 43 | Carrer d'Enric Granados 50 | intermedia | 60–65 | 0 / 13 / 1 / 53 | alta |
+| 74 | 63 | 79 | 79 | 35 | Carrer de Martínez de la Rosa 20 | control | 55–60 | 3 / 27 / 5 / 57 | media |
 | 73 | 62 | 73 | 80 | 31 | Carrer Nou de la Rambla 30 | ruidosa | 60–65 | 1 / 21 / 5 / 44 | media |
 | 72 | 63 | 76 | 76 | 48 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | alta |
 | 72 | 71 | 74 | 73 | 56 | Carrer Gran de Sant Andreu 200 | intermedia | 55–60 | 0 / 2 / 5 / 0 | media |
@@ -72,6 +73,7 @@ Nota media de la noche (23–7 h) que empieza cada día: la del viernes va del v
 | Plaça del Sol 12 | 77 | 79 | 81 | 86 | 89 | 89 | 80 | +12 |
 | Carrer Nou de la Rambla 30 | 73 | 74 | 77 | 82 | 85 | 85 | 76 | +12 |
 | Carrer de Blai 20 | 71 | 72 | 75 | 80 | 83 | 83 | 74 | +12 |
+| Carrer de Martínez de la Rosa 20 | 73 | 74 | 76 | 81 | 85 | 85 | 74 | +12 |
 | Passeig de Joan de Borbó Comte de Barcelona 50 | 63 | 64 | 65 | 70 | 74 | 74 | 64 | +11 |
 | Carrer d'Escudellers 20 | 80 | 81 | 84 | 88 | 90 | 90 | 82 | +10 |
 | Carrer del Parlament 30 | 71 | 72 | 73 | 77 | 81 | 81 | 72 | +10 |
@@ -93,6 +95,46 @@ Nota media de la noche (23–7 h) que empieza cada día: la del viernes va del v
 | Carrer de Pere II de Montcada 10 | 61 | 61 | 61 | 62 | 63 | 64 | 60 | +2 |
 | Carrer de Campoamor 30 | 61 | 61 | 61 | 62 | 63 | 64 | 60 | +2 |
 <!-- semana:fin -->
+
+## Picos nocturnos: camiones de recogida y limpieza
+
+El paso de un camión de basura o de limpieza de madrugada es un pico corto que apenas mueve la media anual del mapa oficial, pero despierta a los vecinos, sobre todo en calles estrechas donde el sonido rebota entre fachadas. Por eso va como **aviso aparte**, no dentro de la nota:
+
+- **Anchura de la calle**: distancia entre portales de lados opuestos (listado oficial de portales). Estrecha: menos de 12 m.
+- **Quejas** al Ajuntament (IRIS 2023–2026) por ruido de "servicios de limpieza y recogida", a menos de 100 m.
+- **Aviso alto**: calle estrecha con alguna queja cerca, o 5 quejas o más. **Medio**: calle estrecha, o alguna queja. **Bajo**: el resto.
+
+Falta lo más importante, que no es público: la ubicación de los contenedores y las rutas y horarios de los camiones.
+
+<!-- picos:inicio -->
+| Dirección | Anchura | Quejas recogida y limpieza (100 m, 2023-26) | Picos nocturnos |
+|---|---|---|---|
+| Carrer d'Escudellers 20 | 7 m | 7 | alto |
+| Carrer de Martínez de la Rosa 20 | 8 m | 5 | alto |
+| Carrer de Verdi 20 | 10 m | 2 | alto |
+| Carrer Nou de la Rambla 30 | 11 m | 1 | alto |
+| Carrer Gran de Sant Andreu 200 | 14 m | 5 | alto |
+| Travessera de Gràcia 150 | 8 m | 0 | medio |
+| Carrer de Blai 20 | 12 m | 3 | medio |
+| Carrer de Pomaret 20 | 12 m | 1 | medio |
+| Carrer de la Mare de Déu del Coll 50 | 13 m | 1 | medio |
+| Carrer d'Enric Granados 50 | 22 m | 1 | medio |
+| Carrer del Parlament 30 | 22 m | 3 | medio |
+| Rambla del Poblenou 60 | 22 m | 3 | medio |
+| Travessera de Gràcia 81 | 23 m | 4 | medio |
+| Carrer de Sants 100 | 24 m | 1 | medio |
+| Plaça del Sol 12 | 25 m | 1 | medio |
+| Gran Via de les Corts Catalanes 600 | — | 0 | bajo |
+| Carrer de Pere II de Montcada 10 | 13 m | 0 | bajo |
+| Carrer de Campoamor 30 | 18 m | 0 | bajo |
+| Carrer del Consell de Cent 250 | 22 m | 0 | bajo |
+| Carrer de Tuset 20 | 23 m | 0 | bajo |
+| Travessera de Gràcia 300 | 23 m | 0 | bajo |
+| Carrer d'Aragó 300 | 32 m | 0 | bajo |
+| Ronda del General Mitre 150 | 32 m | 0 | bajo |
+| Passeig de Joan de Borbó Comte de Barcelona 50 | 81 m | 0 | bajo |
+| Carrer de les Agudes 20 | 102 m | 0 | bajo |
+<!-- picos:fin -->
 
 ## Qué aprendemos
 

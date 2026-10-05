@@ -142,3 +142,19 @@ def calcular(mapa, focos=None, dia=None):
     notas = notas_horarias(db, extra_focos(**focos) if focos else 0, dia)
     franjas, global_ = resumen(notas)
     return {"db": db, "notas": notas, "franjas": franjas, "global": global_}
+
+
+def aviso_picos(ancho_m, quejas_recogida):
+    """Aviso de picos nocturnos (camiones de recogida y limpieza). No entra en la nota 0-100.
+
+    ancho_m: anchura de la calle entre portales de lados opuestos (-1 si no se sabe).
+    quejas_recogida: quejas por ruido de limpieza y recogida (IRIS 2023-2026) a menos de 100 m.
+    """
+    estrecha = 0 <= ancho_m < 12
+    if (estrecha and quejas_recogida >= 1) or quejas_recogida >= 5:
+        nivel = "alto"
+    elif estrecha or quejas_recogida >= 1:
+        nivel = "medio"
+    else:
+        nivel = "bajo"
+    return nivel

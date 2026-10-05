@@ -128,6 +128,36 @@ Limitaciones:
 - Plataforma vecinal (xavecs.org, "Barcelona Ruidosa") que muestra en tiempo real los datos de los sensores de Sentilo, con gráficos diarios y semanales y registros minuto a minuto. Tiene análisis de terrazas, patios escolares y macroconciertos por distrito y barrio.
 - No es una fuente que convenga copiar, pero sí un **posible aliado**: ya han resuelto parte del tratamiento de datos de los sensores y tienen contacto con vecinos afectados, útil para las entrevistas de validación.
 
+### 2.13 Recogida de residuos y limpieza (picos nocturnos)
+
+El paso de camiones de basura y de limpieza de madrugada da picos cortos e intensos, sobre todo en calles estrechas. El mapa oficial no los recoge porque es una media anual.
+
+**Qué hay (comprobado):**
+- **Quejas IRIS** con el detalle "Serveis neteja i recollida": unas 1.200 entre 2023 y 2026, con dirección y coordenadas. Ya las usa el aviso de "picos nocturnos" del visor. Que una calle no tenga quejas no significa que no haya molestia (Martínez de la Rosa no tiene ninguna, pero hay 5 a menos de 100 m).
+- **Anchura de la calle**: no es un dato publicado, pero se estima con el listado oficial de portales (distancia a los portales de enfrente). Ejemplos: Martínez de la Rosa ≈ 8 m, Escudellers ≈ 7 m, Tuset ≈ 23 m, Passeig de Gràcia ≈ 63 m.
+- **Recogida de muebles y trastos**: cada calle tiene un día asignado y se deja entre las 20 y las 22 h. El buscador de residus del Ajuntament lo consulta por dirección, pero no está publicado como datos abiertos. La síndica de greuges señaló en 2021 esta recogida como la principal queja por ruido de los servicios municipales.
+- **Horarios por zona, sueltos en prensa**: por ejemplo, en Ciutat Vella se concentró la recogida a la 1:45 y en Joaquín Costa se adelantó a las 3:00 (betevé); en el Poble-sec se recogía entre las 0:00 y las 4:30 (Zona Sec, 2016).
+
+**Qué no hay (en abierto):** la ubicación de los contenedores de calle, y las rutas y horarios de los camiones por calle. Open Data BCN solo publica puntos verdes, contenedores de ropa y de sal; la wiki de OpenStreetMap recoge importaciones municipales de contenedores de pilas y aceite, no de los de calle.
+
+**Cómo conseguirlo:**
+1. **Solicitud de acceso a la información pública** (Ley 19/2014 de transparencia de Cataluña) al Ajuntament, por la sede electrónica. Tiene plazo legal de respuesta de un mes. Borrador listo para enviar más abajo.
+2. **Pedir a Open Data BCN que lo publique** (tienen un formulario de sugerencias de datos).
+3. **OpenStreetMap**: hay voluntarios que mapean contenedores (`amenity=recycling`, `amenity=waste_disposal`). Falta medir la cobertura en Barcelona: el servidor de consultas (Overpass) no responde desde el entorno de trabajo.
+4. **Vecinos**: que los usuarios marquen "aquí pasa el camión a las 2:00" y el contenedor de su calle. Es el dato más preciso y además genera comunidad.
+5. **Sensores**: los datos minuto a minuto desde 2024 sí recogen el pico del camión donde hay sensor (pendientes de descarga manual).
+
+**Borrador de solicitud (castellano; se puede enviar también en catalán):**
+
+> Al amparo de la Ley 19/2014, de 29 de diciembre, de transparencia, acceso a la información pública y buen gobierno, solicito la siguiente información en formato reutilizable (CSV, JSON o SHP), referida al servicio municipal de recogida de residuos y limpieza viaria de Barcelona:
+>
+> 1. Ubicación georreferenciada de los contenedores de calle de todas las fracciones (resto, orgánica, envases, papel y cartón, vidrio), con su fracción.
+> 2. Rutas o sectores de recogida y, para cada calle o tramo, la franja horaria y los días de la semana en que pasa el camión de cada fracción.
+> 3. Calendario de recogida de muebles y trastos por calle (el día asignado a cada calle).
+> 4. Franjas horarias de los servicios nocturnos de limpieza viaria (barrido mecánico y baldeo) por calle o sector.
+>
+> La finalidad es elaborar un servicio informativo sobre el ruido urbano para la ciudadanía. Solicito además, si es posible, que esta información se publique en Open Data BCN.
+
 ## 3. Cómo se accede a los datos
 
 - **Ficheros tabulares (CSV)**: se leen sin problema por la API del portal (`datastore_search` y `datastore_search_sql`), con consultas y filtros. Así funcionan el MES por tramo, el censo de locales, los pisos turísticos, IRIS y la lista de sensores.
@@ -170,6 +200,13 @@ Las mediciones colaborativas y las valoraciones de vecinos de las fases siguient
 5. Contactar con Xavecs.
 
 ## Fuentes consultadas
+
+- [Cercador de residus — mobles i trastos (Ajuntament)](https://ajuntament.barcelona.cat/cercador-de-residus/ca/fra/VO)
+- [Sabeu quin dia es recullen els mobles i trastos vells al vostre carrer? (Ajuntament)](https://www.barcelona.cat/infobarcelona/ca/sabeu-quin-dia-es-recullen-els-mobles-i-trastos-vells-al-vostre-carrer_1343837.html)
+- [Canvi d'horaris de neteja a Ciutat Vella (betevé)](https://beteve.cat/societat/canvi-horari-neteja-ciutat-vella-soroll-nocturn/)
+- [La síndica vol avançar la recollida de residus pel soroll (betevé)](https://beteve.cat/societat/sindica-demana-avancar-recollida-residus-voluminosos-pel-soroll-barcelona/)
+- [La recollida de brossa al barri genera queixes pel soroll (Zona Sec)](https://zona-sec.cat/2016/05/21/la-recollida-de-brossa-al-barri-genera-queixes-pel-soroll-i-lhorari/)
+- [Importació Ajuntament de Barcelona (wiki OpenStreetMap)](https://wiki.openstreetmap.org/wiki/Ca:Importaci%C3%B3_Ajuntament_de_Barcelona)
 
 - [Open Data BCN — catálogo](https://opendata-ajuntament.barcelona.cat/data/ca/dataset)
 - [Mapas de ruido por tramo de calle del MES (datos.gob.es)](https://datos.gob.es/en/catalogo/l01080193-mapas-de-ruido-por-tramo-de-calle-del-mapa-estrategico-de-ruido-de-la-ciudad-de-barcelona)

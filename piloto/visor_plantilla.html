@@ -19,6 +19,9 @@
   --sel-bg: #12161b;
   --sel-fg: #ffffff;
   --focus: #2a78d6;
+  --st-alto: #d03b3b;
+  --st-medio: #fab219;
+  --st-bajo: #0ca30c;
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -131,6 +134,11 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 .calle .sw { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--line-2); }
 .calle .val { font-family: var(--f-mono); font-variant-numeric: tabular-nums; min-width: 2.2ch; text-align: right; }
 
+.picos { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; align-items: start; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 8px; }
+.picos .nivel-picos { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
+.picos .nivel-picos i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.picos p { margin: 0; color: var(--ink-2); font-size: 0.9rem; }
+.picos small { grid-column: 1 / -1; color: var(--muted); font-size: 0.8rem; }
 .pie { color: var(--muted); font-size: 0.85rem; display: grid; gap: 6px; }
 .pie p { margin: 0; max-width: 90ch; }
 
@@ -211,6 +219,12 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
       <div class="escala" aria-hidden="true">
         <div class="barra"><span class="marca-barra" id="marca-barra"></span></div>
         <div class="ticks"><span style="left:0">0 tranquilo</span><span style="left:50%">50 · límite OMS</span><span style="left:100%">100 ruidoso</span></div>
+      </div>
+
+      <div class="picos" id="picos" aria-live="polite">
+        <span class="nivel-picos"><i id="picos-punto"></i><span id="picos-nivel"></span></span>
+        <p id="picos-motivo"></p>
+        <small>Camiones de basura y limpieza de madrugada: picos cortos que no recoge la media del mapa oficial. No entra en la nota. Faltan datos públicos de contenedores y de rutas y horarios de recogida.</small>
       </div>
 
       <div class="hora">
@@ -335,6 +349,12 @@ function resumen(notas) {
 }
 function extraFocos(ocio, bares, quejas, turisticos) {
   return Math.min(10, 4 * ocio) + Math.min(6, 1.2 * Math.sqrt(bares)) + Math.min(6, 2 * Math.sqrt(quejas)) + Math.min(3, Math.sqrt(turisticos) / 3);
+}
+function avisoPicos(anchoM, quejas) {
+  const estrecha = anchoM >= 0 && anchoM < 12;
+  if ((estrecha && quejas >= 1) || quejas >= 5) return "alto";
+  if (estrecha || quejas >= 1) return "medio";
+  return "bajo";
 }
 // MODELO:fin
 
@@ -598,6 +618,12 @@ function pintarDetalle() {
   $("hora").value = posicion(estado.hora);
   $("hora-out").textContent = estado.modo === "franja" ? NOMBRE_FRANJA[estado.franja].split(" ")[0] : hh(estado.hora);
 
+  const nivelPicos = avisoPicos(r.ancho_m, r.quejas_recogida);
+  $("picos-nivel").textContent = "Picos nocturnos: " + nivelPicos;
+  $("picos-punto").style.background = `var(--st-${nivelPicos})`;
+  const anchoTxt = r.ancho_m < 0 ? "anchura desconocida" : r.ancho_m < 12 ? `calle estrecha (≈ ${r.ancho_m} m entre fachadas): el ruido rebota` : `calle de ≈ ${r.ancho_m} m entre fachadas`;
+  const quejasTxt = r.quejas_recogida ? `${r.quejas_recogida} queja${r.quejas_recogida > 1 ? "s" : ""} por ruido de limpieza y recogida a menos de 100 m (2023–2026)` : "sin quejas por ruido de limpieza y recogida a menos de 100 m (2023–2026)";
+  $("picos-motivo").textContent = `${anchoTxt} · ${quejasTxt}.`;
   const lado = r.ini % 2 ? "impar" : "par";
   const filas = [
     ["Tráfico de noche (mapa)", res.trafico],

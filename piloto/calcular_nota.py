@@ -85,6 +85,8 @@ def main():
             "ocio_nocturno_100m": v["ocio"], "bares_rest_100m": v["bares"], "quejas_ruido_100m": v["quejas"],
             "pisos_turisticos_100m": v["turisticos"], "sensor_mas_cercano_m": v["sensor_dam"] * 10,
             "rango_portales": f'{v["ini"]}-{v["fin"]}', "confianza": confianza,
+            "ancho_m": v["ancho_m"], "quejas_recogida_100m": v["quejas_recogida"],
+            "picos_nocturnos": modelo.aviso_picos(v["ancho_m"], v["quejas_recogida"]),
             **{f"noche_{d}": n for d, n in noches.items()},
         })
 
@@ -124,6 +126,12 @@ def escribir_tabla_md(filas):
     semana = [cab, "|---|" + "---|" * 8]
     for r in sorted(filas, key=lambda r: -(r["noche_viernes"] - r["noche_lunes"])):
         semana.append(f'| {r["direccion"]} | ' + " | ".join(str(r[f"noche_{d}"]) for d in modelo.DIAS) + f' | {r["noche_viernes"] - r["noche_lunes"]:+d} |')
+    picos = ["| Dirección | Anchura | Quejas recogida y limpieza (100 m, 2023-26) | Picos nocturnos |", "|---|---|---|---|"]
+    orden = {"alto": 0, "medio": 1, "bajo": 2}
+    for r in sorted(filas, key=lambda r: (orden[r["picos_nocturnos"]], r["ancho_m"])):
+        ancho = f'{r["ancho_m"]} m' if r["ancho_m"] >= 0 else "—"
+        picos.append(f'| {r["direccion"]} | {ancho} | {r["quejas_recogida_100m"]} | {r["picos_nocturnos"]} |')
+    texto = re.sub(r"<!-- picos:inicio -->.*<!-- picos:fin -->", "<!-- picos:inicio -->\n" + "\n".join(picos) + "\n<!-- picos:fin -->", texto, flags=re.S)
     texto = re.sub(r"<!-- semana:inicio -->.*<!-- semana:fin -->", "<!-- semana:inicio -->\n" + "\n".join(semana) + "\n<!-- semana:fin -->", texto, flags=re.S)
     md.write_text(texto, encoding="utf-8")
 

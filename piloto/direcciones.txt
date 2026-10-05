@@ -23,3 +23,4 @@ Carrer de Tuset 20 | control | Sant Gervasi-Galvany
 Travessera de Gràcia 81 | control | Sant Gervasi-Galvany
 Travessera de Gràcia 150 | control | Vila de Gràcia
 Travessera de Gràcia 300 | control | Camp d'en Grassot i Gràcia Nova
+Carrer de Martínez de la Rosa 20 | control | la Vila de Gràcia | Calle estrecha propuesta como ejemplo de picos nocturnos por camiones de recogida.
