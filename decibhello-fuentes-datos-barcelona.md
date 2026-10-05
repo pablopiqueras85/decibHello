@@ -1,6 +1,6 @@
 # DecibHello — Fuentes de datos de ruido en Barcelona
 
-Estado: primera investigación (octubre 2026). Basada en búsquedas web: los portales de datos no se han podido abrir directamente desde el entorno de trabajo, así que **los nombres de columnas, la cobertura exacta y la fecha del último fichero están por comprobar** descargando cada conjunto.
+Estado: investigación de octubre de 2026. Las fuentes 1–6 están **comprobadas directamente en Open Data BCN** (columnas, número de registros y fechas; cómo acceder en la sección 3). El resto sale de búsquedas web y está por comprobar.
 
 Licencia general de Open Data BCN: **CC BY 4.0**. Se puede usar comercialmente citando al Ajuntament de Barcelona como fuente.
 
@@ -8,12 +8,12 @@ Licencia general de Open Data BCN: **CC BY 4.0**. Se puede usar comercialmente c
 
 | # | Fuente | Qué aporta a la nota | Detalle espacial | Detalle temporal | Prioridad |
 |---|---|---|---|---|---|
-| 1 | Mapa estratégico de ruido (MES) — por tramo de calle | Base de la nota en toda la ciudad | Tramo entre dos cruces | Día, tarde, noche y Lden (media anual) | **Imprescindible** |
-| 2 | MES — fachadas, ráster e isófonas | Afinar el lado del edificio y el patio interior | Fachada / celda | Igual que 1 | Alta |
-| 3 | Red municipal de sensores de ruido | Patrones reales de noche y fin de semana | Unos 200 puntos | Continuo; publicación mensual | **Imprescindible** |
-| 4 | Censo de locales en planta baja | Bares, restaurantes y ocio cerca del piso | Local | Foto fija | Alta |
-| 5 | Quejas IRIS | Molestia percibida por los vecinos | Por confirmar | Trimestral | Media |
-| 6 | Viviendas de uso turístico (HUT) | Densidad de pisos turísticos | Dirección con coordenadas | Trimestral | Media |
+| 1 | Mapa estratégico de ruido (MES) — por tramo de calle | Base de la nota en toda la ciudad | 17.958 tramos entre cruces | Día, tarde, noche y Lden (media anual, **2017**) | **Imprescindible** |
+| 2 | MES 2022 — ráster | Versión más reciente del mapa | Celda de rejilla | Día, tarde, noche y Lden | Alta |
+| 3 | Red municipal de sensores de ruido | Patrones reales de noche y fin de semana | 176 sensores activos | Minuto a minuto desde 2024 | **Imprescindible** |
+| 4 | Censo de locales en planta baja | Bares, restaurantes y ocio cerca del piso | 44.000 locales con coordenadas | Foto fija (2024) | Alta |
+| 5 | Quejas IRIS | Quejas de vecinos por ruido en la calle | Dirección con coordenadas | Anual, actualizado durante el año | Alta |
+| 6 | Viviendas de uso turístico (HUT) | Densidad de pisos turísticos | 10.721 pisos con coordenadas | Trimestral | Media |
 | 7 | Obras en el espacio público | Avisos de obras activas | Obra georreferenciada | Con fechas de inicio y fin | Media |
 | 8 | Estado del tráfico por tramos | Intensidad de tráfico por hora | Tramo de vía principal | Tiempo real + histórico | Baja–media |
 | 9 | Aeropuerto de El Prat (MER fase IV) | Ruido de aviones | Isófonas | Día, tarde, noche y Lden | Baja en Barcelona ciudad |
@@ -25,13 +25,19 @@ Licencia general de Open Data BCN: **CC BY 4.0**. Se puede usar comercialmente c
 
 ### 2.1 Mapa estratégico de ruido de Barcelona (MES)
 
-Es la fuente principal. El vigente es el de la **fase 4**: datos de 2022, válido para 2022–2027, y hecho con el método europeo común CNOSSOS-EU.
+Es la fuente principal. El vigente es el de la **fase 4** (datos de 2022, válido para 2022–2027, método europeo CNOSSOS-EU), pero **por tramo de calle solo está publicada la versión de 2017**.
 
-Conjuntos publicados en Open Data BCN:
-- **Por tramo de calle** (`tramer-mapa-estrategic-soroll`): nivel medio que llega a las fachadas entre dos cruces, por tipo de fuente y franja horaria. Hay versiones de 2009, 2012, 2017 y 2022, en CSV (geometría en la columna `GEOM_WKT`) y GeoPackage.
-- **Por fachada** (`facanes-mapa-estrategic-soroll`): nivel en cada fachada. Sirve para distinguir un piso que da a la calle de uno que da al patio de manzana.
-- **Ráster** (`rasters-mapa-estrategic-soroll`): rejilla continua en GeoPackage, 2022, con ruido industrial, de ocio y total, en día, tarde, noche y Lden.
-- **Isófonas, población expuesta y mapa de capacidad acústica** (zonificación acústica de la ciudad).
+Conjuntos publicados en Open Data BCN (comprobado):
+- **Por tramo de calle** (`tramer-mapa-estrategic-soroll`): versiones de 2009, 2012 y **2017**; la de 2022 no está. 17.958 tramos, legibles por la API del portal. Columnas, para día (`_D`), tarde (`_E`), noche (`_N`) y Lden (`_DEN`):
+  - `TOTAL`, `TRANSIT` (tráfico), `GI_TR` (grandes infraestructuras de transporte), `FFCC` (ferrocarril), `INDUST` (industria);
+  - `VIANANTS_D/E` (zonas peatonales), `OCI_N` (ocio de noche), `PATIS_D/E` (patios escolares);
+  - `GEOM_WKT` con la geometría del tramo.
+  - **Los valores vienen en franjas de 5 dB** como texto ("60 - 65 dB(A)"), no como cifra exacta.
+- **Ráster 2022** (`rasters-mapa-estrategic-soroll`): 24 ficheros GeoPackage de unos 97 MB cada uno: tráfico, ferrocarril, industria, ocio, total y total obligatorio, cada uno en día, tarde, noche y Lden. Es el dato más reciente, pero hay que leerlo como rejilla y no por calle.
+- **Por fachada** (`facanes-mapa-estrategic-soroll`): solo 2017, en GeoPackage. Sirve para distinguir un piso que da a la calle de uno que da al patio de manzana.
+- **Población expuesta y mapa de capacidad acústica** (zonificación acústica de la ciudad).
+
+Primer dato útil (MES 2017, noche): el **76 % de los tramos** está en 45 dB o más, por encima de la recomendación nocturna de la OMS para tráfico. Solo el 15 % está por debajo de 40 dB. La escala 0–100 tendrá que repartir bien la franja de 45–65 dB, que es donde está la mayoría de calles.
 
 Fuentes de ruido separadas: tráfico, ferrocarril, industria y ocio. Según el Ajuntament, el tráfico es la fuente principal en toda la ciudad, y de noche, en algunas zonas, aparece el ruido por uso intensivo del espacio público, que no es el más alto pero sí el que más molesta. El mapa de 2022 muestra una bajada media del 5–6 % frente al de cinco años antes.
 
@@ -41,17 +47,37 @@ Limitaciones:
 
 ### 2.2 Red de sensores de ruido (Sentilo)
 
-- Open Data BCN publica las **instalaciones** de la red de monitorización del ruido ambiental y los **datos de medición**, con actualización mensual y un histórico que arranca al menos en 2016. Está clasificado como conjunto de datos de alto valor.
-- Los sensores envían datos a Sentilo, la plataforma de sensores del Ajuntament. Según la prensa, hay **más de 200 sonómetros**.
+- **Instalaciones** (`xarxasoroll-equipsmonitor-instal`, comprobado): 989 ubicaciones históricas, de las que **176 están activas** (sin fecha de retirada), en **39 barrios**. Cada una tiene dirección, coordenadas y el motivo de la medición:
+  - ocio: 80;
+  - tráfico: 79;
+  - zona peatonal: 13;
+  - otros: 4.
+- Reparto por distrito de los sensores activos:
+
+  | Distrito | Sensores |
+  |---|---|
+  | Eixample | 45 |
+  | Ciutat Vella | 37 |
+  | Sant Martí | 27 |
+  | Gràcia | 21 |
+  | Sants-Montjuïc | 16 |
+  | Sant Andreu | 14 |
+  | Horta-Guinardó | 6 |
+  | Sarrià-Sant Gervasi | 6 |
+  | Les Corts | 3 |
+  | Nou Barris | 1 |
+- **Mediciones** (`xarxasoroll-equipsmonitor-dades`): datos **por hora de 2015 a 2023** (un ZIP por semestre) y **por minuto desde enero de 2024** (un ZIP por mes, el último de junio de 2026).
+- **Sesgo importante**: los sensores se ponen donde hay problemas (ocio y tráfico) y apenas los hay en zonas tranquilas. Sirven para calibrar la nota en calles ruidosas, pero no como muestra representativa de la ciudad.
 - Es la única fuente con el ruido real hora a hora. Sirve para:
   - calibrar la nota calculada con el MES;
   - mostrar el patrón real de noche, fin de semana y verano en las calles con sensor;
   - medir el efecto de fiestas y eventos.
-- Limitación: unos 200 puntos no cubren todas las calles. Fuera de ellos, la nota se apoya en el MES con confianza menor.
+- Limitación: 176 puntos no cubren todas las calles. Fuera de ellos, la nota se apoya en el MES con confianza menor.
 
 ### 2.3 Locales en planta baja
 
-- `cens-locals-planta-baixa-act-economica`: ubicación y tipo de actividad de cada local en planta baja, con su estado (activo, inactivo, en alquiler, en venta). Última actualización encontrada: diciembre de 2024.
+- `cens-locals-planta-baixa-act-economica` (comprobado): censo de 2024 con **44.000 locales**, revisados entre octubre de 2021 y octubre de 2024. Cada local tiene coordenadas, dirección, actividad y estado.
+- Trae un indicador directo, `SN_Oci_Nocturn`, que marca **212 locales de ocio nocturno**. Además hay **7.729 locales** en el grupo "restaurantes, bares y hoteles".
 - Para DecibHello: contar bares, restaurantes y locales de ocio en un radio de 50–100 m del piso. Es el mejor indicador de ruido intermitente nocturno.
 - Hay una tabla de códigos de actividad aparte (`cens-activitats-economiques-class-bcn`).
 
@@ -64,11 +90,12 @@ Limitaciones:
 
 - Conjunto `iris`: incidencias, quejas y sugerencias de la ciudadanía, con tipo, tema, fechas, ubicación y canal. Se publica cada trimestre.
 - El ruido en el espacio público encabeza las quejas en algunos periodos.
-- Pendiente: comprobar si la ubicación viene por dirección o solo por barrio. Si es por barrio, sirve como indicador de molestia por zona, no por calle.
+- Comprobado: cada petición trae **calle, número, sección censal y coordenadas**, así que sirve por calle y no solo por barrio.
+- En 2025 hubo **3.625 quejas** del tipo "molestias por ruido en la vía pública", casi todas con coordenadas. Hay un fichero por año desde 2023 y el de 2026 se va actualizando.
 
 ### 2.6 Viviendas de uso turístico
 
-- `habitatges-us-turistic`: registro de pisos turísticos con dirección, número de plazas y coordenadas WGS84. Publicación trimestral, histórico desde 2018.
+- `habitatges-us-turistic` (comprobado): **10.721 pisos turísticos** con dirección (hasta planta y puerta), número de plazas y coordenadas WGS84. Publicación trimestral, histórico desde 2018.
 - Para DecibHello: densidad de pisos turísticos en el edificio y en la manzana (ruido de entradas, salidas y maletas a deshoras).
 
 ### 2.7 Obras en el espacio público
@@ -101,15 +128,23 @@ Limitaciones:
 - Plataforma vecinal (xavecs.org, "Barcelona Ruidosa") que muestra en tiempo real los datos de los sensores de Sentilo, con gráficos diarios y semanales y registros minuto a minuto. Tiene análisis de terrazas, patios escolares y macroconciertos por distrito y barrio.
 - No es una fuente que convenga copiar, pero sí un **posible aliado**: ya han resuelto parte del tratamiento de datos de los sensores y tienen contacto con vecinos afectados, útil para las entrevistas de validación.
 
-## 3. Área metropolitana (para más adelante)
+## 3. Cómo se accede a los datos
+
+- **Ficheros tabulares (CSV)**: se leen sin problema por la API del portal (`datastore_search` y `datastore_search_sql`), con consultas y filtros. Así funcionan el MES por tramo, el censo de locales, los pisos turísticos, IRIS y la lista de sensores.
+- **Descargas directas (ZIP y GeoPackage)**: el portal las protege con una **verificación anti-bots (hCaptcha)**, así que no se pueden descargar de forma automática. Afecta a las mediciones de los sensores y al ráster de 2022. Opciones:
+  - descargarlas a mano desde el navegador para el piloto;
+  - pedir acceso al Ajuntament (Open Data BCN) para un uso continuado.
+- datos.gob.es también rechaza los accesos automáticos.
+
+## 4. Área metropolitana (para más adelante)
 
 - Badalona, Santa Coloma de Gramenet y Sant Adrià de Besòs tienen un mapa estratégico de ruido común, la "aglomeración del Barcelonès", de fase 4 (2022–2027). La Generalitat lo aprobó en enero de 2025 (Resolució TER/4750/2024).
 - Otras aglomeraciones del área (Baix Llobregat, Vallès) también tienen mapas de fase 4.
 - Pendiente: comprobar el formato de descarga (¿datos SIG o solo PDF?) y el mapa de L'Hospitalet.
 
-## 4. Cómo encajan en la nota 0–100 (100 = muy ruidoso)
+## 5. Cómo encajan en la nota 0–100 (100 = muy ruidoso)
 
-1. **Base**: nivel del MES por tramo de calle (o por fachada) en día, tarde y noche → nota por franja.
+1. **Base**: nivel del MES por tramo de calle (2017, en franjas de 5 dB) en día, tarde y noche → nota por franja. Más adelante, actualizarlo con el ráster de 2022.
 2. **Corrección con sensores**: si hay sensor cerca, ajustar con el patrón real (noches de fin de semana, verano).
 3. **Suma por focos intermitentes**: bares y ocio cercanos, terrazas, densidad de pisos turísticos, colegios.
 4. **Avisos aparte, sin entrar en la nota**: obras activas, fiestas mayores, eventos.
@@ -118,7 +153,7 @@ Limitaciones:
    - media: solo MES;
    - baja: datos antiguos o tramo sin datos.
 
-## 5. Huecos que ningún dato público cubre
+## 6. Huecos que ningún dato público cubre
 
 - Ruido dentro del edificio: vecinos, ascensor, instalaciones, calidad del aislamiento.
 - Diferencias entre plantas (un 1.º y un 7.º en la misma fachada).
@@ -126,12 +161,12 @@ Limitaciones:
 
 Las mediciones colaborativas y las valoraciones de vecinos de las fases siguientes servirían para cubrir estos huecos.
 
-## 6. Próximos pasos
+## 7. Próximos pasos
 
-1. Descargar el MES 2022 por tramo de calle y por fachada, revisar columnas y cobertura.
-2. Descargar el histórico de los sensores y ver cuántas calles quedan cerca de uno.
-3. Cruzar las 20 direcciones del piloto con el MES, los locales y los pisos turísticos, y calcular una primera nota.
-4. Localizar el conjunto de terrazas ordinarias y comprobar el detalle de ubicación de IRIS.
+1. Elegir las 20 direcciones del piloto y calcular una primera nota con el MES 2017 por tramo, los locales de ocio, los pisos turísticos y las quejas IRIS. Todo eso ya es accesible por la API.
+2. Descargar a mano un mes de datos de sensores (minuto a minuto) y el ráster de noche de 2022, para comparar con el MES 2017.
+3. Escribir a Open Data BCN para saber si hay MES 2022 por tramo de calle y cómo acceder sin la verificación anti-bots.
+4. Localizar el conjunto de terrazas ordinarias.
 5. Contactar con Xavecs.
 
 ## Fuentes consultadas
