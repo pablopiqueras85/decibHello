@@ -70,6 +70,8 @@ def main():
         if v["patio"] >= 0:
             mp = mapa_tramo(indice, v["patio"])
             interior = modelo.calcular({f"TOTAL_{f}": mp[f"TOTAL_{f}"] for f in "DEN"})
+        focos = {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]}
+        noches = {modelo.DIAS[d]: round(modelo.calcular(mapa, focos, d)["franjas"]["N"]) for d in range(7)}
         confianza = "alta" if v["sensor_dam"] <= RADIO_SENSOR_DAM else "media"
         if not exacto:
             confianza = "baja"
@@ -83,6 +85,7 @@ def main():
             "ocio_nocturno_100m": v["ocio"], "bares_rest_100m": v["bares"], "quejas_ruido_100m": v["quejas"],
             "pisos_turisticos_100m": v["turisticos"], "sensor_mas_cercano_m": v["sensor_dam"] * 10,
             "rango_portales": f'{v["ini"]}-{v["fin"]}', "confianza": confianza,
+            **{f"noche_{d}": n for d, n in noches.items()},
         })
 
     with open(AQUI / "resultados.csv", "w", newline="", encoding="utf-8") as f:
@@ -117,6 +120,11 @@ def escribir_tabla_md(filas):
                       f'{r["ocio_nocturno_100m"]} / {r["bares_rest_100m"]} / {r["quejas_ruido_100m"]} / {r["pisos_turisticos_100m"]} | {r["confianza"]} |')
     texto = md.read_text(encoding="utf-8")
     texto = re.sub(r"<!-- tabla:inicio -->.*<!-- tabla:fin -->", "<!-- tabla:inicio -->\n" + "\n".join(lineas) + "\n<!-- tabla:fin -->", texto, flags=re.S)
+    cab = "| Dirección | " + " | ".join(d[:3].capitalize() for d in modelo.DIAS) + " | Vie − lun |"
+    semana = [cab, "|---|" + "---|" * 8]
+    for r in sorted(filas, key=lambda r: -(r["noche_viernes"] - r["noche_lunes"])):
+        semana.append(f'| {r["direccion"]} | ' + " | ".join(str(r[f"noche_{d}"]) for d in modelo.DIAS) + f' | {r["noche_viernes"] - r["noche_lunes"]:+d} |')
+    texto = re.sub(r"<!-- semana:inicio -->.*<!-- semana:fin -->", "<!-- semana:inicio -->\n" + "\n".join(semana) + "\n<!-- semana:fin -->", texto, flags=re.S)
     md.write_text(texto, encoding="utf-8")
 
 

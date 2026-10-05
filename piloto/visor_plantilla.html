@@ -177,6 +177,19 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
           </div>
         </div>
         <div class="grupo-ctl">
+          <span class="etq" id="etq-dia">Día de la semana</span>
+          <div class="seg" role="group" aria-labelledby="etq-dia">
+            <button type="button" data-dia="" aria-pressed="true">Media</button>
+            <button type="button" data-dia="0" aria-pressed="false" aria-label="Lunes">L</button>
+            <button type="button" data-dia="1" aria-pressed="false" aria-label="Martes">M</button>
+            <button type="button" data-dia="2" aria-pressed="false" aria-label="Miércoles">X</button>
+            <button type="button" data-dia="3" aria-pressed="false" aria-label="Jueves">J</button>
+            <button type="button" data-dia="4" aria-pressed="false" aria-label="Viernes">V</button>
+            <button type="button" data-dia="5" aria-pressed="false" aria-label="Sábado">S</button>
+            <button type="button" data-dia="6" aria-pressed="false" aria-label="Domingo">D</button>
+          </div>
+        </div>
+        <div class="grupo-ctl">
           <span class="etq" id="etq-franja">Franja</span>
           <div class="seg" role="group" aria-labelledby="etq-franja">
             <button type="button" data-franja="D" aria-pressed="false">Día<small>7–19</small></button>
@@ -202,8 +215,8 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 
       <div class="hora">
         <div class="hora-cab"><label for="hora" class="etq">Hora del día</label><output id="hora-out" for="hora">01:00</output></div>
-        <input type="range" id="hora" min="0" max="23" step="1" value="1">
-        <div class="hora-ejes" aria-hidden="true"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+        <input type="range" id="hora" min="0" max="23" step="1" value="18">
+        <div class="hora-ejes" aria-hidden="true"><span>07</span><span>13</span><span>19</span><span>01</span><span>06</span></div>
       </div>
 
       <div class="grafico" id="grafico">
@@ -235,7 +248,7 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
   </main>
 
   <footer class="pie">
-    <p><strong>Cómo se calcula (v0).</strong> Base: mapa estratégico de ruido de Barcelona de 2017 (día, tarde y noche, en franjas de 5 dB) en el tramo de calle de cada portal. El reparto hora a hora es una estimación: sigue la forma típica del tráfico y del ocio nocturno y respeta la media oficial de cada franja. De noche el mismo ruido puntúa más, como en el indicador europeo Lden. Se suman bares, locales de ocio nocturno, quejas por ruido y pisos turísticos a menos de 100 m, sobre todo entre las 22 y las 3 h. "Interior" usa la fachada al patio de manzana.</p>
+    <p><strong>Cómo se calcula (v0).</strong> Base: mapa estratégico de ruido de Barcelona de 2017 (día, tarde y noche, en franjas de 5 dB) en el tramo de calle de cada portal. El reparto hora a hora es una estimación: sigue la forma típica del tráfico y del ocio nocturno y respeta la media oficial de cada franja. De noche el mismo ruido puntúa más, como en el indicador europeo Lden. El día de la semana reparte esa media anual con pesos supuestos (más ocio de jueves a sábado, menos tráfico de día el fin de semana), pendientes de calibrar con los sensores municipales; cada día va de las 7:00 a las 7:00 del siguiente. Se suman bares, locales de ocio nocturno, quejas por ruido y pisos turísticos a menos de 100 m, sobre todo entre las 22 y las 3 h. "Interior" usa la fachada al patio de manzana.</p>
     <p>Cubre Barcelona ciudad. Datos: Open Data BCN (Ajuntament de Barcelona, CC BY 4.0): mapa de ruido, portales y calles, censo de locales, quejas IRIS, pisos turísticos y sensores. Es una estimación para validar, no una medición del piso.</p>
   </footer>
 </div>
@@ -253,40 +266,49 @@ const PUNTOS_POR_DB = 50 / 30;
 const PERFIL_TRAFICO = [-6, -8, -9, -10, -10, -8, -4, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -3, -4, -5];
 const PERFIL_OCIO = { 23: 0, 0: 0, 1: -1, 2: -3, 3: -6, 4: -9, 5: -12, 6: -15 };
 const REPARTO_FOCOS = { 19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 3: 0.5, 4: 0.2 };
+const DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+const normalizarPesos = p => { const m = p.reduce((a, b) => a + b, 0) / p.length; return p.map(x => x / m); };
+const PESO_DIA_TRAFICO = {
+  D: normalizarPesos([1, 1, 1, 1, 1.05, 0.75, 0.55]),
+  E: normalizarPesos([1, 1, 1, 1.05, 1.1, 0.95, 0.8]),
+  N: normalizarPesos([0.85, 0.85, 0.9, 1.0, 1.25, 1.3, 0.8]),
+};
+const PESO_DIA_OCIO_NOCHE = normalizarPesos([0.2, 0.25, 0.35, 0.7, 1.0, 1.0, 0.3]);
+const PESO_DIA_OCIO_TARDE = normalizarPesos([0.6, 0.6, 0.7, 0.85, 1.0, 1.0, 0.7]);
 const energia = db => Math.pow(10, db / 10);
+const suma = a => a.reduce((x, y) => x + y, 0);
 
-function perfilHorario(total, trafico, ocioNoche) {
+function perfilHorario(total, trafico, ocioNoche, dia) {
   const db = new Array(24).fill(0);
   for (const f of "DEN") {
     const horas = HORAS[f], n = horas.length;
     const eTotal = energia(total[f]);
-    const comp = {};
-    horas.forEach(h => (comp[h] = 0));
-    let eUsada = 0, resto;
+    let traf = horas.map(() => 0), ocio = horas.map(() => 0);
     if (trafico) {
       const forma = horas.map(h => energia(PERFIL_TRAFICO[h]));
-      const k = energia(trafico[f]) / (forma.reduce((a, b) => a + b, 0) / n);
-      horas.forEach((h, i) => (comp[h] += forma[i] * k));
-      eUsada += energia(trafico[f]);
+      const k = energia(trafico[f]) / (suma(forma) / n);
+      traf = forma.map(x => x * k);
     }
     if (ocioNoche != null && f === "N") {
       const forma = horas.map(h => energia(PERFIL_OCIO[h]));
-      const k = energia(ocioNoche) / (forma.reduce((a, b) => a + b, 0) / n);
-      horas.forEach((h, i) => (comp[h] += forma[i] * k));
-      eUsada += energia(ocioNoche);
+      const k = energia(ocioNoche) / (suma(forma) / n);
+      ocio = forma.map(x => x * k);
     }
-    resto = Math.max(0, eTotal - eUsada);
+    let resto = Math.max(0, eTotal - (suma(traf) + suma(ocio)) / n);
     if (!trafico) {
       const forma = horas.map(h => energia(PERFIL_TRAFICO[h]));
-      const k = eTotal / (forma.reduce((a, b) => a + b, 0) / n);
-      horas.forEach((h, i) => (comp[h] = forma[i] * k));
+      const k = eTotal / (suma(forma) / n);
+      traf = forma.map(x => x * k);
       resto = 0;
     }
-    horas.forEach(h => (comp[h] += resto));
-    const ajuste = eTotal / (horas.reduce((a, h) => a + comp[h], 0) / n);
-    horas.forEach(h => (db[h] = 10 * Math.log10(comp[h] * ajuste)));
+    const ajuste = eTotal / (horas.reduce((a, _, i) => a + traf[i] + ocio[i] + resto, 0) / n);
+    const fTraf = dia != null ? PESO_DIA_TRAFICO[f][dia] : 1;
+    const fOcio = dia != null ? PESO_DIA_OCIO_NOCHE[dia] : 1;
+    const eT = suma(traf), eO = suma(ocio);
+    const fResto = eT + eO ? (eT * fTraf + eO * fOcio) / (eT + eO) : fTraf;
+    horas.forEach((h, i) => (db[h] = 10 * Math.log10((traf[i] * fTraf + ocio[i] * fOcio + resto * fResto) * ajuste)));
   }
-  for (const [h1, h2] of [[6, 7], [18, 19], [22, 23]]) {
+  for (const [h1, h2] of [[18, 19], [22, 23]]) {
     const e1 = energia(db[h1]), e2 = energia(db[h2]);
     db[h1] = 10 * Math.log10((2 * e1 + e2) / 3);
     db[h2] = 10 * Math.log10((e1 + 2 * e2) / 3);
@@ -298,8 +320,13 @@ function suavizarExtremos(v) {
   if (v < 30) return 30 - 30 * (1 - Math.exp(-(30 - v) / 30));
   return v;
 }
-function notasHorarias(db, extra) {
-  return db.map((v, h) => suavizarExtremos(50 + (v - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB + extra * (REPARTO_FOCOS[h] || 0)));
+function pesoFocos(h, dia) {
+  let p = REPARTO_FOCOS[h] || 0;
+  if (dia != null && p) p *= FRANJA[h] === "E" ? PESO_DIA_OCIO_TARDE[dia] : PESO_DIA_OCIO_NOCHE[dia];
+  return p;
+}
+function notasHorarias(db, extra, dia) {
+  return db.map((v, h) => suavizarExtremos(50 + (v - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB + extra * pesoFocos(h, dia)));
 }
 function resumen(notas) {
   const franjas = {};
@@ -336,19 +363,19 @@ const CALLES = IX.calles.map(([nombre, planos]) => {
   return { nombre, rangos, ...tokensCalle(nombre) };
 });
 const cacheCalc = new Map();
-function calcular(r) {
-  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos;
+function calcular(r, dia = estado.dia) {
+  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + dia;
   if (cacheCalc.has(clave)) return cacheCalc.get(clave);
   const t = IX.tramos[r.tramo];
   const b = k => bandaDb(+t[IX.campos_tramo.indexOf(k)]);
-  const dbExt = perfilHorario({ D: b("TOTAL_D"), E: b("TOTAL_E"), N: b("TOTAL_N") }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"));
-  const notasExt = notasHorarias(dbExt, extraFocos(r.ocio, r.bares, r.quejas, r.turisticos));
+  const dbExt = perfilHorario({ D: b("TOTAL_D"), E: b("TOTAL_E"), N: b("TOTAL_N") }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"), dia);
+  const notasExt = notasHorarias(dbExt, extraFocos(r.ocio, r.bares, r.quejas, r.turisticos), dia);
   const ext = { db: dbExt, nota: notasExt, ...resumen(notasExt), mapa: { D: IX.bandas[+t[0]], E: IX.bandas[+t[1]], N: IX.bandas[+t[2]] } };
   let int = null;
   if (r.patio >= 0) {
     const p = IX.tramos[r.patio];
-    const dbInt = perfilHorario({ D: bandaDb(+p[0]), E: bandaDb(+p[1]), N: bandaDb(+p[2]) }, null, null);
-    const notasInt = notasHorarias(dbInt, 0);
+    const dbInt = perfilHorario({ D: bandaDb(+p[0]), E: bandaDb(+p[1]), N: bandaDb(+p[2]) }, null, null, dia);
+    const notasInt = notasHorarias(dbInt, 0, dia);
     int = { db: dbInt, nota: notasInt, ...resumen(notasInt), mapa: { D: IX.bandas[+p[0]], E: IX.bandas[+p[1]], N: IX.bandas[+p[2]] } };
   }
   const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]] };
@@ -478,7 +505,20 @@ function interpretar(texto) {
 }
 
 // ---------- Estado y pintado ----------
-const estado = { ci: 0, r: null, numero: null, origen: "", lado: "exterior", modo: "hora", hora: 1, franja: "N", grupo: null, aviso: "" };
+const estado = { ci: 0, r: null, numero: null, origen: "", lado: "exterior", modo: "hora", hora: 1, franja: "N", dia: null, grupo: null, aviso: "" };
+// El eje del día va de las 7:00 a las 7:00 del día siguiente: la noche pertenece al día en que empieza.
+const ORDEN = Array.from({ length: 24 }, (_, i) => (i + 7) % 24);
+const posicion = h => (h + 17) % 24;
+const nombreDia = d => DIAS[d].charAt(0).toUpperCase() + DIAS[d].slice(1);
+function momento(h) {
+  if (estado.dia == null) return hh(h);
+  if (h < 7) return `${hh(h)} · madrugada del ${DIAS[(estado.dia + 1) % 7]}`;
+  return `${nombreDia(estado.dia)} ${hh(h)}`;
+}
+function etiquetaCuando() {
+  const dia = estado.dia == null ? "media de todos los días" : DIAS[estado.dia];
+  return estado.modo === "franja" ? `${NOMBRE_FRANJA[estado.franja].toLowerCase()}, ${dia}` : `${momento(estado.hora)}${estado.dia == null ? ", media de todos los días" : ""}`;
+}
 const $ = id => document.getElementById(id);
 const hh = h => String(h).padStart(2, "0") + ":00";
 const NOMBRE_FRANJA = { D: "Día (7–19 h)", E: "Tarde (19–23 h)", N: "Noche (23–7 h)" };
@@ -541,6 +581,7 @@ function pintarDetalle() {
   $("lado-exterior").setAttribute("aria-pressed", estado.lado === "exterior");
   $("lado-interior").setAttribute("aria-pressed", estado.lado === "interior");
   document.querySelectorAll("[data-franja]").forEach(b => b.setAttribute("aria-pressed", estado.modo === "franja" && b.dataset.franja === estado.franja));
+  document.querySelectorAll("[data-dia]").forEach(b => b.setAttribute("aria-pressed", b.dataset.dia === (estado.dia == null ? "" : String(estado.dia))));
 
   const l = lectura(res);
   const nota = Math.round(l.nota);
@@ -549,11 +590,12 @@ function pintarDetalle() {
   $("nivel").textContent = nivelTexto(nota);
   $("db").textContent = `≈ ${Math.round(l.db)} dB(A) ${estado.lado === "interior" ? "en el patio interior" : "en la fachada a la calle"}`;
   const fr = estado.modo === "franja" ? estado.franja : FRANJA[estado.hora];
+  const diaTxt = estado.dia == null ? "media de todos los días" : DIAS[estado.dia];
   $("cuando").textContent = estado.modo === "franja"
-    ? `${NOMBRE_FRANJA[fr]} · media de la franja · mapa oficial ${s.mapa[fr]}`
-    : `${hh(estado.hora)} · ${NOMBRE_FRANJA[fr].split(" ")[0].toLowerCase()} · mapa oficial de la franja ${s.mapa[fr]}`;
+    ? `${NOMBRE_FRANJA[fr]} · ${diaTxt} · mapa oficial (media anual) ${s.mapa[fr]}`
+    : `${momento(estado.hora)} · ${estado.dia == null ? "media de todos los días · " : ""}mapa oficial (media anual) ${s.mapa[fr]}`;
   $("marca-barra").style.left = nota + "%";
-  $("hora").value = estado.hora;
+  $("hora").value = posicion(estado.hora);
   $("hora-out").textContent = estado.modo === "franja" ? NOMBRE_FRANJA[estado.franja].split(" ")[0] : hh(estado.hora);
 
   const lado = r.ini % 2 ? "impar" : "par";
@@ -590,7 +632,8 @@ function el(tag, attrs, padre) {
 function texto(padre, x, y, contenido, anchor = "middle") { const t = el("text", { x, y, "text-anchor": anchor }, padre); t.textContent = contenido; return t; }
 
 const G = { w: 640, h: 230, l: 34, r: 14, t: 26, b: 26 };
-const xh = h => G.l + ((h + 0.5) / 24) * (G.w - G.l - G.r);
+const xh = h => G.l + ((posicion(h) + 0.5) / 24) * (G.w - G.l - G.r);
+const xs = i => G.l + ((i + 0.5) / 24) * (G.w - G.l - G.r); // por posición en el eje (0 = 7:00)
 const yv = v => G.t + (1 - v / 100) * (G.h - G.t - G.b);
 function pintarGrafico(res) {
   const svg = $("svg");
@@ -602,21 +645,22 @@ function pintarGrafico(res) {
   el("stop", { offset: "0%", style: "stop-color: var(--loud)" }, grad);
   el("stop", { offset: "50%", style: "stop-color: var(--mid)" }, grad);
   el("stop", { offset: "100%", style: "stop-color: var(--quiet)" }, grad);
-  for (const [fr, a, b, txt] of [["N", 0, 7, "Noche"], ["D", 7, 19, "Día"], ["E", 19, 23, "Tarde"], ["N", 23, 24, ""]]) {
+  for (const [fr, a, b, txt] of [["D", 0, 12, "Día"], ["E", 12, 16, "Tarde"], ["N", 16, 24, "Noche"]]) {
     const activa = estado.modo === "franja" && estado.franja === fr;
-    el("rect", { x: xh(a - 0.5), y: G.t, width: xh(b - 0.5) - xh(a - 0.5), height: G.h - G.t - G.b, style: `fill: ${activa ? "var(--line)" : fr === "D" ? "transparent" : "var(--band)"}` }, svg);
-    if (txt) texto(svg, (xh(a - 0.5) + xh(b - 0.5)) / 2, 16, txt);
+    el("rect", { x: xs(a - 0.5), y: G.t, width: xs(b - 0.5) - xs(a - 0.5), height: G.h - G.t - G.b, style: `fill: ${activa ? "var(--line)" : fr === "D" ? "transparent" : "var(--band)"}` }, svg);
+    texto(svg, (xs(a - 0.5) + xs(b - 0.5)) / 2, 16, estado.dia != null && fr === "N" ? `Noche del ${DIAS[estado.dia]}` : txt);
+    if (a > 0) el("line", { x1: xs(a - 0.5), x2: xs(a - 0.5), y1: G.t, y2: G.h - G.b, style: "stroke: var(--line-2); stroke-width: 1" }, svg);
   }
   for (const v of [0, 25, 50, 75, 100]) {
     el("line", { x1: G.l, x2: G.w - G.r, y1: yv(v), y2: yv(v), style: `stroke: ${v === 50 ? "var(--line-2)" : "var(--line)"}; stroke-width: 1; ${v === 50 ? "stroke-dasharray: 4 4;" : ""}` }, svg);
     texto(svg, G.l - 6, yv(v) + 4, v, "end");
   }
-  for (const h of G.w < 520 ? [0, 6, 12, 18] : [0, 3, 6, 9, 12, 15, 18, 21]) texto(svg, xh(h), G.h - 8, String(h).padStart(2, "0") + "h");
+  for (const h of G.w < 520 ? [7, 13, 19, 1] : [7, 10, 13, 16, 19, 22, 1, 4]) texto(svg, xh(h), G.h - 8, String(h).padStart(2, "0") + "h");
 
   const sel = ladoDe(res);
   const otro = estado.lado === "interior" ? res.exterior : res.interior;
-  const puntos = arr => arr.map((v, h) => `${xh(h).toFixed(1)},${yv(v).toFixed(1)}`).join(" ");
-  el("polygon", { points: `${xh(0)},${yv(0)} ${puntos(sel.nota)} ${xh(23)},${yv(0)}`, style: "fill: url(#g-ruido); fill-opacity: 0.35; stroke: none" }, svg);
+  const puntos = arr => ORDEN.map(h => `${xh(h).toFixed(1)},${yv(arr[h]).toFixed(1)}`).join(" ");
+  el("polygon", { points: `${xs(0)},${yv(0)} ${puntos(sel.nota)} ${xs(23)},${yv(0)}`, style: "fill: url(#g-ruido); fill-opacity: 0.35; stroke: none" }, svg);
   if (otro) el("polyline", { points: puntos(otro.nota), style: "fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 5 4" }, svg);
   el("polyline", { points: puntos(sel.nota), style: "fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round" }, svg);
   if (estado.modo === "hora") {
@@ -625,7 +669,7 @@ function pintarGrafico(res) {
     el("circle", { cx: xh(h), cy: yv(sel.nota[h]), r: 5, style: "fill: var(--ink); stroke: var(--surface); stroke-width: 2" }, svg);
   }
   const zona = el("rect", { x: G.l, y: 0, width: G.w - G.l - G.r, height: G.h, style: "fill: transparent; cursor: crosshair" }, svg);
-  const horaDe = e => { const rr = svg.getBoundingClientRect(); const x = ((e.clientX - rr.left) / rr.width) * G.w; return Math.max(0, Math.min(23, Math.round(((x - G.l) / (G.w - G.l - G.r)) * 24 - 0.5))); };
+  const horaDe = e => { const rr = svg.getBoundingClientRect(); const x = ((e.clientX - rr.left) / rr.width) * G.w; return ORDEN[Math.max(0, Math.min(23, Math.round(((x - G.l) / (G.w - G.l - G.r)) * 24 - 0.5)))]; };
   const mover = (e, fijar) => {
     const h = horaDe(e), rr = svg.getBoundingClientRect(), tip = $("tip");
     tip.hidden = false;
@@ -633,7 +677,7 @@ function pintarGrafico(res) {
     tip.style.top = (yv(sel.nota[h]) / G.h) * rr.height - 10 + "px";
     tip.replaceChildren();
     const b = document.createElement("b"); b.textContent = Math.round(sel.nota[h]);
-    tip.append(b, ` · ${hh(h)} · ≈ ${Math.round(sel.db[h])} dB`);
+    tip.append(b, ` · ${momento(h)} · ≈ ${Math.round(sel.db[h])} dB`);
     if (fijar || e.buttons) { estado.modo = "hora"; estado.hora = h; pintarTodo(); }
   };
   zona.addEventListener("pointermove", e => mover(e));
@@ -661,7 +705,7 @@ function pintarTira() {
   const span = Math.max(1, maxN - minN + 2);
   const xn = n => l + ((n - minN) / span) * (w - l - rgt);
   const lado = estado.lado;
-  $("calle-sub").textContent = `${c.rangos.length} tramos del nº ${minN} al ${maxN}. Nota ${estado.modo === "franja" ? "media de " + NOMBRE_FRANJA[estado.franja].toLowerCase() : "a las " + hh(estado.hora)}, ${lado === "interior" ? "interior" : "exterior"}. Toca un tramo para verlo.`;
+  $("calle-sub").textContent = `${c.rangos.length} tramos del nº ${minN} al ${maxN}. Nota: ${etiquetaCuando()}, ${lado === "interior" ? "interior" : "exterior"}. Toca un tramo para verlo.`;
   const carriles = [["Impares", 1, top], ["Pares", 0, top + carril + sep]];
   for (const [nombre, par, y0] of carriles) {
     el("line", { x1: l, x2: w - rgt, y1: y0 + carril, y2: y0 + carril, style: "stroke: var(--line-2); stroke-width: 1" }, svg);
@@ -702,9 +746,7 @@ function pintarTira() {
 function pintarLista() {
   const cont = $("lista");
   cont.replaceChildren();
-  $("nota-hora").textContent = estado.modo === "franja"
-    ? `Nota media de ${NOMBRE_FRANJA[estado.franja].toLowerCase()}, ${estado.lado === "interior" ? "interior" : "exterior"}.`
-    : `Nota a las ${hh(estado.hora)}, ${estado.lado === "interior" ? "interior" : "exterior"}.`;
+  $("nota-hora").textContent = `Nota: ${etiquetaCuando()}, ${estado.lado === "interior" ? "interior" : "exterior"}.`;
   for (const [g, titulo] of GRUPOS) {
     const items = PILOTO.filter(p => p.grupo === g);
     if (!items.length) continue;
@@ -813,7 +855,8 @@ q.addEventListener("blur", () => setTimeout(cerrarSugerencias, 150));
 document.querySelectorAll("[data-ejemplo]").forEach(b => b.addEventListener("click", () => { q.value = b.dataset.ejemplo; enviar(); }));
 
 // ---------- Controles ----------
-$("hora").addEventListener("input", e => { estado.modo = "hora"; estado.hora = +e.target.value; pintarTodo(); });
+$("hora").addEventListener("input", e => { estado.modo = "hora"; estado.hora = ORDEN[+e.target.value]; pintarTodo(); });
+document.querySelectorAll("[data-dia]").forEach(b => b.addEventListener("click", () => { estado.dia = b.dataset.dia === "" ? null : +b.dataset.dia; pintarTodo(); }));
 $("lado-exterior").addEventListener("click", () => { estado.lado = "exterior"; pintarTodo(); });
 $("lado-interior").addEventListener("click", () => { estado.lado = "interior"; pintarTodo(); });
 document.querySelectorAll("[data-franja]").forEach(b => b.addEventListener("click", () => {
