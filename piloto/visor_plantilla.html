@@ -594,7 +594,10 @@ function pintarDetalle() {
   $("confianza").textContent = "confianza " + estado.confianza;
   $("grupo").hidden = !estado.grupo;
   $("grupo").textContent = estado.grupo ? NOMBRE_GRUPO[estado.grupo] : "";
-  const avisos = [estado.origen, estado.aviso].filter(Boolean).join(" ");
+  // Validación con sensores: en calles con mucha vida nocturna el mapa oficial se queda corto de noche (hasta 25 dB).
+  const ocioSinSensor = r.sensor < 0 && (r.ocio >= 1 || r.bares >= 15)
+    ? "Calle con mucha vida nocturna y sin sensor municipal en el tramo: en sitios así, los sensores miden de noche bastante más ruido que el mapa oficial, así que la nota nocturna probablemente se queda corta." : "";
+  const avisos = [estado.origen, estado.aviso, ocioSinSensor].filter(Boolean).join(" ");
   $("aviso").hidden = !avisos;
   $("aviso").textContent = avisos;
 

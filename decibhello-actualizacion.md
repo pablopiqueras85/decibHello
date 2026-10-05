@@ -1,0 +1,41 @@
+# DecibHello — Actualización (noche del 5 al 6 de octubre de 2026)
+
+## Resumen
+
+Con los datos de los sensores que pasaste, la nota ya no depende de supuestos míos para las horas y los días de la semana: usa lo que midieron 135 sensores municipales en 2023. Además, en 352 tramos de la ciudad la nota sale directamente de la medición de un sensor. Todo está en la rama `claude/keen-bohr-5oenpq` y en el visor (mismo enlace).
+
+## Qué he hecho
+
+1. **Encontrado y corregido un error en los datos del Ajuntament.** De 7:00 a 23:59 la fecha registrada es la del día siguiente (de 0:00 a 6:59 es correcta). Lo detecté porque el tráfico salía mínimo los lunes y la verbena de Sant Joan aparecía el día 24. Comprobado también con Navidad y Semana Santa. Sin esta corrección, los días de la semana habrían salido cambiados.
+2. **Patrones medidos en lugar de supuestos** (sin festivos ni vísperas):
+   - tráfico de día: sábado −1,2 dB, domingo −2,2 dB;
+   - ocio de noche: viernes +2,7 dB y sábado +2,4 dB; lunes −2,6, martes −2,5 y domingo −3,0. El jueves queda en la media (yo lo había sobrestimado);
+   - la forma hora a hora del tráfico y del ocio, también medida.
+3. **Donde hay sensor, manda la medición.** Los portales del mismo tramo que un sensor (a menos de 60 m) usan el nivel medido día a día y hora a hora. Salen con "confianza medida" y el visor dice qué sensor es.
+4. **Comparación sensores frente al mapa oficial** (`piloto/validacion_sensores.md`, 140 sensores):
+   - en calles de tráfico el mapa acierta: +0,9 dB de diferencia mediana de noche;
+   - en zonas de ocio se queda corto: +2,6 dB de mediana y **hasta +18 a +27 dB** en plazas y calles pequeñas de Gràcia, el Born y Sant Antoni (Raspall, Puigmartí, Fonollar, Comte Borrell);
+   - Consell de Cent confirma el eje verde: el sensor mide 6,6 dB menos que el mapa de 2017, y su nota baja de 82 a 72.
+   - Probé si bares, quejas o anchura de la calle explican esa diferencia: apenas (mejora de 0,2–0,3 dB). No he inventado una corrección.
+5. **Aviso nuevo en el visor**: en calles con mucha vida nocturna y sin sensor, avisa de que la nota de noche probablemente se queda corta.
+6. **Documentación**: informe del piloto actualizado (`piloto/resultados.md`), `piloto/README.md` con cómo regenerarlo todo, fuentes de datos y pendientes al día.
+7. **Comprobado**: el visor y el cálculo en Python dan exactamente las mismas notas en las 26 direcciones (nota global, 7 noches y aviso de picos).
+
+## Cambios que notarás en el visor
+
+- Las notas han cambiado algunos puntos, sobre todo por día de la semana. Ejemplo: Verdi 20 sube de 75 (lunes) a 85 (viernes) de noche.
+- Calles con sensor (Consell de Cent, Aragó 300, Blai 20, Rambla del Poblenou 60, Enric Granados 50…) muestran "confianza medida".
+
+## Lo que necesito de ti
+
+1. Tu **nota a ciegas** (0–100, día y noche) de Tuset 20, Travessera de Gràcia 81, 150 y 300 y Martínez de la Rosa 20. Ya se ven en el visor, así que si quieres que sea a ciegas, puntúalas antes de abrirlo.
+2. El **tramo silencioso de Travessera de Gràcia**.
+3. Si te parece razonable que Travessera de Gràcia 150 mida unos 8 m de ancho.
+4. Cuando quieras: la **solicitud al Ajuntament** sobre contenedores y horarios de recogida (borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.13).
+
+## Pendiente que queda
+
+- Datos de sensores minuto a minuto, para los picos cortos (camiones de basura).
+- Cómo detectar el ocio que el mapa no ve en calles sin sensor (opiniones de vecinos, mediciones con móvil).
+- Pasar del mapa de 2017 al de 2022.
+- El resto, en `decibhello-pendientes.md`.
