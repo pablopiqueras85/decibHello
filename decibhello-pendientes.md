@@ -47,6 +47,14 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Mantenimiento de datos**: actualizar quejas, locales, pisos turísticos y sensores cada mes o trimestre de forma automática.
 - [ ] **Siguiente ciudad**: área metropolitana de Barcelona; después Madrid o Valencia.
 
+### 6. Venta a portales y empresas (cuando haya portal público y validación)
+- [ ] **Estrategia extensión vs. portales**: la extensión sirve para medir interés, no para presionar. En la web de un portal que integre la nota, la extensión deja de mostrarse. El portal propio sigue siendo el centro.
+- [ ] **Material**: demo pública, resultados de la validación, cifras de uso y una hoja de presentación (qué es, datos, integración por recuadro o conexión directa, propuesta de piloto).
+- [ ] **Orden de contacto**: primero Fotocasa y Habitaclia (mismo grupo, competidores de Idealista, Habitaclia fuerte en Cataluña); en paralelo agencias, gestoras de alquiler, tasadoras y aseguradoras; Idealista cuando haya un piloto que enseñar.
+- [ ] **Canales**: LinkedIn (producto, alianzas, desarrollo de negocio, innovación), contactos que te presenten, eventos (SIMA, Barcelona Meeting Point, PropTech Spain), programas para startups de los propios grupos.
+- [ ] **Oferta**: piloto gratuito de 3 meses en los anuncios de Barcelona, midiendo visitas al recuadro, tiempo en el anuncio y peticiones de visita; después licencia mensual o por volumen. Sin exclusividad al principio salvo que se pague.
+- [ ] **Mensaje inicial**: borrador en la conversación; adaptarlo a cada portal cuando toque.
+
 ## Orden recomendado
 
 1. Sensores + validación sobre el terreno (sin fiabilidad, no hay producto).
