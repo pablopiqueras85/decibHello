@@ -13,6 +13,8 @@ import re
 import unicodedata
 from pathlib import Path
 
+import numpy as np
+
 import modelo
 
 AQUI = Path(__file__).parent
@@ -51,6 +53,42 @@ def buscar(indice, calle, numero):
     return r, min(abs(numero - r[0]), abs(numero - r[1])) <= TOLERANCIA_NUMERO
 
 
+def anclar_sensores(indice, perfiles, radio=60):
+    """Marca los rangos del mismo tramo que un sensor municipal, a menos de `radio` m: allí se usa lo medido.
+
+    Se toma el rango más cercano al sensor y se anclan los rangos con su mismo tramo del mapa, para no pasar a la
+    calle de al lado. Añade el campo 'sensor' (índice en `perfiles`, o -1) a cada rango del índice.
+    """
+    campos = indice["campos_rango"]
+    n = len(campos)
+    ilat, ilon, itr = campos.index("lat_e5"), campos.index("lon_e5"), campos.index("tramo")
+    todos = []
+    for c, (_, pl) in enumerate(indice["calles"]):
+        for k in range(0, len(pl), n):
+            todos.append((c, k, 41.3 + pl[k + ilat] / 1e5, 2.0 + pl[k + ilon] / 1e5, pl[k + itr]))
+    lat = np.array([t[2] for t in todos]); lon = np.array([t[3] for t in todos]); tr = np.array([t[4] for t in todos])
+    asignado = np.full(len(todos), -1); dist = np.full(len(todos), np.inf)
+    for si, p in enumerate(perfiles):
+        d = np.hypot((lon - p["lon"]) * 83300, (lat - p["lat"]) * 110540)
+        j = int(d.argmin())
+        if d[j] > 40:
+            continue
+        cerca = (tr == tr[j]) & (d <= radio) & (d < dist)
+        asignado[cerca], dist[cerca] = si, d[cerca]
+    # Reconstruir los planos con el campo nuevo al final de cada rango.
+    nuevos = {}
+    for (c, k, *_), si in zip(todos, asignado):
+        nuevos.setdefault(c, []).append((k, int(si)))
+    for c, lst in nuevos.items():
+        pl = indice["calles"][c][1]
+        out = []
+        for k, si in sorted(lst):
+            out += pl[k:k + n] + [si]
+        indice["calles"][c][1] = out
+    indice["campos_rango"] = campos + ["sensor"]
+    return int((asignado >= 0).sum())
+
+
 def mapa_tramo(indice, i):
     t = indice["tramos"][i]
     return {campo: indice["bandas"][int(t[k])] for k, campo in enumerate(indice["campos_tramo"])}
@@ -58,6 +96,9 @@ def mapa_tramo(indice, i):
 
 def main():
     indice = json.loads(INDICE.read_text(encoding="utf-8"))
+    f_sens = AQUI / "perfiles_por_sensor.json"
+    perfiles = json.loads(f_sens.read_text(encoding="utf-8")) if f_sens.exists() else []
+    print(f"rangos con medición de sensor: {anclar_sensores(indice, perfiles)}")
     campos = indice["campos_rango"]
     filas = []
     for info in leer_direcciones():
@@ -65,16 +106,19 @@ def main():
         r, exacto = buscar(indice, calle, int(numero))
         v = dict(zip(campos, r))
         mapa = mapa_tramo(indice, v["tramo"])
-        res = modelo.calcular(mapa, {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]})
+        medido = perfiles[v["sensor"]]["db"] if v["sensor"] >= 0 else None
+        res = modelo.calcular(mapa, {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]}, medido=medido)
         interior = None
         if v["patio"] >= 0:
             mp = mapa_tramo(indice, v["patio"])
             interior = modelo.calcular({f"TOTAL_{f}": mp[f"TOTAL_{f}"] for f in "DEN"})
         focos = {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]}
-        noches = {modelo.DIAS[d]: round(modelo.calcular(mapa, focos, d)["franjas"]["N"]) for d in range(7)}
+        noches = {modelo.DIAS[d]: round(modelo.calcular(mapa, focos, d, medido)["franjas"]["N"]) for d in range(7)}
         confianza = "alta" if v["sensor_dam"] <= RADIO_SENSOR_DAM else "media"
         if not exacto:
             confianza = "baja"
+        elif medido is not None:
+            confianza = "medida"
         filas.append({
             "direccion": info["direccion"], "grupo": info["grupo"],
             "nota_global": round(res["global"]), "nota_dia": round(res["franjas"]["D"]),
@@ -85,6 +129,7 @@ def main():
             "ocio_nocturno_100m": v["ocio"], "bares_rest_100m": v["bares"], "quejas_ruido_100m": v["quejas"],
             "pisos_turisticos_100m": v["turisticos"], "sensor_mas_cercano_m": v["sensor_dam"] * 10,
             "rango_portales": f'{v["ini"]}-{v["fin"]}', "confianza": confianza,
+            "sensor": perfiles[v["sensor"]]["calle"] if medido is not None else "",
             "ancho_m": v["ancho_m"], "quejas_recogida_100m": v["quejas_recogida"],
             "picos_nocturnos": modelo.aviso_picos(v["ancho_m"], v["quejas_recogida"]),
             **{f"noche_{d}": n for d, n in noches.items()},
@@ -95,16 +140,18 @@ def main():
         w.writeheader()
         w.writerows(filas)
     escribir_tabla_md(filas)
-    construir_visor(indice)
+    construir_visor(indice, perfiles)
 
     for r in sorted(filas, key=lambda r: -r["nota_global"]):
         print(f'{r["nota_global"]:>3}  D{r["nota_dia"]:>3} T{r["nota_tarde"]:>3} N{r["nota_noche"]:>3}  int {str(r["nota_global_interior"]):>3}  '
               f'{r["grupo"]:<11} {r["direccion"]:<46} {r["confianza"]}')
 
 
-def construir_visor(indice):
+def construir_visor(indice, perfiles):
     piloto = [{"direccion": d["direccion"], "grupo": d["grupo"], "aviso": d["aviso"]} for d in leer_direcciones()]
-    datos = json.dumps({"indice": indice, "piloto": piloto}, ensure_ascii=False, separators=(",", ":"))
+    sensores = [{"calle": p["calle"], "tipo": p["tipo"], "dias": p["dias"], "db": p["db"]} for p in perfiles]
+    datos = json.dumps({"indice": indice, "piloto": piloto, "perfiles": modelo.PERFILES, "sensores": sensores},
+                       ensure_ascii=False, separators=(",", ":"))
     html = (AQUI / "visor_plantilla.html").read_text(encoding="utf-8").replace("/*DATOS*/null", datos)
     (AQUI / "visor.html").write_text(html, encoding="utf-8")
 

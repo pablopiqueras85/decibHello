@@ -4,7 +4,8 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 
 ## Pendientes tuyos
 
-- [ ] **Datos de los sensores**: descargar `2023_1S_XarxaSoroll_EqMonitor_Dades_1Hora.zip` y `2023_2S_XarxaSoroll_EqMonitor_Dades_1Hora.zip` de [Open Data BCN](https://opendata-ajuntament.barcelona.cat/data/es/dataset/xarxasoroll-equipsmonitor-dades) y pasármelos (adjuntos o en `piloto/sensores/`).
+- [x] **Datos de los sensores por hora (2023)**: recibidos y analizados (octubre de 2026).
+- [ ] **Datos de los sensores minuto a minuto** (desde 2024, 250–350 MB por mes) para medir los picos cortos (camiones de basura, gritos). Hay que buscar cómo pasarlos: recortarlos antes o enlazarlos desde una nube.
 - [ ] **Nota a ciegas** (0–100, de día y de noche) de las calles de control: Tuset 20, Travessera de Gràcia 81, 150 y 300, Martínez de la Rosa 20.
 - [ ] **Tramo silencioso de Travessera de Gràcia**: número o cruce.
 - [ ] **Anchura de Travessera de Gràcia 150**: confirmar si ≈ 8 m es razonable.
@@ -15,7 +16,8 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 ## Lo que falta para que sea funcional y tenga valor
 
 ### 1. Que la nota sea fiable (lo más importante)
-- [ ] **Calibrar con mediciones reales**: perfiles por hora y día de la semana con los sensores (sustituye los supuestos v0).
+- [x] **Calibrar con mediciones reales**: perfiles por hora y día de la semana medidos con los sensores, y nivel medido en 352 tramos con sensor.
+- [ ] **Ocio infravalorado por el mapa**: en plazas y calles pequeñas con vida nocturna el mapa se queda hasta 25 dB corto de noche. Buscar cómo detectarlo sin sensor (opiniones de vecinos, mediciones con el móvil, terrazas).
 - [ ] **Validación sobre el terreno**: medir con sonómetro o móvil en 20–30 portales, de día y de noche, entre semana y en fin de semana, y comparar con la nota. Sin esto no podemos decir cuánto acierta.
 - [ ] **Mapa de ruido 2022**: pasar del de 2017 (por tramo) al ráster de 2022, para recoger cambios como los ejes verdes (Consell de Cent).
 - [ ] **Explicar la incertidumbre**: mostrar un margen ("entre 70 y 80") además de la cifra.

@@ -16,17 +16,11 @@ PESOS = {"D": 0.3, "E": 0.2, "N": 0.5}
 ANCLA_50 = {"D": 55, "E": 50, "N": 45}
 PUNTOS_POR_DB = 50 / 30
 
-# Forma típica del ruido de tráfico urbano a lo largo del día (dB relativos a la hora punta).
-PERFIL_TRAFICO = [-6, -8, -9, -10, -10, -8, -4, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -3, -4, -5]
-# Forma del ruido de ocio nocturno dentro de la franja de noche (pico entre las 23 y la 1).
-PERFIL_OCIO = {23: 0, 0: 0, 1: -1, 2: -3, 3: -6, 4: -9, 5: -12, 6: -15}
-# Reparto horario de los focos intermitentes (bares, quejas, pisos turísticos): peso 1 = todo el extra en esa hora.
-REPARTO_FOCOS = {19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 3: 0.5, 4: 0.2}
+# Formas horarias y pesos por día de la semana MEDIDOS con la red municipal de sensores (2023, datos por hora):
+# ver sensores.py -> perfiles_sensores.json. Si ese fichero no existe, se usan los supuestos iniciales (v0).
+import json as _json
+from pathlib import Path as _Path
 
-# Día de la semana (0 = lunes ... 6 = domingo). Un "día" va de las 7:00 a las 7:00 del día siguiente: la noche del
-# viernes (23-7 h) es la que empieza el viernes. Pesos en energía, normalizados a media 1 en la semana, para que la
-# media de los 7 días siga siendo la del mapa oficial (media anual).
-# SUPUESTOS v0, a calibrar con los datos por hora de los sensores municipales (tráfico y ocio).
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 
 
@@ -35,13 +29,26 @@ def _normalizar(pesos):
     return [p / media for p in pesos]
 
 
-PESO_DIA_TRAFICO = {  # menos tráfico de día el fin de semana; más de noche el viernes y el sábado
-    "D": _normalizar([1, 1, 1, 1, 1.05, 0.75, 0.55]),
-    "E": _normalizar([1, 1, 1, 1.05, 1.1, 0.95, 0.8]),
-    "N": _normalizar([0.85, 0.85, 0.9, 1.0, 1.25, 1.3, 0.8]),
-}
-PESO_DIA_OCIO_NOCHE = _normalizar([0.2, 0.25, 0.35, 0.7, 1.0, 1.0, 0.3])  # jueves ya fuerte; viernes y sábado, máximo
-PESO_DIA_OCIO_TARDE = _normalizar([0.6, 0.6, 0.7, 0.85, 1.0, 1.0, 0.7])
+_F = _Path(__file__).with_name("perfiles_sensores.json")
+PERFILES = _json.loads(_F.read_text(encoding="utf-8")) if _F.exists() else None
+if PERFILES:
+    PERFIL_TRAFICO = PERFILES["trafico"]["forma_horaria_db"]
+    _ocio = PERFILES["ocio"]["forma_horaria_db"]
+    _max_noche = max(_ocio[h] for h in (23, 0, 1, 2, 3, 4, 5, 6))
+    PERFIL_OCIO = {h: round(_ocio[h] - _max_noche, 1) for h in (23, 0, 1, 2, 3, 4, 5, 6)}
+    PESO_DIA_TRAFICO = {f: _normalizar(PERFILES["trafico"]["pesos_dia"][f]) for f in "DEN"}
+    PESO_DIA_OCIO_NOCHE = _normalizar(PERFILES["ocio"]["pesos_dia"]["N"])
+    PESO_DIA_OCIO_TARDE = _normalizar(PERFILES["ocio"]["pesos_dia"]["E"])
+else:  # supuestos v0
+    PERFIL_TRAFICO = [-6, -8, -9, -10, -10, -8, -4, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -3, -4, -5]
+    PERFIL_OCIO = {23: 0, 0: 0, 1: -1, 2: -3, 3: -6, 4: -9, 5: -12, 6: -15}
+    PESO_DIA_TRAFICO = {"D": _normalizar([1, 1, 1, 1, 1.05, 0.75, 0.55]), "E": _normalizar([1, 1, 1, 1.05, 1.1, 0.95, 0.8]),
+                        "N": _normalizar([0.85, 0.85, 0.9, 1.0, 1.25, 1.3, 0.8])}
+    PESO_DIA_OCIO_NOCHE = _normalizar([0.2, 0.25, 0.35, 0.7, 1.0, 1.0, 0.3])
+    PESO_DIA_OCIO_TARDE = _normalizar([0.6, 0.6, 0.7, 0.85, 1.0, 1.0, 0.7])
+# Reparto horario de los focos intermitentes (bares, quejas, pisos turísticos): peso 1 = todo el extra en esa hora.
+REPARTO_FOCOS = {19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 3: 0.5, 4: 0.2}
+# Un "día" va de las 7:00 a las 7:00 del día siguiente: la noche del viernes (23-7 h) es la que empieza el viernes.
 
 
 def banda_a_db(texto):
@@ -132,8 +139,22 @@ def extra_focos(ocio, bares, quejas, turisticos):
     return min(10, 4 * ocio) + min(6, 1.2 * math.sqrt(bares)) + min(6, 2 * math.sqrt(quejas)) + min(3, math.sqrt(turisticos) / 3)
 
 
-def calcular(mapa, focos=None, dia=None):
-    """mapa: {'TOTAL_D':banda,...,'TRANSIT_N':banda,'OCI_N':banda} (texto de banda o dB); dia: 0-6 o None (media anual)."""
+def perfil_medido(db_dias, dia=None):
+    """Nivel por hora medido por un sensor: db_dias[dia][hora]. Sin día: media energética de los 7 días."""
+    if dia is not None:
+        return list(db_dias[dia])
+    return [10 * math.log10(sum(energia(db_dias[d][h]) for d in range(7)) / 7) for h in range(24)]
+
+
+def calcular(mapa, focos=None, dia=None, medido=None):
+    """mapa: {'TOTAL_D':banda,...,'TRANSIT_N':banda,'OCI_N':banda} (texto de banda o dB); dia: 0-6 o None (media anual).
+    medido: perfil de un sensor municipal cercano (7 x 24 dB). Si se da, sustituye al mapa y no se suman focos,
+    porque la medición ya los incluye."""
+    if medido is not None:
+        db = perfil_medido(medido, dia)
+        notas = notas_horarias(db, 0, dia)
+        franjas, global_ = resumen(notas)
+        return {"db": db, "notas": notas, "franjas": franjas, "global": global_}
     db_de = lambda v: v if isinstance(v, (int, float)) else banda_a_db(v)
     total = {f: db_de(mapa[f"TOTAL_{f}"]) for f in "DEN"}
     trafico = {f: db_de(mapa[f"TRANSIT_{f}"]) for f in "DEN"} if "TRANSIT_D" in mapa else None

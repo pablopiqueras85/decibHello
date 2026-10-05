@@ -67,6 +67,11 @@ Limitaciones:
   | Les Corts | 3 |
   | Nou Barris | 1 |
 - **Mediciones** (`xarxasoroll-equipsmonitor-dades`): datos **por hora de 2015 a 2023** (un ZIP por semestre) y **por minuto desde enero de 2024** (un ZIP por mes, el último de junio de 2026).
+- **Datos por hora de 2023 ya analizados** (`piloto/sensores.py`, octubre de 2026), descargados a mano:
+  - columnas: año, mes, día, hora, sensor y nivel LAeq de la hora;
+  - **cuidado con la fecha**: de 7:00 a 23:59 la fecha registrada es la del día siguiente; de 0:00 a 6:59 es correcta. Se comprobó con la verbena de Sant Joan, Navidad y Semana Santa, y el script lo corrige;
+  - de ahí salen la forma horaria y los pesos por día de la semana del tráfico (62 sensores) y del ocio (73 sensores), y el nivel medido en cada sensor, que el visor usa en 352 tramos;
+  - comparación con el mapa oficial en `piloto/validacion_sensores.md`: acierta en el tráfico (+0,9 dB de noche) y se queda corto en el ocio (+2,6 dB de mediana, hasta +27 dB en algunas plazas).
 - **Sesgo importante**: los sensores se ponen donde hay problemas (ocio y tráfico) y apenas los hay en zonas tranquilas. Sirven para calibrar la nota en calles ruidosas, pero no como muestra representativa de la ciudad.
 - Es la única fuente con el ruido real hora a hora. Sirve para:
   - calibrar la nota calculada con el MES;
