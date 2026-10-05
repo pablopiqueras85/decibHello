@@ -114,12 +114,28 @@ Zonas para el piloto (hipótesis, sin datos aún): contrastar barrios presumible
 
 ## 9. Competencia y alternativas
 
-- Mapas de ruido oficiales de ayuntamientos: gratis pero poco accesibles.
-- Plataformas internacionales de ruido por dirección: `[investigar]`.
-- Portales inmobiliarios con filtros de "zona tranquila": normalmente subjetivos.
-- Visitar el piso a distintas horas: es la alternativa real y es gratis, pero cuesta tiempo.
+Investigado en octubre de 2026 (búsqueda web; no se han probado a fondo).
 
-Ventaja a construir: cobertura local buena, lenguaje claro, integración con el momento de decisión (el anuncio).
+| Producto | Dónde | Qué hace | En qué se diferencia DecibHello |
+|---|---|---|---|
+| [HowLoud](https://howloud.com) (Soundscore) | EE. UU. | Nota 0–100 por dirección (tráfico, aviones, bares…) y licencia a portales inmobiliarios | Es el modelo más parecido, pero no opera en España. Su escala es al revés (100 = tranquilo) |
+| [Crystal Roof](https://crystalroof.co.uk) | Reino Unido | Informe por código postal con ruido (tráfico, aviones, bares, sirenas), widgets y API para inmobiliarias | Mismo enfoque B2B; no está en España |
+| [MiraTuZona](https://miratuzona.com) | España | Compara barrios (alquiler, seguridad, ruido día/noche con mapas oficiales), informes PDF, freemium | **Competidor directo en España**, pero generalista: el ruido es un dato más, por zona (sección censal), sin horas, días ni focos |
+| [MisBarrios](https://www.misbarrios.es) | España | Calidad de barrio, incluida la "tranquilidad" | Generalista, por barrio |
+| [MAdB](https://madb.netlify.app) | Madrid | Ruido de tráfico por edificio, fachada y planta, con riesgo para la salud | Muy detallado, pero solo Madrid, solo tráfico y sin enfoque de compra o alquiler |
+| [Observatori del Soroll / Xavecs](https://xavecs.org) | Barcelona | Datos de sensores en tiempo real, análisis de terrazas y patios | Activismo vecinal, no orientado a elegir piso; posible aliado |
+| Mapas oficiales de ruido | Todas las ciudades grandes | Media anual por calle | Gratis pero poco legibles |
+| Apps de sonómetro (Decibel X, NoiseCapture…) | — | Medir en el momento | Exigen estar allí a la hora mala |
+| Visitar el piso a distintas horas | — | La alternativa real | Gratis pero cuesta tiempo |
+
+No he encontrado que Idealista, Fotocasa o Habitaclia muestren el ruido en sus anuncios.
+
+Ventaja a construir:
+- **Especialista en ruido**, no un dato más entre muchos.
+- **Por portal y tramo de calle**, no por barrio.
+- **Hora a hora y por día de la semana** (el viernes por la noche no es el lunes).
+- **Focos concretos y explicados**: ocio nocturno, quejas, camiones de basura, calle estrecha, piso exterior o interior.
+- **En el momento de decidir**: portal propio + extensión de Chrome sobre los anuncios.
 
 ## 10. Riesgos y preguntas abiertas
 
