@@ -91,7 +91,7 @@ Riesgos: cobertura desigual entre ciudades, datos desactualizados, mapas oficial
 
 Investigación detallada en [decibhello-fuentes-datos-barcelona.md](decibhello-fuentes-datos-barcelona.md). Resumen:
 
-- **Base de la nota**: mapa estratégico de ruido municipal (por tramo de calle publicado de 2017; el de 2022 solo como rejilla ráster), con día, tarde y noche y fuentes separadas (tráfico, ferrocarril, industria, ocio). Open Data BCN, licencia CC BY 4.0.
+- **Base de la nota**: mapa estratégico de ruido municipal (el último publicado por tramo de calle es de 2017; el de 2022 solo está como rejilla ráster), con día, tarde y noche y fuentes separadas (tráfico, ferrocarril, industria, ocio). Open Data BCN, licencia CC BY 4.0.
 - **Ruido real**: red municipal de 176 sensores activos (Sentilo), con datos minuto a minuto desde 2024 en Open Data BCN.
 - **Focos intermitentes**: censo de locales en planta baja, pisos turísticos, obras, quejas IRIS y OpenStreetMap.
 - **Secundarias en la ciudad**: aeropuerto de El Prat y ferrocarril (SICA).
