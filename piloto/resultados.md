@@ -7,7 +7,8 @@ Es una **primera versión para aprender**, no una nota definitiva: los pesos y u
 ## Cómo se calcula (v0)
 
 1. **Base**: nivel del mapa estratégico de ruido de 2017 en el tramo de **fachada a la calle** de la dirección (día, tarde y noche, en franjas de 5 dB).
-   - Para elegir el tramo se usa la geometría de la propia calle (OpenStreetMap), no solo el tramo más cercano, porque en las esquinas el más cercano suele ser la calle de al lado.
+   - El índice de toda la ciudad (`indice.py`) asigna a cada portal oficial de Barcelona (172.000) su tramo. No basta con el tramo más cercano, porque en las esquinas suele ser la calle de al lado: se elige el tramo cercano que va en la misma dirección que la calle del portal. Coincide con el método anterior basado en OpenStreetMap en 21 de 22 direcciones comprobadas.
+   - Los focos se cuentan alrededor del punto central de cada grupo de portales del mismo tramo.
    - Los tramos de **patio interior de manzana** (código `P`) dan la nota "interior".
 2. **Hora a hora (estimado)**: el nivel de cada franja se reparte en sus horas con la forma típica del tráfico urbano y, de noche, del ocio nocturno (pico entre las 23 y la 1). La media energética de cada franja sigue siendo la del mapa oficial; solo se suaviza el salto entre franjas.
 3. **Nota de cada hora**: 50 puntos en el umbral de su franja (noche 45 dB, que es la recomendación de la OMS; tarde 50 dB; día 55 dB). Es la misma penalización que el indicador europeo Lden: de noche el mismo ruido puntúa más. Cada dB de más suma 1,7 puntos.
@@ -21,34 +22,34 @@ Es una **primera versión para aprender**, no una nota definitiva: los pesos y u
    - media: no hay sensor cerca;
    - baja: el tramo encontrado está a más de 40 m o no coincide con la calle.
 
-El visor interactivo (`visor.html`) muestra la curva de 24 horas de cada dirección, exterior e interior.
+El visor interactivo (`visor.html`) tiene un buscador para cualquier portal de Barcelona (dirección o enlace de Google Maps) y muestra la curva de 24 horas, exterior e interior, y la calle tramo a tramo. Usa una copia en JavaScript de `modelo.py`; da las mismas notas que este informe.
 
 ## Resultados
 
 <!-- tabla:inicio -->
 | Nota | Día | Tarde | Noche | Interior | Dirección | Hipótesis | Ruido noche (mapa) | Ocio / bares / quejas / HUT (100 m) | Confianza |
 |---|---|---|---|---|---|---|---|---|---|
-| 85 | 83 | 86 | 86 | 46 | Gran Via de les Corts Catalanes 600 | ruidosa | 65–70 | 1 / 23 / 0 / 43 | media |
+| 85 | 83 | 85 | 85 | 46 | Gran Via de les Corts Catalanes 600 | ruidosa | 65–70 | 0 / 21 / 0 / 43 | media |
 | 84 | 83 | 85 | 85 | 68 | Carrer d'Aragó 300 | ruidosa | 65–70 | 0 / 7 / 1 / 5 | alta |
-| 84 | 78 | 86 | 86 | 49 | Ronda del General Mitre 150 | ruidosa | 65–70 | 1 / 5 / 5 / 3 | media |
 | 84 | 78 | 86 | 87 | 60 | Travessera de Gràcia 81 | control | 65–70 | 1 / 13 / 8 / 4 | alta |
-| 83 | 78 | 85 | 86 | 43 | Carrer de Sants 100 | intermedia | 65–70 | 0 / 12 / 5 / 15 | media |
-| 82 | 78 | 80 | 85 | 43 | Carrer del Consell de Cent 250 | intermedia | 65–70 | 0 / 12 / 0 / 15 | media |
-| 81 | 78 | 83 | 83 | 35 | Travessera de Gràcia 150 | control | 60–65 | 1 / 30 / 3 / 29 | alta |
-| 78 | 63 | 81 | 86 | 39 | Carrer dels Escudellers 20 | ruidosa | 65–70 | 4 / 47 / 12 / 43 | alta |
-| 78 | 63 | 80 | 86 | 49 | Carrer de Tuset 20 | control | 65–70 | 7 / 26 / 4 / 4 | alta |
-| 77 | 71 | 79 | 79 | 37 | Travessera de Gràcia 300 | control | 60–65 | 0 / 6 / 0 / 45 | media |
-| 74 | 54 | 79 | 85 | 46 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 30 / 2 / 16 | alta |
-| 74 | 62 | 74 | 82 | 31 | Carrer Nou de la Rambla 30 | ruidosa | 60–65 | 2 / 21 / 5 / 45 | media |
+| 83 | 78 | 85 | 85 | — | Carrer de Sants 100 | intermedia | 65–70 | 0 / 17 / 4 / 4 | media |
+| 82 | 78 | 84 | 84 | 49 | Ronda del General Mitre 150 | ruidosa | 65–70 | 0 / 2 / 2 / 2 | media |
+| 82 | 78 | 84 | 84 | 43 | Carrer del Consell de Cent 250 | intermedia | 65–70 | 0 / 14 / 0 / 18 | media |
+| 81 | 78 | 83 | 83 | 35 | Travessera de Gràcia 150 | control | 60–65 | 1 / 29 / 3 / 50 | alta |
+| 78 | 63 | 81 | 86 | 39 | Carrer d'Escudellers 20 | ruidosa | 65–70 | 3 / 45 / 12 / 43 | alta |
+| 78 | 63 | 80 | 86 | 49 | Carrer de Tuset 20 | control | 65–70 | 7 / 26 / 3 / 4 | alta |
+| 77 | 71 | 79 | 79 | 37 | Travessera de Gràcia 300 | control | 60–65 | 0 / 7 / 0 / 25 | media |
+| 74 | 54 | 79 | 85 | 46 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 29 / 2 / 16 | alta |
+| 74 | 62 | 73 | 81 | 31 | Carrer Nou de la Rambla 30 | ruidosa | 60–65 | 1 / 21 / 5 / 44 | media |
 | 74 | 63 | 75 | 81 | 43 | Carrer d'Enric Granados 50 | intermedia | 60–65 | 0 / 13 / 1 / 53 | alta |
-| 72 | 54 | 78 | 80 | 31 | Carrer de Verdi 20 | ruidosa | 60–65 | 1 / 29 / 11 / 10 | alta |
-| 72 | 62 | 76 | 76 | — | Passeig de Joan de Borbó 50 | ruidosa | 55–60 | 0 / 17 / 13 / 16 | media |
-| 72 | 71 | 73 | 73 | 58 | Carrer Gran de Sant Andreu 200 | intermedia | 55–60 | 0 / 2 / 3 / 0 | baja |
-| 71 | 63 | 75 | 75 | 49 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 24 / 2 / 48 | alta |
-| 71 | 62 | 75 | 75 | 35 | Rambla del Poblenou 60 | intermedia | 55–60 | 0 / 14 / 8 / 6 | alta |
-| 70 | 54 | 70 | 79 | 35 | Carrer de Blai 20 | ruidosa | 60–65 | 0 / 31 / 7 / 35 | baja |
-| 69 | 63 | 72 | 72 | 46 | Carrer de la Mare de Déu del Coll 50 | tranquila | 55–60 | 0 / 0 / 2 / 4 | media |
-| 62 | 62 | 63 | 62 | 33 | Carrer de Campoamor 30 | tranquila | 50–55 | 0 / 0 / 0 / 0 | media |
+| 73 | 71 | 74 | 74 | 58 | Carrer Gran de Sant Andreu 200 | intermedia | 55–60 | 0 / 2 / 5 / 0 | media |
+| 72 | 63 | 76 | 76 | 49 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | alta |
+| 71 | 54 | 76 | 79 | 31 | Carrer de Verdi 20 | ruidosa | 60–65 | 0 / 35 / 8 / 26 | alta |
+| 71 | 62 | 75 | 74 | 35 | Rambla del Poblenou 60 | intermedia | 55–60 | 0 / 12 / 6 / 5 | alta |
+| 70 | 54 | 70 | 79 | 35 | Carrer de Blai 20 | ruidosa | 60–65 | 0 / 31 / 4 / 51 | alta |
+| 69 | 63 | 72 | 72 | 46 | Carrer de la Mare de Déu del Coll 50 | tranquila | 55–60 | 0 / 0 / 2 / 3 | media |
+| 64 | 54 | 67 | 68 | — | Passeig de Joan de Borbó Comte de Barcelona 50 | ruidosa | 50–55 | 0 / 15 / 13 / 10 | media |
+| 62 | 62 | 63 | 62 | — | Carrer de Campoamor 30 | tranquila | 50–55 | 0 / 0 / 0 / 0 | media |
 | 60 | 54 | 62 | 62 | — | Carrer de Pere II de Montcada 10 | tranquila | 50–55 | 0 / 0 / 0 / 0 | media |
 | 60 | 54 | 63 | 63 | — | Carrer de les Agudes 20 | tranquila | 50–55 | 0 / 0 / 1 / 0 | media |
 | 47 | 46 | 47 | 47 | — | Carrer de Pomaret 20 | tranquila | 40–45 | 0 / 0 / 1 / 0 | media |

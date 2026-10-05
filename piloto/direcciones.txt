@@ -2,12 +2,12 @@
 Carrer de Verdi 20 | ruidosa | Vila de Gràcia
 Plaça del Sol 12 | ruidosa | Vila de Gràcia
 Carrer Nou de la Rambla 30 | ruidosa | el Raval
-Carrer dels Escudellers 20 | ruidosa | el Barri Gòtic
+Carrer d'Escudellers 20 | ruidosa | el Barri Gòtic
 Carrer de Blai 20 | ruidosa | el Poble-sec
 Carrer d'Aragó 300 | ruidosa | Dreta de l'Eixample
 Gran Via de les Corts Catalanes 600 | ruidosa | Antiga Esquerra de l'Eixample
 Ronda del General Mitre 150 | ruidosa | Sant Gervasi-Galvany
-Passeig de Joan de Borbó 50 | ruidosa | la Barceloneta
+Passeig de Joan de Borbó Comte de Barcelona 50 | ruidosa | la Barceloneta
 Carrer d'Enric Granados 50 | intermedia | Antiga Esquerra de l'Eixample
 Carrer del Parlament 30 | intermedia | Sant Antoni
 Carrer del Consell de Cent 250 | intermedia | Antiga Esquerra de l'Eixample | El mapa es de 2017, antes del eje verde: hoy debería ser bastante más tranquila.

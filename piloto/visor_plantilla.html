@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: un sonómetro de calle. Lectura grande y franja de 24 h a la izquierda; las calles del piloto a la derecha, con la nota de la hora elegida. */
+/* Layout: un buscador arriba; debajo, el sonómetro de la dirección (lectura grande, 24 h, la calle tramo a tramo) y a la derecha las calles del piloto con la nota de la hora elegida. */
 :root {
   --bg: #f2f4f6;
   --surface: #ffffff;
@@ -39,13 +39,28 @@
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
 .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 20px; }
-button { font: inherit; color: inherit; }
+button, input { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; }
+.top { display: grid; gap: 12px; }
+.marca-fila { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; }
 .marca { font-family: var(--f-display); font-weight: 700; font-size: 1.5rem; letter-spacing: -0.01em; margin: 0; }
 .marca span { color: var(--muted); font-weight: 500; }
-.top p { margin: 0; color: var(--ink-2); max-width: 62ch; }
+.marca-fila p { margin: 0; color: var(--ink-2); max-width: 62ch; }
+
+.buscador { position: relative; display: grid; gap: 8px; }
+.caja { display: flex; gap: 8px; }
+.caja input { flex: 1; min-width: 0; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); font-size: 1rem; }
+.caja input::placeholder { color: var(--muted); }
+.caja button { padding: 0 18px; border: 0; border-radius: 10px; background: var(--sel-bg); color: var(--sel-fg); font-weight: 600; cursor: pointer; }
+.sugerencias { position: absolute; top: 52px; left: 0; right: 0; z-index: 5; margin: 0; padding: 4px; list-style: none; background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 320px; overflow-y: auto; }
+.sugerencias li { padding: 8px 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 12px; }
+.sugerencias li small { color: var(--muted); white-space: nowrap; }
+.sugerencias li[aria-selected="true"], .sugerencias li:hover { background: var(--bg); }
+.ejemplos { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 0.88rem; color: var(--muted); }
+.ejemplos button { border: 1px solid var(--line-2); background: transparent; border-radius: 999px; padding: 2px 10px; cursor: pointer; color: var(--ink-2); font-size: 0.85rem; }
+.mensaje { margin: 0; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2); font-size: 0.92rem; }
+.mensaje strong { color: var(--ink); }
 
 .app { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
 @media (max-width: 900px) { .app { grid-template-columns: minmax(0, 1fr); } }
@@ -91,21 +106,22 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 .hora-ejes { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); }
 
 .grafico { position: relative; }
-.grafico svg { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+.grafico svg { display: block; width: 100%; height: auto; touch-action: none; }
 .grafico svg text { font-family: var(--f-mono); font-size: 11px; fill: var(--muted); }
 .leyenda { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.82rem; color: var(--ink-2); }
 .leyenda i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink); vertical-align: middle; margin-right: 6px; }
 .leyenda i.fant { border-top: 2px dashed var(--muted); }
-.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line-2); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; white-space: nowrap; transform: translate(-50%, -100%); }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line-2); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; white-space: nowrap; transform: translate(-50%, -100%); z-index: 2; }
 .tip b { font-family: var(--f-mono); }
 
-.porque h2, .lista h2 { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; margin: 0 0 10px; }
+.seccion h2, .lista h2 { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; margin: 0 0 4px; }
+.seccion .sub { margin: 0 0 10px; color: var(--muted); font-size: 0.88rem; }
 .porque dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; margin: 0; }
 .porque dt { font-size: 0.78rem; color: var(--muted); }
 .porque dd { margin: 0; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
 
 .lista { padding: 16px; min-width: 0; }
-.lista .nota-hora { color: var(--muted); font-size: 0.85rem; margin: -6px 0 10px; }
+.lista .nota-hora { color: var(--muted); font-size: 0.85rem; margin: 0 0 10px; }
 .lista h3 { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
 .lista ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .calle { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; text-align: left; border: 0; background: transparent; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
@@ -123,15 +139,32 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 
 <div class="wrap">
   <header class="top">
-    <h2 class="marca">DecibHello <span>· Barcelona</span></h2>
-    <p>Cuánto ruido hay en cada calle del piloto, hora a hora. Nota de 0 a 100: cuanto más alta, más ruido.</p>
+    <div class="marca-fila">
+      <h2 class="marca">DecibHello <span>· Barcelona</span></h2>
+      <p>Antes de alquilar o comprar, escucha la calle. Nota de ruido de 0 a 100, hora a hora: cuanto más alta, más ruido.</p>
+    </div>
+    <form class="buscador" id="form-busqueda" role="search" autocomplete="off">
+      <div class="caja">
+        <input id="q" type="text" inputmode="search" aria-label="Dirección, enlace de Google Maps o de un anuncio"
+               placeholder="Calle y número, enlace de Google Maps o de un anuncio"
+               role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugerencias">
+        <button type="submit">Buscar</button>
+      </div>
+      <ul class="sugerencias" id="sugerencias" role="listbox" hidden></ul>
+      <div class="ejemplos"><span>Prueba:</span>
+        <button type="button" data-ejemplo="Travessera de Gràcia 81">Travessera de Gràcia 81</button>
+        <button type="button" data-ejemplo="calle aragon 300">calle aragon 300</button>
+        <button type="button" data-ejemplo="https://www.google.com/maps/place/Pla%C3%A7a+del+Sol/@41.4018,2.1568,18z/data=!3m1!4b1!4m6!3m5!1s0x0:0x0!8m2!3d41.40187!4d2.15683">un enlace de Google Maps</button>
+      </div>
+      <p class="mensaje" id="mensaje" hidden></p>
+    </form>
   </header>
 
   <main class="app">
     <section class="panel detalle" aria-labelledby="calle-titulo">
       <div class="cab">
         <h1 id="calle-titulo"></h1>
-        <div class="meta"><span id="barrio"></span><span class="chip" id="grupo"></span><span class="chip" id="confianza"></span></div>
+        <div class="meta"><span id="barrio"></span><span class="chip" id="confianza"></span><span class="chip" id="grupo" hidden></span></div>
         <p class="aviso" id="aviso" hidden></p>
       </div>
 
@@ -179,7 +212,16 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
       </div>
       <div class="leyenda" id="leyenda"></div>
 
-      <div class="porque">
+      <div class="seccion">
+        <h2>La calle, tramo a tramo</h2>
+        <p class="sub" id="calle-sub"></p>
+        <div class="grafico" id="tira-caja">
+          <svg id="tira" role="img" aria-label="Nota de cada tramo de la calle"></svg>
+          <div class="tip" id="tip-tira" hidden></div>
+        </div>
+      </div>
+
+      <div class="seccion porque">
         <h2>Por qué suena así</h2>
         <dl id="porque"></dl>
       </div>
@@ -193,23 +235,255 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
   </main>
 
   <footer class="pie">
-    <p><strong>Cómo se calcula (v0).</strong> Base: mapa estratégico de ruido de Barcelona de 2017 (día, tarde y noche, en franjas de 5 dB). El reparto hora a hora es una estimación: sigue la forma típica del tráfico y del ocio nocturno y respeta la media oficial de cada franja. De noche el mismo ruido puntúa más, como en el indicador europeo Lden. A la nota de la calle se suman bares, locales de ocio nocturno, quejas por ruido y pisos turísticos a menos de 100 m, sobre todo entre las 22 y las 3 h. "Interior" usa la fachada al patio de manzana.</p>
-    <p>Datos: Open Data BCN (Ajuntament de Barcelona, CC BY 4.0) y OpenStreetMap. Es una estimación para validar, no una medición del piso.</p>
+    <p><strong>Cómo se calcula (v0).</strong> Base: mapa estratégico de ruido de Barcelona de 2017 (día, tarde y noche, en franjas de 5 dB) en el tramo de calle de cada portal. El reparto hora a hora es una estimación: sigue la forma típica del tráfico y del ocio nocturno y respeta la media oficial de cada franja. De noche el mismo ruido puntúa más, como en el indicador europeo Lden. Se suman bares, locales de ocio nocturno, quejas por ruido y pisos turísticos a menos de 100 m, sobre todo entre las 22 y las 3 h. "Interior" usa la fachada al patio de manzana.</p>
+    <p>Cubre Barcelona ciudad. Datos: Open Data BCN (Ajuntament de Barcelona, CC BY 4.0): mapa de ruido, portales y calles, censo de locales, quejas IRIS, pisos turísticos y sensores. Es una estimación para validar, no una medición del piso.</p>
   </footer>
 </div>
 
 <script>
-const DATOS = /*DATOS*/[];
+const DATOS = /*DATOS*/null;
 
-const GRUPOS = [["control", "Calles de control"], ["ruidosa", "Ruidosas"], ["intermedia", "Intermedias"], ["tranquila", "Tranquilas"]];
-const NOMBRE_GRUPO = { control: "control", ruidosa: "hipótesis: ruidosa", intermedia: "hipótesis: intermedia", tranquila: "hipótesis: tranquila" };
+// MODELO:inicio — copia de piloto/modelo.py; si cambias uno, cambia el otro.
 const FRANJA = Array.from({ length: 24 }, (_, h) => (h >= 7 && h < 19 ? "D" : h >= 19 && h < 23 ? "E" : "N"));
-const NOMBRE_FRANJA = { D: "Día (7–19 h)", E: "Tarde (19–23 h)", N: "Noche (23–7 h)" };
+const HORAS = { D: [], E: [], N: [] };
+FRANJA.forEach((f, h) => HORAS[f].push(h));
+const PESOS = { D: 0.3, E: 0.2, N: 0.5 };
+const ANCLA_50 = { D: 55, E: 50, N: 45 };
+const PUNTOS_POR_DB = 50 / 30;
+const PERFIL_TRAFICO = [-6, -8, -9, -10, -10, -8, -4, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -3, -4, -5];
+const PERFIL_OCIO = { 23: 0, 0: 0, 1: -1, 2: -3, 3: -6, 4: -9, 5: -12, 6: -15 };
+const REPARTO_FOCOS = { 19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 3: 0.5, 4: 0.2 };
+const energia = db => Math.pow(10, db / 10);
 
-const estado = { i: Math.max(0, DATOS.findIndex(d => d.direccion === "Carrer de Verdi 20")), lado: "exterior", modo: "hora", hora: 1, franja: "N" };
+function perfilHorario(total, trafico, ocioNoche) {
+  const db = new Array(24).fill(0);
+  for (const f of "DEN") {
+    const horas = HORAS[f], n = horas.length;
+    const eTotal = energia(total[f]);
+    const comp = {};
+    horas.forEach(h => (comp[h] = 0));
+    let eUsada = 0, resto;
+    if (trafico) {
+      const forma = horas.map(h => energia(PERFIL_TRAFICO[h]));
+      const k = energia(trafico[f]) / (forma.reduce((a, b) => a + b, 0) / n);
+      horas.forEach((h, i) => (comp[h] += forma[i] * k));
+      eUsada += energia(trafico[f]);
+    }
+    if (ocioNoche != null && f === "N") {
+      const forma = horas.map(h => energia(PERFIL_OCIO[h]));
+      const k = energia(ocioNoche) / (forma.reduce((a, b) => a + b, 0) / n);
+      horas.forEach((h, i) => (comp[h] += forma[i] * k));
+      eUsada += energia(ocioNoche);
+    }
+    resto = Math.max(0, eTotal - eUsada);
+    if (!trafico) {
+      const forma = horas.map(h => energia(PERFIL_TRAFICO[h]));
+      const k = eTotal / (forma.reduce((a, b) => a + b, 0) / n);
+      horas.forEach((h, i) => (comp[h] = forma[i] * k));
+      resto = 0;
+    }
+    horas.forEach(h => (comp[h] += resto));
+    const ajuste = eTotal / (horas.reduce((a, h) => a + comp[h], 0) / n);
+    horas.forEach(h => (db[h] = 10 * Math.log10(comp[h] * ajuste)));
+  }
+  for (const [h1, h2] of [[6, 7], [18, 19], [22, 23]]) {
+    const e1 = energia(db[h1]), e2 = energia(db[h2]);
+    db[h1] = 10 * Math.log10((2 * e1 + e2) / 3);
+    db[h2] = 10 * Math.log10((e1 + 2 * e2) / 3);
+  }
+  return db;
+}
+function suavizarExtremos(v) {
+  if (v > 70) return 70 + 30 * (1 - Math.exp(-(v - 70) / 30));
+  if (v < 30) return 30 - 30 * (1 - Math.exp(-(30 - v) / 30));
+  return v;
+}
+function notasHorarias(db, extra) {
+  return db.map((v, h) => suavizarExtremos(50 + (v - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB + extra * (REPARTO_FOCOS[h] || 0)));
+}
+function resumen(notas) {
+  const franjas = {};
+  for (const f of "DEN") franjas[f] = HORAS[f].reduce((a, h) => a + notas[h], 0) / HORAS[f].length;
+  return { franjas, global: PESOS.D * franjas.D + PESOS.E * franjas.E + PESOS.N * franjas.N };
+}
+function extraFocos(ocio, bares, quejas, turisticos) {
+  return Math.min(10, 4 * ocio) + Math.min(6, 1.2 * Math.sqrt(bares)) + Math.min(6, 2 * Math.sqrt(quejas)) + Math.min(3, Math.sqrt(turisticos) / 3);
+}
+// MODELO:fin
 
+// ---------- Vocabulario de calles (antes del índice, que lo usa) ----------
+const TIPOS = { carrer: "carrer", calle: "carrer", c: "carrer", cl: "carrer", cr: "carrer", avinguda: "avinguda", avenida: "avinguda", av: "avinguda", avda: "avinguda", avgda: "avinguda",
+  passeig: "passeig", paseo: "passeig", pg: "passeig", pso: "passeig", placa: "placa", plaza: "placa", pl: "placa", pza: "placa", ronda: "ronda", rda: "ronda",
+  rambla: "rambla", rbla: "rambla", passatge: "passatge", pasaje: "passatge", ptge: "passatge", pje: "passatge", travessera: "travessera", travesera: "travessera", trav: "travessera",
+  cami: "cami", camino: "cami", carretera: "carretera", ctra: "carretera", baixada: "baixada", bajada: "baixada", pujada: "pujada", subida: "pujada", via: "via", moll: "moll", muelle: "moll" };
+const PARTICULAS = new Set(["de", "del", "d", "la", "les", "el", "els", "dels", "l", "i", "y", "las", "los", "en", "na"]);
+const RUIDO_TEXTO = new Set(["barcelona", "bcn", "espana", "spain", "catalunya", "cataluna", "n", "no", "num", "numero", "nro", "s", "sn", "piso", "planta", "puerta", "pta", "bajo", "baixos", "atico", "principal", "pral", "esc", "escalera"]);
+
+// ---------- Índice ----------
+const IX = DATOS.indice;
+const NC = IX.campos_rango.length;
+const bandaDb = i => 37.5 + 5 * i;
+const CALLES = IX.calles.map(([nombre, planos]) => {
+  const rangos = [];
+  for (let i = 0; i < planos.length; i += NC) {
+    const r = {};
+    IX.campos_rango.forEach((c, k) => (r[c] = planos[i + k]));
+    r.lat = IX.origen.lat + r.lat_e5 / 1e5;
+    r.lon = IX.origen.lon + r.lon_e5 / 1e5;
+    rangos.push(r);
+  }
+  rangos.sort((a, b) => a.ini - b.ini);
+  return { nombre, rangos, ...tokensCalle(nombre) };
+});
+const cacheCalc = new Map();
+function calcular(r) {
+  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos;
+  if (cacheCalc.has(clave)) return cacheCalc.get(clave);
+  const t = IX.tramos[r.tramo];
+  const b = k => bandaDb(+t[IX.campos_tramo.indexOf(k)]);
+  const dbExt = perfilHorario({ D: b("TOTAL_D"), E: b("TOTAL_E"), N: b("TOTAL_N") }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"));
+  const notasExt = notasHorarias(dbExt, extraFocos(r.ocio, r.bares, r.quejas, r.turisticos));
+  const ext = { db: dbExt, nota: notasExt, ...resumen(notasExt), mapa: { D: IX.bandas[+t[0]], E: IX.bandas[+t[1]], N: IX.bandas[+t[2]] } };
+  let int = null;
+  if (r.patio >= 0) {
+    const p = IX.tramos[r.patio];
+    const dbInt = perfilHorario({ D: bandaDb(+p[0]), E: bandaDb(+p[1]), N: bandaDb(+p[2]) }, null, null);
+    const notasInt = notasHorarias(dbInt, 0);
+    int = { db: dbInt, nota: notasInt, ...resumen(notasInt), mapa: { D: IX.bandas[+p[0]], E: IX.bandas[+p[1]], N: IX.bandas[+p[2]] } };
+  }
+  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]] };
+  cacheCalc.set(clave, res);
+  return res;
+}
+
+// ---------- Búsqueda ----------
+function normalizar(s) {
+  return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/l·l/g, "ll").replace(/[º°ª]/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
+}
+function tokensCalle(nombre) {
+  const toks = normalizar(nombre).split(" ").filter(Boolean);
+  let tipo = null;
+  const nucleo = [];
+  toks.forEach((t, i) => {
+    if (i === 0 && TIPOS[t]) tipo = TIPOS[t];
+    else if (!PARTICULAS.has(t)) nucleo.push(t);
+  });
+  return { tipo, nucleo, norm: toks.join(" ") };
+}
+function levenshtein(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    let minFila = i;
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      minFila = Math.min(minFila, cur[j]);
+    }
+    if (minFila > max) return max + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function parecido(q, t) {
+  if (q === t) return 1;
+  if (q.length >= 2 && t.startsWith(q)) return 0.8;
+  if (q.length >= 4 && levenshtein(q, t, 1) <= 1) return 0.75;
+  if (q.length >= 7 && levenshtein(q, t, 2) <= 2) return 0.6;
+  return 0;
+}
+function analizarTexto(texto) {
+  const toks = normalizar(texto).split(" ").filter(Boolean);
+  let tipo = null, numero = null;
+  const nucleo = [];
+  let vistoTexto = false;
+  for (const t of toks) {
+    if (/^\d+$/.test(t)) {
+      if (t.length === 5) continue; // código postal
+      if (vistoTexto && numero === null && t.length <= 4) numero = +t;
+      continue;
+    }
+    if (numero !== null) continue; // piso, puerta, ciudad después del número
+    if (RUIDO_TEXTO.has(t)) continue;
+    if (!vistoTexto && TIPOS[t] && tipo === null) { tipo = TIPOS[t]; continue; }
+    vistoTexto = true;
+    if (!PARTICULAS.has(t)) nucleo.push(t);
+  }
+  return { tipo, nucleo, numero };
+}
+function buscarCalles(consulta, max = 8) {
+  if (!consulta.nucleo.length) return [];
+  const res = [];
+  for (let i = 0; i < CALLES.length; i++) {
+    const c = CALLES[i];
+    if (!c.nucleo.length) continue;
+    let suma = 0, ok = true;
+    const usados = new Set();
+    for (const q of consulta.nucleo) {
+      let mejor = 0, mejorJ = -1;
+      c.nucleo.forEach((t, j) => { if (usados.has(j)) return; const p = parecido(q, t); if (p > mejor) { mejor = p; mejorJ = j; } });
+      if (!mejor) { ok = false; break; }
+      usados.add(mejorJ); suma += mejor;
+    }
+    if (!ok) continue;
+    const cobertura = consulta.nucleo.length / Math.max(consulta.nucleo.length, c.nucleo.length);
+    let puntos = (suma / consulta.nucleo.length) * (0.6 + 0.4 * cobertura);
+    if (consulta.tipo && consulta.tipo === c.tipo) puntos += 0.15;
+    puntos += 0.01 * Math.log10(1 + c.rangos.length); // a igualdad, primero las calles largas (las más buscadas)
+    res.push({ i, puntos });
+  }
+  res.sort((a, b) => b.puntos - a.puntos || CALLES[a.i].nombre.length - CALLES[b.i].nombre.length);
+  return res.slice(0, max);
+}
+function rangoDeNumero(calle, numero) {
+  const rs = calle.rangos;
+  if (numero == null) return { r: rs[Math.floor(rs.length / 2)], exacto: false, sinNumero: true };
+  const mismos = rs.filter(r => r.ini % 2 === numero % 2);
+  const base = mismos.length ? mismos : rs;
+  const exacto = base.find(r => r.ini <= numero && numero <= r.fin);
+  if (exacto) return { r: exacto, exacto: true };
+  const cerca = base.reduce((m, r) => { const d = Math.min(Math.abs(numero - r.ini), Math.abs(numero - r.fin)); return !m || d < m.d ? { r, d } : m; }, null);
+  return { r: cerca.r, exacto: cerca.d <= 4 }; // a 4 números o menos de un portal del mismo lado: se da por encontrado
+}
+function distanciaM(lat1, lon1, lat2, lon2) {
+  const x = (lon2 - lon1) * Math.cos(((lat1 + lat2) / 2) * Math.PI / 180) * 111320;
+  const y = (lat2 - lat1) * 110540;
+  return Math.hypot(x, y);
+}
+function rangoMasCercano(lat, lon) {
+  let mejor = null;
+  CALLES.forEach((c, ci) => c.rangos.forEach(r => {
+    const d = distanciaM(lat, lon, r.lat, r.lon);
+    if (!mejor || d < mejor.d) mejor = { ci, r, d };
+  }));
+  return mejor;
+}
+const PORTALES = ["idealista", "fotocasa", "habitaclia", "pisos.com", "milanuncios", "yaencontre", "badi.com", "spotahome", "housinganywhere", "uniplaces", "enalquiler", "tucasa"];
+function interpretar(texto) {
+  const t = texto.trim();
+  if (!t) return { tipo: "vacio" };
+  const tl = t.toLowerCase();
+  if (/maps\.app\.goo\.gl|goo\.gl\/maps/.test(tl)) return { tipo: "aviso", html: "<strong>Ese es un enlace corto de Google Maps.</strong> Ábrelo, espera a que cargue el mapa y copia la dirección completa de la barra del navegador (empieza por google.com/maps/…). También puedes escribir la calle y el número." };
+  const portal = PORTALES.find(p => tl.includes(p + ".") || tl.includes(p + "/") || tl.includes(p));
+  if (/^https?:\/\//.test(tl) && portal) return { tipo: "aviso", html: `<strong>Los anuncios no traen la dirección en el enlace.</strong> El enlace de ${portal} solo identifica el anuncio, y muchos portales ocultan el número exacto. Escribe la calle que aparece en el anuncio (y el número si lo pone), o abre su mapa en Google Maps y pega ese enlace aquí.` };
+  let m = t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || t.match(/[?&](?:q|query|ll|destination|center)=(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/i);
+  let precision = "punto";
+  if (!m) { m = t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/); precision = "centro"; }
+  if (!m) { m = t.match(/^\s*(-?\d{1,2}\.\d{3,})\s*[,;\s]\s*(-?\d{1,3}\.\d{3,})\s*$/); precision = "punto"; }
+  if (m) return { tipo: "coordenadas", lat: +m[1], lon: +m[2], precision };
+  const lugar = t.match(/google\.[a-z.]+\/maps\/(?:place|search)\/([^/@?]+)/i);
+  if (lugar) return { tipo: "texto", texto: decodeURIComponent(lugar[1].replace(/\+/g, " ")) };
+  if (/^https?:\/\//.test(tl)) return { tipo: "aviso", html: "<strong>No reconozco ese enlace.</strong> Pega un enlace de Google Maps o escribe la calle y el número." };
+  return { tipo: "texto", texto: t };
+}
+
+// ---------- Estado y pintado ----------
+const estado = { ci: 0, r: null, numero: null, origen: "", lado: "exterior", modo: "hora", hora: 1, franja: "N", grupo: null, aviso: "" };
 const $ = id => document.getElementById(id);
 const hh = h => String(h).padStart(2, "0") + ":00";
+const NOMBRE_FRANJA = { D: "Día (7–19 h)", E: "Tarde (19–23 h)", N: "Noche (23–7 h)" };
+const GRUPOS = [["control", "Calles de control"], ["ruidosa", "Ruidosas"], ["intermedia", "Intermedias"], ["tranquila", "Tranquilas"]];
+const NOMBRE_GRUPO = { control: "piloto · control", ruidosa: "piloto · hipótesis ruidosa", intermedia: "piloto · hipótesis intermedia", tranquila: "piloto · hipótesis tranquila" };
 
 function nivelTexto(s) {
   if (s <= 15) return "Muy tranquilo";
@@ -222,133 +496,148 @@ function colorNota(s) {
   if (s >= 50) return `color-mix(in oklab, var(--loud) ${Math.round((s - 50) * 2)}%, var(--mid))`;
   return `color-mix(in oklab, var(--quiet) ${Math.round((50 - s) * 2)}%, var(--mid))`;
 }
-function mediaEnergetica(dbs) {
-  return 10 * Math.log10(dbs.reduce((a, v) => a + Math.pow(10, v / 10), 0) / dbs.length);
-}
-function lado(d) {
-  return estado.lado === "interior" && d.interior ? d.interior : d.exterior;
-}
-function lectura(d) {
-  const s = lado(d);
-  if (estado.modo === "franja") {
-    const horas = [...Array(24).keys()].filter(h => FRANJA[h] === estado.franja);
-    return { nota: s.franjas[estado.franja], db: mediaEnergetica(horas.map(h => s.db[h])) };
-  }
+function mediaEnergetica(dbs) { return 10 * Math.log10(dbs.reduce((a, v) => a + energia(v), 0) / dbs.length); }
+function ladoDe(res) { return estado.lado === "interior" && res.interior ? res.interior : res.exterior; }
+function lectura(res) {
+  const s = ladoDe(res);
+  if (estado.modo === "franja") return { nota: s.franjas[estado.franja], db: mediaEnergetica(HORAS[estado.franja].map(h => s.db[h])) };
   return { nota: s.nota[estado.hora], db: s.db[estado.hora] };
 }
 
-function pintarDetalle() {
-  const d = DATOS[estado.i];
-  if (!d) return;
-  const s = lado(d);
-  $("calle-titulo").textContent = d.direccion;
-  $("barrio").textContent = d.barrio;
-  $("grupo").textContent = NOMBRE_GRUPO[d.grupo] || d.grupo;
-  $("confianza").textContent = "confianza " + d.confianza;
-  $("aviso").hidden = !d.aviso;
-  $("aviso").textContent = d.aviso || "";
+const PILOTO = DATOS.piloto.map(p => {
+  const partes = p.direccion.match(/^(.*\D)\s+(\d+)$/);
+  const ci = CALLES.findIndex(c => c.nombre === partes[1].trim());
+  if (ci < 0) return null;
+  const { r, exacto } = rangoDeNumero(CALLES[ci], +partes[2]);
+  return { ...p, ci, r, numero: +partes[2], exacto };
+}).filter(Boolean);
 
-  const sinPatio = !d.interior;
+function seleccionar(ci, r, numero, origen, extra = {}) {
+  Object.assign(estado, { ci, r, numero, origen, grupo: null, aviso: "" }, extra);
+  pintarTodo();
+}
+function confianza(r, exacto, distancia) {
+  if (!exacto || (distancia != null && distancia > 60)) return "baja";
+  return r.sensor_dam <= 15 ? "alta" : "media";
+}
+
+function pintarDetalle() {
+  const c = CALLES[estado.ci], r = estado.r;
+  const res = calcular(r);
+  const s = ladoDe(res);
+  $("calle-titulo").textContent = c.nombre + (estado.numero != null ? " " + estado.numero : "");
+  $("barrio").textContent = IX.barrios[r.barrio] || "";
+  $("confianza").textContent = "confianza " + estado.confianza;
+  $("grupo").hidden = !estado.grupo;
+  $("grupo").textContent = estado.grupo ? NOMBRE_GRUPO[estado.grupo] : "";
+  const avisos = [estado.origen, estado.aviso].filter(Boolean).join(" ");
+  $("aviso").hidden = !avisos;
+  $("aviso").textContent = avisos;
+
+  const sinPatio = !res.interior;
   if (sinPatio && estado.lado === "interior") estado.lado = "exterior";
   $("lado-interior").disabled = sinPatio;
-  $("lado-interior").title = sinPatio ? "No hay datos de patio interior cerca de esta dirección" : "";
+  $("lado-interior").title = sinPatio ? "No hay datos de patio interior para este portal" : "";
   $("lado-exterior").setAttribute("aria-pressed", estado.lado === "exterior");
   $("lado-interior").setAttribute("aria-pressed", estado.lado === "interior");
   document.querySelectorAll("[data-franja]").forEach(b => b.setAttribute("aria-pressed", estado.modo === "franja" && b.dataset.franja === estado.franja));
 
-  const l = lectura(d);
+  const l = lectura(res);
   const nota = Math.round(l.nota);
   $("nota").textContent = nota;
   $("muestra").style.background = colorNota(nota);
   $("nivel").textContent = nivelTexto(nota);
-  const donde = estado.lado === "interior" ? "en el patio interior" : "en la fachada a la calle";
-  $("db").textContent = `≈ ${Math.round(l.db)} dB(A) ${donde}`;
-  const mapa = s.mapa[estado.modo === "franja" ? estado.franja : FRANJA[estado.hora]];
+  $("db").textContent = `≈ ${Math.round(l.db)} dB(A) ${estado.lado === "interior" ? "en el patio interior" : "en la fachada a la calle"}`;
+  const fr = estado.modo === "franja" ? estado.franja : FRANJA[estado.hora];
   $("cuando").textContent = estado.modo === "franja"
-    ? `${NOMBRE_FRANJA[estado.franja]} · media de la franja · mapa oficial ${mapa}`
-    : `${hh(estado.hora)} · ${NOMBRE_FRANJA[FRANJA[estado.hora]].split(" ")[0].toLowerCase()} · mapa oficial de la franja ${mapa}`;
+    ? `${NOMBRE_FRANJA[fr]} · media de la franja · mapa oficial ${s.mapa[fr]}`
+    : `${hh(estado.hora)} · ${NOMBRE_FRANJA[fr].split(" ")[0].toLowerCase()} · mapa oficial de la franja ${s.mapa[fr]}`;
   $("marca-barra").style.left = nota + "%";
   $("hora").value = estado.hora;
   $("hora-out").textContent = estado.modo === "franja" ? NOMBRE_FRANJA[estado.franja].split(" ")[0] : hh(estado.hora);
 
-  const f = d.focos;
+  const lado = r.ini % 2 ? "impar" : "par";
   const filas = [
-    ["Tráfico de noche (mapa)", d.fuentes.trafico_noche],
-    ["Ocio de noche (mapa)", d.fuentes.ocio_noche],
-    ["Locales de ocio nocturno · 100 m", f.ocio],
-    ["Bares y restaurantes · 100 m", f.bares],
-    ["Quejas por ruido 2025 · 100 m", f.quejas],
-    ["Pisos turísticos · 100 m", f.turisticos],
-    ["Sensor municipal más cercano", d.sensor_m >= 1000 ? (d.sensor_m / 1000).toFixed(1).replace(".", ",") + " km" : d.sensor_m + " m"],
-    ["Nota global del día", `${d.exterior.global} exterior` + (d.interior ? ` · ${d.interior.global} interior` : "")],
+    ["Tráfico de noche (mapa)", res.trafico],
+    ["Ocio de noche (mapa)", res.ocioMapa],
+    ["Locales de ocio nocturno · 100 m", r.ocio],
+    ["Bares y restaurantes · 100 m", r.bares],
+    ["Quejas por ruido 2025 · 100 m", r.quejas],
+    ["Pisos turísticos · 100 m", r.turisticos],
+    ["Sensor municipal más cercano", r.sensor_dam >= 100 ? (r.sensor_dam / 100).toFixed(1).replace(".", ",") + " km" : r.sensor_dam * 10 + " m"],
+    ["Mismo tramo", `portales ${r.ini}–${r.fin} (lado ${lado})`],
+    ["Nota global del día", `${Math.round(res.exterior.global)} exterior` + (res.interior ? ` · ${Math.round(res.interior.global)} interior` : "")],
   ];
   const dl = $("porque");
   dl.replaceChildren();
   for (const [k, v] of filas) {
-    const wrap = document.createElement("div");
+    const w = document.createElement("div");
     const dt = document.createElement("dt"); dt.textContent = k;
     const dd = document.createElement("dd"); dd.textContent = v;
-    wrap.append(dt, dd); dl.append(wrap);
+    w.append(dt, dd); dl.append(w);
   }
-  pintarGrafico(d);
+  pintarGrafico(res);
+  pintarTira();
 }
 
 const NS = "http://www.w3.org/2000/svg";
-const G = { w: 640, h: 230, l: 34, r: 14, t: 26, b: 26 };
-// El gráfico usa el ancho real en píxeles para que el texto no encoja en pantallas estrechas.
-function medirGrafico() {
-  const ancho = Math.round($("grafico").clientWidth) || 640;
-  G.w = ancho; G.h = ancho < 520 ? 210 : 240;
-  $("svg").setAttribute("viewBox", `0 0 ${G.w} ${G.h}`);
-}
-const xh = h => G.l + ((h + 0.5) / 24) * (G.w - G.l - G.r);
-const yv = v => G.t + (1 - v / 100) * (G.h - G.t - G.b);
 function el(tag, attrs, padre) {
   const e = document.createElementNS(NS, tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]);
   if (padre) padre.append(e);
   return e;
 }
-function pintarGrafico(d) {
-  medirGrafico();
+function texto(padre, x, y, contenido, anchor = "middle") { const t = el("text", { x, y, "text-anchor": anchor }, padre); t.textContent = contenido; return t; }
+
+const G = { w: 640, h: 230, l: 34, r: 14, t: 26, b: 26 };
+const xh = h => G.l + ((h + 0.5) / 24) * (G.w - G.l - G.r);
+const yv = v => G.t + (1 - v / 100) * (G.h - G.t - G.b);
+function pintarGrafico(res) {
   const svg = $("svg");
+  G.w = Math.round($("grafico").clientWidth) || 640;
+  G.h = G.w < 520 ? 210 : 240;
+  svg.setAttribute("viewBox", `0 0 ${G.w} ${G.h}`);
   svg.replaceChildren();
-  const defs = el("defs", {}, svg);
-  const grad = el("linearGradient", { id: "g-ruido", x1: 0, y1: yv(100), x2: 0, y2: yv(0), gradientUnits: "userSpaceOnUse" }, defs);
+  const grad = el("linearGradient", { id: "g-ruido", x1: 0, y1: yv(100), x2: 0, y2: yv(0), gradientUnits: "userSpaceOnUse" }, el("defs", {}, svg));
   el("stop", { offset: "0%", style: "stop-color: var(--loud)" }, grad);
   el("stop", { offset: "50%", style: "stop-color: var(--mid)" }, grad);
   el("stop", { offset: "100%", style: "stop-color: var(--quiet)" }, grad);
-
-  // Franjas del mapa oficial.
-  const tramos = [["N", 0, 7, "Noche"], ["D", 7, 19, "Día"], ["E", 19, 23, "Tarde"], ["N", 23, 24, ""]];
-  for (const [fr, a, b, txt] of tramos) {
+  for (const [fr, a, b, txt] of [["N", 0, 7, "Noche"], ["D", 7, 19, "Día"], ["E", 19, 23, "Tarde"], ["N", 23, 24, ""]]) {
     const activa = estado.modo === "franja" && estado.franja === fr;
-    el("rect", { x: xh(a - 0.5), y: G.t, width: xh(b - 0.5) - xh(a - 0.5), height: G.h - G.t - G.b, style: `fill: ${fr === "D" ? "transparent" : "var(--band)"}; ${activa ? "fill: var(--line);" : ""}` }, svg);
-    if (txt) { const t = el("text", { x: (xh(a - 0.5) + xh(b - 0.5)) / 2, y: 16, "text-anchor": "middle" }, svg); t.textContent = txt; }
+    el("rect", { x: xh(a - 0.5), y: G.t, width: xh(b - 0.5) - xh(a - 0.5), height: G.h - G.t - G.b, style: `fill: ${activa ? "var(--line)" : fr === "D" ? "transparent" : "var(--band)"}` }, svg);
+    if (txt) texto(svg, (xh(a - 0.5) + xh(b - 0.5)) / 2, 16, txt);
   }
   for (const v of [0, 25, 50, 75, 100]) {
-    el("line", { x1: G.l, x2: G.w - G.r, y1: yv(v), y2: yv(v), style: `stroke: var(--line); stroke-width: 1; ${v === 50 ? "stroke-dasharray: 4 4; stroke: var(--line-2);" : ""}` }, svg);
-    const t = el("text", { x: G.l - 6, y: yv(v) + 4, "text-anchor": "end" }, svg); t.textContent = v;
+    el("line", { x1: G.l, x2: G.w - G.r, y1: yv(v), y2: yv(v), style: `stroke: ${v === 50 ? "var(--line-2)" : "var(--line)"}; stroke-width: 1; ${v === 50 ? "stroke-dasharray: 4 4;" : ""}` }, svg);
+    texto(svg, G.l - 6, yv(v) + 4, v, "end");
   }
-  for (const h of G.w < 520 ? [0, 6, 12, 18] : [0, 3, 6, 9, 12, 15, 18, 21]) {
-    const t = el("text", { x: xh(h), y: G.h - 8, "text-anchor": "middle" }, svg); t.textContent = String(h).padStart(2, "0") + "h";
-  }
+  for (const h of G.w < 520 ? [0, 6, 12, 18] : [0, 3, 6, 9, 12, 15, 18, 21]) texto(svg, xh(h), G.h - 8, String(h).padStart(2, "0") + "h");
 
-  const sel = lado(d);
-  const otro = estado.lado === "interior" ? d.exterior : d.interior;
+  const sel = ladoDe(res);
+  const otro = estado.lado === "interior" ? res.exterior : res.interior;
   const puntos = arr => arr.map((v, h) => `${xh(h).toFixed(1)},${yv(v).toFixed(1)}`).join(" ");
   el("polygon", { points: `${xh(0)},${yv(0)} ${puntos(sel.nota)} ${xh(23)},${yv(0)}`, style: "fill: url(#g-ruido); fill-opacity: 0.35; stroke: none" }, svg);
   if (otro) el("polyline", { points: puntos(otro.nota), style: "fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 5 4" }, svg);
   el("polyline", { points: puntos(sel.nota), style: "fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round" }, svg);
-
   if (estado.modo === "hora") {
-    const h = estado.hora, v = sel.nota[h];
+    const h = estado.hora;
     el("line", { x1: xh(h), x2: xh(h), y1: G.t, y2: G.h - G.b, style: "stroke: var(--ink); stroke-width: 1" }, svg);
-    el("circle", { cx: xh(h), cy: yv(v), r: 5, style: "fill: var(--ink); stroke: var(--surface); stroke-width: 2" }, svg);
+    el("circle", { cx: xh(h), cy: yv(sel.nota[h]), r: 5, style: "fill: var(--ink); stroke: var(--surface); stroke-width: 2" }, svg);
   }
-  const zona = el("rect", { x: G.l, y: 0, width: G.w - G.l - G.r, height: G.h, style: "fill: transparent" }, svg);
-  zona.addEventListener("pointermove", e => moverPuntero(e, d));
-  zona.addEventListener("pointerdown", e => { moverPuntero(e, d, true); });
+  const zona = el("rect", { x: G.l, y: 0, width: G.w - G.l - G.r, height: G.h, style: "fill: transparent; cursor: crosshair" }, svg);
+  const horaDe = e => { const rr = svg.getBoundingClientRect(); const x = ((e.clientX - rr.left) / rr.width) * G.w; return Math.max(0, Math.min(23, Math.round(((x - G.l) / (G.w - G.l - G.r)) * 24 - 0.5))); };
+  const mover = (e, fijar) => {
+    const h = horaDe(e), rr = svg.getBoundingClientRect(), tip = $("tip");
+    tip.hidden = false;
+    tip.style.left = (xh(h) / G.w) * rr.width + "px";
+    tip.style.top = (yv(sel.nota[h]) / G.h) * rr.height - 10 + "px";
+    tip.replaceChildren();
+    const b = document.createElement("b"); b.textContent = Math.round(sel.nota[h]);
+    tip.append(b, ` · ${hh(h)} · ≈ ${Math.round(sel.db[h])} dB`);
+    if (fijar || e.buttons) { estado.modo = "hora"; estado.hora = h; pintarTodo(); }
+  };
+  zona.addEventListener("pointermove", e => mover(e));
+  zona.addEventListener("pointerdown", e => mover(e, true));
   zona.addEventListener("pointerleave", () => { $("tip").hidden = true; });
 
   const ley = $("leyenda");
@@ -357,23 +646,57 @@ function pintarGrafico(d) {
   item("", estado.lado === "interior" ? "Interior (patio)" : "Exterior (fachada a la calle)");
   if (otro) item("fant", estado.lado === "interior" ? "Exterior" : "Interior (patio)");
 }
-function horaDesdePuntero(e) {
-  const r = $("svg").getBoundingClientRect();
-  const x = ((e.clientX - r.left) / r.width) * G.w;
-  return Math.max(0, Math.min(23, Math.round(((x - G.l) / (G.w - G.l - G.r)) * 24 - 0.5)));
-}
-function moverPuntero(e, d, fijar) {
-  const h = horaDesdePuntero(e);
-  const s = lado(d);
-  const tip = $("tip");
-  const r = $("svg").getBoundingClientRect();
-  tip.hidden = false;
-  tip.style.left = (xh(h) / G.w) * r.width + "px";
-  tip.style.top = (yv(s.nota[h]) / G.h) * r.height - 10 + "px";
-  tip.replaceChildren();
-  const b = document.createElement("b"); b.textContent = Math.round(s.nota[h]);
-  tip.append(b, ` · ${hh(h)} · ≈ ${Math.round(s.db[h])} dB`);
-  if (fijar || e.buttons) { estado.modo = "hora"; estado.hora = h; pintarTodo(); }
+
+function pintarTira() {
+  const c = CALLES[estado.ci];
+  const svg = $("tira");
+  const w = Math.round($("tira-caja").clientWidth) || 640;
+  const carril = 64, l = 58, rgt = 10, top = 8, sep = 18, h = top + carril * 2 + sep + 26;
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.replaceChildren();
+  // Escala de números sin portales aislados muy lejanos (errores o numeraciones especiales), que aplastarían la tira.
+  const fins = c.rangos.map(r => r.fin).sort((a, b) => a - b);
+  const p98 = fins[Math.floor(0.98 * (fins.length - 1))];
+  const minN = Math.min(...c.rangos.map(r => r.ini)), maxN = fins[fins.length - 1] > 2 * p98 + 20 ? p98 : fins[fins.length - 1];
+  const span = Math.max(1, maxN - minN + 2);
+  const xn = n => l + ((n - minN) / span) * (w - l - rgt);
+  const lado = estado.lado;
+  $("calle-sub").textContent = `${c.rangos.length} tramos del nº ${minN} al ${maxN}. Nota ${estado.modo === "franja" ? "media de " + NOMBRE_FRANJA[estado.franja].toLowerCase() : "a las " + hh(estado.hora)}, ${lado === "interior" ? "interior" : "exterior"}. Toca un tramo para verlo.`;
+  const carriles = [["Impares", 1, top], ["Pares", 0, top + carril + sep]];
+  for (const [nombre, par, y0] of carriles) {
+    el("line", { x1: l, x2: w - rgt, y1: y0 + carril, y2: y0 + carril, style: "stroke: var(--line-2); stroke-width: 1" }, svg);
+    texto(svg, l - 8, y0 + carril - 4, nombre, "end");
+    for (const r of c.rangos.filter(r => r.ini % 2 === par && r.ini <= maxN)) {
+      const res = calcular(r);
+      const s = lado === "interior" && res.interior ? res.interior : res.exterior;
+      const v = estado.modo === "franja" ? s.franjas[estado.franja] : s.nota[estado.hora];
+      const x0 = xn(r.ini), x1 = Math.max(x0 + 3, xn(r.fin + 2) - 1);
+      const alto = Math.max(2, (v / 100) * (carril - 4));
+      const sel = r === estado.r;
+      const rect = el("rect", { x: x0, y: y0 + carril - alto, width: x1 - x0, height: alto, rx: 2,
+        style: `fill: ${colorNota(v)}; ${sel ? "stroke: var(--ink); stroke-width: 2;" : "stroke: var(--surface); stroke-width: 1;"} cursor: pointer` }, svg);
+      rect.addEventListener("pointerenter", e => {
+        const tip = $("tip-tira"), rr = svg.getBoundingClientRect();
+        tip.hidden = false;
+        tip.style.left = (((x0 + x1) / 2) / w) * rr.width + "px";
+        tip.style.top = ((y0 + carril - alto) / h) * rr.height - 6 + "px";
+        tip.replaceChildren();
+        const b = document.createElement("b"); b.textContent = Math.round(v);
+        tip.append(b, ` · nº ${r.ini}${r.fin !== r.ini ? "–" + r.fin : ""}`);
+      });
+      rect.addEventListener("pointerleave", () => { $("tip-tira").hidden = true; });
+      rect.addEventListener("click", () => {
+        estado.r = r; estado.numero = r.ini; estado.origen = ""; estado.grupo = null; estado.aviso = "";
+        estado.confianza = confianza(r, true);
+        pintarTodo();
+      });
+    }
+  }
+  const ticks = 5;
+  for (let k = 0; k <= ticks; k++) {
+    const n = Math.round(minN + (k / ticks) * (maxN - minN));
+    texto(svg, xn(n), h - 6, "nº " + n, k === 0 ? "start" : k === ticks ? "end" : "middle");
+  }
 }
 
 function pintarLista() {
@@ -383,38 +706,123 @@ function pintarLista() {
     ? `Nota media de ${NOMBRE_FRANJA[estado.franja].toLowerCase()}, ${estado.lado === "interior" ? "interior" : "exterior"}.`
     : `Nota a las ${hh(estado.hora)}, ${estado.lado === "interior" ? "interior" : "exterior"}.`;
   for (const [g, titulo] of GRUPOS) {
-    const items = DATOS.map((d, i) => [d, i]).filter(([d]) => d.grupo === g);
+    const items = PILOTO.filter(p => p.grupo === g);
     if (!items.length) continue;
     const h3 = document.createElement("h3"); h3.textContent = titulo;
     const ul = document.createElement("ul");
-    for (const [d, i] of items) {
+    for (const p of items) {
       const li = document.createElement("li");
       const btn = document.createElement("button");
       btn.type = "button"; btn.className = "calle";
-      btn.setAttribute("aria-current", i === estado.i);
-      const nom = document.createElement("span"); nom.className = "nom"; nom.textContent = d.direccion;
-      const nota = Math.round(lectura(d).nota);
+      btn.setAttribute("aria-current", p.r === estado.r && p.numero === estado.numero);
+      const nom = document.createElement("span"); nom.className = "nom"; nom.textContent = p.direccion;
+      const nota = Math.round(lectura(calcular(p.r)).nota);
       const sw = document.createElement("span"); sw.className = "sw"; sw.style.background = colorNota(nota);
       const val = document.createElement("span"); val.className = "val"; val.textContent = nota;
       btn.append(nom, sw, val);
-      btn.addEventListener("click", () => { estado.i = i; pintarTodo(); });
+      btn.addEventListener("click", () => seleccionar(p.ci, p.r, p.numero, "", { grupo: p.grupo, aviso: p.aviso, confianza: confianza(p.r, p.exacto) }));
       li.append(btn); ul.append(li);
     }
     cont.append(h3, ul);
   }
 }
-
 function pintarTodo() { pintarDetalle(); pintarLista(); }
 
+// ---------- Buscador ----------
+const q = $("q"), lista = $("sugerencias");
+let opciones = [], activa = -1;
+function mostrarMensaje(html) { const m = $("mensaje"); m.hidden = !html; m.innerHTML = html || ""; }
+function cerrarSugerencias() { lista.hidden = true; q.setAttribute("aria-expanded", "false"); activa = -1; }
+function pintarSugerencias() {
+  lista.replaceChildren();
+  opciones.forEach((o, k) => {
+    const li = document.createElement("li");
+    li.id = "sug-" + k; li.setAttribute("role", "option"); li.setAttribute("aria-selected", k === activa);
+    const n = document.createElement("span"); n.textContent = CALLES[o.i].nombre + (o.numero != null ? " " + o.numero : "");
+    const b = document.createElement("small"); b.textContent = IX.barrios[CALLES[o.i].rangos[0].barrio] || "";
+    li.append(n, b);
+    li.addEventListener("mousedown", e => { e.preventDefault(); elegir(o); });
+    lista.append(li);
+  });
+  lista.hidden = !opciones.length;
+  q.setAttribute("aria-expanded", String(!!opciones.length));
+  if (activa >= 0) q.setAttribute("aria-activedescendant", "sug-" + activa); else q.removeAttribute("aria-activedescendant");
+}
+function elegir(o) {
+  cerrarSugerencias();
+  const c = CALLES[o.i];
+  q.value = c.nombre + (o.numero != null ? " " + o.numero : "");
+  const { r, exacto, sinNumero } = rangoDeNumero(c, o.numero);
+  let origen = "";
+  if (sinNumero) origen = "Sin número: se muestra un tramo central de la calle. Añade el número del portal para afinar.";
+  else if (!exacto) origen = `No hay portal ${o.numero} en este lado de la calle; se muestra el tramo más próximo (${r.ini}–${r.fin}).`;
+  mostrarMensaje("");
+  seleccionar(o.i, r, sinNumero ? null : o.numero, origen, { confianza: confianza(r, exacto && !sinNumero) });
+}
+function buscarTexto(texto, alEnviar) {
+  const a = analizarTexto(texto);
+  const res = buscarCalles(a);
+  opciones = res.map(x => ({ i: x.i, numero: a.numero }));
+  if (alEnviar) {
+    if (!res.length) { cerrarSugerencias(); mostrarMensaje("<strong>No encuentro esa calle en Barcelona.</strong> Revisa el nombre o prueba sin el tipo de vía (por ejemplo, solo «Verdi 20»)."); return; }
+    const claro = res.length === 1 || res[0].puntos - res[1].puntos >= 0.1;
+    if (claro) { elegir(opciones[0]); return; }
+    activa = 0; pintarSugerencias(); mostrarMensaje("Hay varias calles con ese nombre: elige una.");
+    return;
+  }
+  activa = -1; pintarSugerencias();
+}
+function enviar() {
+  const intento = interpretar(q.value);
+  if (intento.tipo === "vacio") return;
+  if (intento.tipo === "aviso") { cerrarSugerencias(); mostrarMensaje(intento.html); return; }
+  if (intento.tipo === "coordenadas") {
+    cerrarSugerencias();
+    const { lat, lon } = intento;
+    if (lat < 41.31 || lat > 41.47 || lon < 2.05 || lon > 2.24) { mostrarMensaje("<strong>Ese punto está fuera de Barcelona ciudad.</strong> De momento DecibHello solo cubre Barcelona."); return; }
+    const m = rangoMasCercano(lat, lon);
+    const c = CALLES[m.ci];
+    const nota = intento.precision === "centro" ? "El enlace solo trae el centro del mapa, no el punto marcado: comprueba que la calle es la correcta. " : "";
+    mostrarMensaje("");
+    seleccionar(m.ci, m.r, m.r.ini, `${nota}Punto del mapa → portal más cercano: ${c.nombre} ${m.r.ini}${m.r.fin !== m.r.ini ? "–" + m.r.fin : ""} (a ${Math.round(m.d)} m).`, { confianza: confianza(m.r, true, m.d) });
+    return;
+  }
+  buscarTexto(intento.texto, true);
+}
+$("form-busqueda").addEventListener("submit", e => {
+  e.preventDefault();
+  if (!lista.hidden && activa >= 0) { elegir(opciones[activa]); return; }
+  enviar();
+});
+let esperaQ;
+q.addEventListener("input", () => {
+  mostrarMensaje("");
+  clearTimeout(esperaQ);
+  esperaQ = setTimeout(() => {
+    const intento = interpretar(q.value);
+    if (intento.tipo === "texto" && !/^https?:/i.test(q.value.trim())) buscarTexto(intento.texto, false); else cerrarSugerencias();
+  }, 120);
+});
+q.addEventListener("keydown", e => {
+  if (lista.hidden) return;
+  if (e.key === "ArrowDown") { activa = Math.min(opciones.length - 1, activa + 1); pintarSugerencias(); e.preventDefault(); }
+  else if (e.key === "ArrowUp") { activa = Math.max(0, activa - 1); pintarSugerencias(); e.preventDefault(); }
+  else if (e.key === "Escape") cerrarSugerencias();
+});
+q.addEventListener("blur", () => setTimeout(cerrarSugerencias, 150));
+document.querySelectorAll("[data-ejemplo]").forEach(b => b.addEventListener("click", () => { q.value = b.dataset.ejemplo; enviar(); }));
+
+// ---------- Controles ----------
 $("hora").addEventListener("input", e => { estado.modo = "hora"; estado.hora = +e.target.value; pintarTodo(); });
 $("lado-exterior").addEventListener("click", () => { estado.lado = "exterior"; pintarTodo(); });
 $("lado-interior").addEventListener("click", () => { estado.lado = "interior"; pintarTodo(); });
 document.querySelectorAll("[data-franja]").forEach(b => b.addEventListener("click", () => {
-  estado.modo = "franja"; estado.franja = b.dataset.franja;
-  estado.hora = { D: 13, E: 21, N: 1 }[estado.franja];
+  estado.modo = "franja"; estado.franja = b.dataset.franja; estado.hora = { D: 13, E: 21, N: 1 }[estado.franja];
   pintarTodo();
 }));
-let espera;
-window.addEventListener("resize", () => { clearTimeout(espera); espera = setTimeout(() => pintarGrafico(DATOS[estado.i]), 120); });
-pintarTodo();
+let esperaR;
+window.addEventListener("resize", () => { clearTimeout(esperaR); esperaR = setTimeout(pintarDetalle, 120); });
+
+const inicial = PILOTO.find(p => p.direccion === "Carrer de Verdi 20") || PILOTO[0];
+seleccionar(inicial.ci, inicial.r, inicial.numero, "Ejemplo: escribe tu dirección arriba para ver la tuya.", { grupo: inicial.grupo, confianza: confianza(inicial.r, inicial.exacto) });
 </script>
