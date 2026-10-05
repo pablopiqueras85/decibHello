@@ -1,0 +1,25 @@
+# direccion | grupo (hipótesis)
+Carrer de Verdi 20 | ruidosa
+Plaça del Sol 12 | ruidosa
+Carrer Nou de la Rambla 30 | ruidosa
+Carrer dels Escudellers 20 | ruidosa
+Carrer de Blai 20 | ruidosa
+Carrer d'Aragó 300 | ruidosa
+Gran Via de les Corts Catalanes 600 | ruidosa
+Ronda del General Mitre 150 | ruidosa
+Passeig de Joan de Borbó 50 | ruidosa
+Carrer d'Enric Granados 50 | intermedia
+Carrer del Parlament 30 | intermedia
+Carrer del Consell de Cent 250 | intermedia
+Rambla del Poblenou 60 | intermedia
+Carrer de Sants 100 | intermedia
+Carrer Gran de Sant Andreu 200 | intermedia
+Carrer de Pomaret 20 | tranquila
+Carrer de Pere II de Montcada 10 | tranquila
+Carrer de Campoamor 30 | tranquila
+Carrer de la Mare de Déu del Coll 50 | tranquila
+Carrer de les Agudes 20 | tranquila
+Carrer de Tuset 20 | control
+Travessera de Gràcia 81 | control
+Travessera de Gràcia 150 | control
+Travessera de Gràcia 300 | control

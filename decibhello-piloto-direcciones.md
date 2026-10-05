@@ -51,7 +51,7 @@ Travessera de Gràcia es larga y cambia mucho de un tramo a otro: tráfico de d�
 | # | Dirección | Barrio / distrito | Hipótesis |
 |---|---|---|---|
 | 21 | Carrer de Tuset, 20 | Sant Gervasi-Galvany, Sarrià-Sant Gervasi | Ruidosa: ocio y mucha gente |
-| 22 | Travessera de Gràcia, 30 | Sant Gervasi-Galvany, Sarrià-Sant Gervasi | Ruidosa: tramo junto a Tuset |
+| 22 | Travessera de Gràcia, 81 | Sant Gervasi-Galvany, Sarrià-Sant Gervasi | Ruidosa: tramo donde desemboca Tuset |
 | 23 | Travessera de Gràcia, 150 | Vila de Gràcia, Gràcia | Por confirmar con el vecino |
 | 24 | Travessera de Gràcia, 300 | Camp d'en Grassot, Gràcia | Por confirmar con el vecino |
 
