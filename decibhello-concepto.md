@@ -112,6 +112,17 @@ Zonas para el piloto (hipótesis, sin datos aún): contrastar barrios presumible
 - **Afiliación**: servicios de aislamiento acústico, ventanas, mudanzas.
 - A explorar: acuerdos con ayuntamientos y asociaciones vecinales.
 
+**Referencia: cómo cobra HowLoud** (EE. UU., [precios](https://howloud.com/pricing), octubre de 2026). Consulta gratis para particulares; el dinero viene de empresas que muestran la nota en sus webs:
+
+| Plan | Precio | Límite |
+|---|---|---|
+| Gratis | 0 | 1 web, < 2.500 consultas/mes, sin guardar resultados |
+| Basic | 25 $/mes | 1 web, < 5.000 consultas/mes |
+| Premium | 100 $/mes | varias webs, < 50.000 consultas/mes |
+| Enterprise | a medida | mucho volumen, datos en bruto, incluir la nota en otros productos |
+
+Clientes públicos: Apartments.com, Homes.com, Estately, beycome.com y una asociación de agentes inmobiliarios (Staten Island Board of Realtors). Lección para DecibHello: la vía B2B (API y widget para portales e inmobiliarias) es la principal; el particular entra gratis y da visibilidad.
+
 ## 9. Competencia y alternativas
 
 Investigado en octubre de 2026 (búsqueda web; no se han probado a fondo).
