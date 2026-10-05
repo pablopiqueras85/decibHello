@@ -1,25 +1,25 @@
-direccion,grupo,nota_global,nota_dia,nota_tarde,nota_noche,mes_dia,mes_tarde,mes_noche,mes_trafico_noche,mes_ocio_noche,mes_patio_noche,ocio_nocturno_100m,bares_rest_100m,quejas_ruido_100m,pisos_turisticos_100m,sensor_mas_cercano_m,distancia_tramo_m,confianza
-Carrer de Verdi 20,ruidosa,80,54,79,96,55 - 60 dB(A),60 - 65 dB(A),60 - 65 dB(A),45 - 50 dB(A),60 - 65 dB(A),< 40 dB(A),1,29,11,10,109,3.9,alta
-Plaça del Sol 12,ruidosa,82,54,81,100,55 - 60 dB(A),60 - 65 dB(A),65 - 70 dB(A),40 - 45 dB(A),65 - 70 dB(A),45 - 50 dB(A),3,30,2,16,39,3.4,alta
-Carrer Nou de la Rambla 30,ruidosa,83,62,73,99,60 - 65 dB(A),55 - 60 dB(A),60 - 65 dB(A),50 - 55 dB(A),60 - 65 dB(A),< 40 dB(A),2,21,5,45,155,4.7,media
-Carrer dels Escudellers 20,ruidosa,85,62,83,100,60 - 65 dB(A),60 - 65 dB(A),65 - 70 dB(A),55 - 60 dB(A),65 - 70 dB(A),40 - 45 dB(A),4,47,12,43,33,2.9,alta
-Carrer de Blai 20,ruidosa,76,54,69,92,55 - 60 dB(A),55 - 60 dB(A),60 - 65 dB(A),45 - 50 dB(A),60 - 65 dB(A),< 40 dB(A),0,31,7,35,30,48.4,baja
-Carrer d'Aragó 300,ruidosa,91,88,90,93,75 - 80 dB(A),70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),< 40 dB(A),55 - 60 dB(A),0,7,1,5,26,14.7,alta
-Gran Via de les Corts Catalanes 600,ruidosa,95,88,93,99,75 - 80 dB(A),70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),40 - 45 dB(A),40 - 45 dB(A),1,23,0,43,253,28.8,media
-Ronda del General Mitre 150,ruidosa,92,79,93,99,70 - 75 dB(A),70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),< 40 dB(A),40 - 45 dB(A),1,5,5,3,208,16.5,media
-Passeig de Joan de Borbó 50,ruidosa,76,62,77,83,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),50 - 55 dB(A),,0,17,13,16,181,26.2,media
-Carrer d'Enric Granados 50,intermedia,78,62,75,88,60 - 65 dB(A),60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),40 - 45 dB(A),0,13,1,53,17,11.6,alta
-Carrer del Parlament 30,intermedia,75,62,76,82,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),< 40 dB(A),0,24,2,48,43,31.9,alta
-Carrer del Consell de Cent 250,intermedia,87,79,82,93,70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),60 - 65 dB(A),60 - 65 dB(A),40 - 45 dB(A),0,12,0,15,157,29.1,media
-Rambla del Poblenou 60,intermedia,75,62,76,82,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),0,14,8,6,88,9.4,alta
-Carrer de Sants 100,intermedia,91,79,92,97,70 - 75 dB(A),70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),< 40 dB(A),40 - 45 dB(A),0,12,5,15,415,0.8,media
-Carrer Gran de Sant Andreu 200,intermedia,74,71,73,76,65 - 70 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),40 - 45 dB(A),0,2,3,0,416,42.0,baja
-Carrer de Pomaret 20,tranquila,47,46,47,48,50 - 55 dB(A),45 - 50 dB(A),40 - 45 dB(A),40 - 45 dB(A),< 40 dB(A),,0,0,1,0,1081,7.0,media
-Carrer de Pere II de Montcada 10,tranquila,60,54,62,62,55 - 60 dB(A),55 - 60 dB(A),50 - 55 dB(A),50 - 55 dB(A),< 40 dB(A),,0,0,0,0,1800,5.4,media
-Carrer de Campoamor 30,tranquila,62,62,62,62,60 - 65 dB(A),55 - 60 dB(A),50 - 55 dB(A),50 - 55 dB(A),< 40 dB(A),< 40 dB(A),0,0,0,0,527,11.5,media
-Carrer de la Mare de Déu del Coll 50,tranquila,70,62,73,74,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),40 - 45 dB(A),0,0,2,4,290,7.7,media
-Carrer de les Agudes 20,tranquila,61,54,64,64,55 - 60 dB(A),55 - 60 dB(A),50 - 55 dB(A),50 - 55 dB(A),< 40 dB(A),,0,0,1,0,2553,1.0,media
-Carrer de Tuset 20,control,85,62,81,100,60 - 65 dB(A),60 - 65 dB(A),65 - 70 dB(A),55 - 60 dB(A),65 - 70 dB(A),40 - 45 dB(A),7,26,4,4,73,34.9,alta
-Travessera de Gràcia 81,control,93,79,95,100,70 - 75 dB(A),70 - 75 dB(A),65 - 70 dB(A),60 - 65 dB(A),55 - 60 dB(A),50 - 55 dB(A),1,13,8,4,101,10.3,alta
-Travessera de Gràcia 150,control,88,79,87,94,70 - 75 dB(A),65 - 70 dB(A),60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),< 40 dB(A),1,30,3,29,50,2.8,alta
-Travessera de Gràcia 300,control,80,71,82,84,65 - 70 dB(A),65 - 70 dB(A),60 - 65 dB(A),60 - 65 dB(A),< 40 dB(A),< 40 dB(A),0,6,0,45,316,10.8,media
+direccion,grupo,nota_global,nota_dia,nota_tarde,nota_noche,mes_dia,mes_tarde,mes_noche,mes_trafico_noche,mes_ocio_noche,mes_patio_noche,nota_global_interior,ocio_nocturno_100m,bares_rest_100m,quejas_ruido_100m,pisos_turisticos_100m,sensor_mas_cercano_m,distancia_tramo_m,confianza
+Carrer de Verdi 20,ruidosa,72,54,78,80,55 - 60 dB(A),60 - 65 dB(A),60 - 65 dB(A),45 - 50 dB(A),60 - 65 dB(A),< 40 dB(A),31,1,29,11,10,109,3.9,alta
+Plaça del Sol 12,ruidosa,74,54,79,85,55 - 60 dB(A),60 - 65 dB(A),65 - 70 dB(A),40 - 45 dB(A),65 - 70 dB(A),45 - 50 dB(A),46,3,30,2,16,39,3.4,alta
+Carrer Nou de la Rambla 30,ruidosa,74,62,74,82,60 - 65 dB(A),55 - 60 dB(A),60 - 65 dB(A),50 - 55 dB(A),60 - 65 dB(A),< 40 dB(A),31,2,21,5,45,155,4.7,media
+Carrer dels Escudellers 20,ruidosa,78,63,81,86,60 - 65 dB(A),60 - 65 dB(A),65 - 70 dB(A),55 - 60 dB(A),65 - 70 dB(A),40 - 45 dB(A),39,4,47,12,43,33,2.9,alta
+Carrer de Blai 20,ruidosa,70,54,70,79,55 - 60 dB(A),55 - 60 dB(A),60 - 65 dB(A),45 - 50 dB(A),60 - 65 dB(A),< 40 dB(A),35,0,31,7,35,30,48.4,baja
+Carrer d'Aragó 300,ruidosa,84,83,85,85,75 - 80 dB(A),70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),< 40 dB(A),55 - 60 dB(A),68,0,7,1,5,26,14.7,alta
+Gran Via de les Corts Catalanes 600,ruidosa,85,83,86,86,75 - 80 dB(A),70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),40 - 45 dB(A),40 - 45 dB(A),46,1,23,0,43,253,28.8,media
+Ronda del General Mitre 150,ruidosa,84,78,86,86,70 - 75 dB(A),70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),< 40 dB(A),40 - 45 dB(A),49,1,5,5,3,208,16.5,media
+Passeig de Joan de Borbó 50,ruidosa,72,62,76,76,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),50 - 55 dB(A),,,0,17,13,16,181,26.2,media
+Carrer d'Enric Granados 50,intermedia,74,63,75,81,60 - 65 dB(A),60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),40 - 45 dB(A),43,0,13,1,53,17,11.6,alta
+Carrer del Parlament 30,intermedia,71,63,75,75,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),< 40 dB(A),49,0,24,2,48,43,31.9,alta
+Carrer del Consell de Cent 250,intermedia,82,78,80,85,70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),60 - 65 dB(A),60 - 65 dB(A),40 - 45 dB(A),43,0,12,0,15,157,29.1,media
+Rambla del Poblenou 60,intermedia,71,62,75,75,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),35,0,14,8,6,88,9.4,alta
+Carrer de Sants 100,intermedia,83,78,85,86,70 - 75 dB(A),70 - 75 dB(A),65 - 70 dB(A),65 - 70 dB(A),< 40 dB(A),40 - 45 dB(A),43,0,12,5,15,415,0.8,media
+Carrer Gran de Sant Andreu 200,intermedia,72,71,73,73,65 - 70 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),40 - 45 dB(A),58,0,2,3,0,416,42.0,baja
+Carrer de Pomaret 20,tranquila,47,46,47,47,50 - 55 dB(A),45 - 50 dB(A),40 - 45 dB(A),40 - 45 dB(A),< 40 dB(A),,,0,0,1,0,1081,7.0,media
+Carrer de Pere II de Montcada 10,tranquila,60,54,62,62,55 - 60 dB(A),55 - 60 dB(A),50 - 55 dB(A),50 - 55 dB(A),< 40 dB(A),,,0,0,0,0,1800,5.4,media
+Carrer de Campoamor 30,tranquila,62,62,63,62,60 - 65 dB(A),55 - 60 dB(A),50 - 55 dB(A),50 - 55 dB(A),< 40 dB(A),< 40 dB(A),33,0,0,0,0,527,11.5,media
+Carrer de la Mare de Déu del Coll 50,tranquila,69,63,72,72,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),40 - 45 dB(A),46,0,0,2,4,290,7.7,media
+Carrer de les Agudes 20,tranquila,60,54,63,63,55 - 60 dB(A),55 - 60 dB(A),50 - 55 dB(A),50 - 55 dB(A),< 40 dB(A),,,0,0,1,0,2553,1.0,media
+Carrer de Tuset 20,control,78,63,80,86,60 - 65 dB(A),60 - 65 dB(A),65 - 70 dB(A),55 - 60 dB(A),65 - 70 dB(A),40 - 45 dB(A),49,7,26,4,4,73,34.9,alta
+Travessera de Gràcia 81,control,84,78,86,87,70 - 75 dB(A),70 - 75 dB(A),65 - 70 dB(A),60 - 65 dB(A),55 - 60 dB(A),50 - 55 dB(A),60,1,13,8,4,101,10.3,alta
+Travessera de Gràcia 150,control,81,78,83,83,70 - 75 dB(A),65 - 70 dB(A),60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),< 40 dB(A),35,1,30,3,29,50,2.8,alta
+Travessera de Gràcia 300,control,77,71,79,79,65 - 70 dB(A),65 - 70 dB(A),60 - 65 dB(A),60 - 65 dB(A),< 40 dB(A),< 40 dB(A),37,0,6,0,45,316,10.8,media

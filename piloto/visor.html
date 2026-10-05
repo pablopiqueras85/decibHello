@@ -1,0 +1,420 @@
+<title>DecibHello Barcelona</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: un sonómetro de calle. Lectura grande y franja de 24 h a la izquierda; las calles del piloto a la derecha, con la nota de la hora elegida. */
+:root {
+  --bg: #f2f4f6;
+  --surface: #ffffff;
+  --ink: #12161b;
+  --ink-2: #48515b;
+  --muted: #6f7883;
+  --line: #dce1e6;
+  --line-2: #c4ccd4;
+  --band: #e9edf1;
+  --quiet: #2a78d6;
+  --mid: #e4e6e9;
+  --loud: #e34948;
+  --sel-bg: #12161b;
+  --sel-fg: #ffffff;
+  --focus: #2a78d6;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317; --surface: #191c21; --ink: #f1f3f5; --ink-2: #c2c8cf; --muted: #8b949e;
+    --line: #2a2f36; --line-2: #3a414a; --band: #20242a; --quiet: #3987e5; --mid: #3a3e44; --loud: #e66767;
+    --sel-bg: #f1f3f5; --sel-fg: #111317; --focus: #3987e5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111317; --surface: #191c21; --ink: #f1f3f5; --ink-2: #c2c8cf; --muted: #8b949e;
+  --line: #2a2f36; --line-2: #3a414a; --band: #20242a; --quiet: #3987e5; --mid: #3a3e44; --loud: #e66767;
+  --sel-bg: #f1f3f5; --sel-fg: #111317; --focus: #3987e5; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 20px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; }
+.marca { font-family: var(--f-display); font-weight: 700; font-size: 1.5rem; letter-spacing: -0.01em; margin: 0; }
+.marca span { color: var(--muted); font-weight: 500; }
+.top p { margin: 0; color: var(--ink-2); max-width: 62ch; }
+
+.app { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .app { grid-template-columns: minmax(0, 1fr); } }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.detalle { padding: 20px; display: grid; gap: 18px; min-width: 0; }
+
+.cab h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem); line-height: 1.1; margin: 0 0 6px; text-wrap: balance; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; color: var(--ink-2); }
+.chip { font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid var(--line-2); border-radius: 999px; padding: 1px 8px; color: var(--ink-2); }
+.aviso { margin: 8px 0 0; font-size: 0.9rem; color: var(--ink-2); border-left: 3px solid var(--line-2); padding-left: 10px; }
+
+.controles { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+.grupo-ctl { display: grid; gap: 4px; }
+.etq { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line-2); border-radius: 8px; padding: 2px; gap: 2px; background: var(--bg); }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+.seg button small { color: var(--muted); font-family: var(--f-mono); font-size: 0.75rem; margin-left: 4px; }
+.seg button[aria-pressed="true"] { background: var(--sel-bg); color: var(--sel-fg); }
+.seg button[aria-pressed="true"] small { color: inherit; opacity: 0.75; }
+.seg button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.lectura { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 20px; align-items: end; }
+.cifra { font-family: var(--f-display); font-weight: 700; font-size: clamp(4rem, 3rem + 5vw, 6.2rem); line-height: 0.85; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; display: flex; align-items: flex-end; gap: 10px; }
+.cifra .muestra { width: 14px; height: 14px; border-radius: 3px; margin-bottom: 0.4rem; border: 1px solid var(--line-2); }
+.cifra-txt { display: grid; gap: 2px; min-width: 0; padding-bottom: 4px; }
+.cifra-txt .nivel { font-family: var(--f-display); font-weight: 700; font-size: 1.3rem; }
+.cifra-txt .db { font-family: var(--f-mono); font-size: 1.05rem; color: var(--ink); }
+.cifra-txt .cuando { color: var(--muted); font-size: 0.88rem; }
+
+.escala { display: grid; gap: 4px; }
+.barra { position: relative; height: 10px; border-radius: 5px; background: linear-gradient(to right, var(--quiet), var(--mid) 50%, var(--loud)); }
+.marca-barra { position: absolute; top: -5px; width: 4px; height: 20px; margin-left: -2px; border-radius: 2px; background: var(--ink); box-shadow: 0 0 0 2px var(--surface); transition: left 0.2s ease; }
+.ticks { position: relative; height: 16px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); }
+.ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.ticks span:first-child { transform: none; }
+.ticks span:last-child { transform: translateX(-100%); }
+
+.hora { display: grid; gap: 6px; }
+.hora-cab { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.hora-cab output { font-family: var(--f-mono); font-size: 1.1rem; font-weight: 500; }
+input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
+.hora-ejes { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); }
+
+.grafico { position: relative; }
+.grafico svg { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+.grafico svg text { font-family: var(--f-mono); font-size: 11px; fill: var(--muted); }
+.leyenda { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.82rem; color: var(--ink-2); }
+.leyenda i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink); vertical-align: middle; margin-right: 6px; }
+.leyenda i.fant { border-top: 2px dashed var(--muted); }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line-2); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; white-space: nowrap; transform: translate(-50%, -100%); }
+.tip b { font-family: var(--f-mono); }
+
+.porque h2, .lista h2 { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; margin: 0 0 10px; }
+.porque dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; margin: 0; }
+.porque dt { font-size: 0.78rem; color: var(--muted); }
+.porque dd { margin: 0; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+.lista { padding: 16px; min-width: 0; }
+.lista .nota-hora { color: var(--muted); font-size: 0.85rem; margin: -6px 0 10px; }
+.lista h3 { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
+.lista ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.calle { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; text-align: left; border: 0; background: transparent; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+.calle:hover { background: var(--bg); }
+.calle[aria-current="true"] { background: var(--sel-bg); color: var(--sel-fg); }
+.calle .nom { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9rem; }
+.calle .sw { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--line-2); }
+.calle .val { font-family: var(--f-mono); font-variant-numeric: tabular-nums; min-width: 2.2ch; text-align: right; }
+
+.pie { color: var(--muted); font-size: 0.85rem; display: grid; gap: 6px; }
+.pie p { margin: 0; max-width: 90ch; }
+
+@media (prefers-reduced-motion: reduce) { .marca-barra { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h2 class="marca">DecibHello <span>· Barcelona</span></h2>
+    <p>Cuánto ruido hay en cada calle del piloto, hora a hora. Nota de 0 a 100: cuanto más alta, más ruido.</p>
+  </header>
+
+  <main class="app">
+    <section class="panel detalle" aria-labelledby="calle-titulo">
+      <div class="cab">
+        <h1 id="calle-titulo"></h1>
+        <div class="meta"><span id="barrio"></span><span class="chip" id="grupo"></span><span class="chip" id="confianza"></span></div>
+        <p class="aviso" id="aviso" hidden></p>
+      </div>
+
+      <div class="controles">
+        <div class="grupo-ctl">
+          <span class="etq" id="etq-lado">Piso</span>
+          <div class="seg" role="group" aria-labelledby="etq-lado">
+            <button type="button" id="lado-exterior" aria-pressed="true">Exterior</button>
+            <button type="button" id="lado-interior" aria-pressed="false">Interior (patio)</button>
+          </div>
+        </div>
+        <div class="grupo-ctl">
+          <span class="etq" id="etq-franja">Franja</span>
+          <div class="seg" role="group" aria-labelledby="etq-franja">
+            <button type="button" data-franja="D" aria-pressed="false">Día<small>7–19</small></button>
+            <button type="button" data-franja="E" aria-pressed="false">Tarde<small>19–23</small></button>
+            <button type="button" data-franja="N" aria-pressed="false">Noche<small>23–7</small></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lectura" aria-live="polite">
+        <div class="cifra"><span id="nota">–</span><span class="muestra" id="muestra"></span></div>
+        <div class="cifra-txt">
+          <span class="nivel" id="nivel"></span>
+          <span class="db" id="db"></span>
+          <span class="cuando" id="cuando"></span>
+        </div>
+      </div>
+
+      <div class="escala" aria-hidden="true">
+        <div class="barra"><span class="marca-barra" id="marca-barra"></span></div>
+        <div class="ticks"><span style="left:0">0 tranquilo</span><span style="left:50%">50 · límite OMS</span><span style="left:100%">100 ruidoso</span></div>
+      </div>
+
+      <div class="hora">
+        <div class="hora-cab"><label for="hora" class="etq">Hora del día</label><output id="hora-out" for="hora">01:00</output></div>
+        <input type="range" id="hora" min="0" max="23" step="1" value="1">
+        <div class="hora-ejes" aria-hidden="true"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+      </div>
+
+      <div class="grafico" id="grafico">
+        <svg id="svg" viewBox="0 0 640 230" role="img" aria-label="Nota de ruido a lo largo de las 24 horas"></svg>
+        <div class="tip" id="tip" hidden></div>
+      </div>
+      <div class="leyenda" id="leyenda"></div>
+
+      <div class="porque">
+        <h2>Por qué suena así</h2>
+        <dl id="porque"></dl>
+      </div>
+    </section>
+
+    <aside class="panel lista" aria-labelledby="lista-titulo">
+      <h2 id="lista-titulo">Calles del piloto</h2>
+      <p class="nota-hora" id="nota-hora"></p>
+      <div id="lista"></div>
+    </aside>
+  </main>
+
+  <footer class="pie">
+    <p><strong>Cómo se calcula (v0).</strong> Base: mapa estratégico de ruido de Barcelona de 2017 (día, tarde y noche, en franjas de 5 dB). El reparto hora a hora es una estimación: sigue la forma típica del tráfico y del ocio nocturno y respeta la media oficial de cada franja. De noche el mismo ruido puntúa más, como en el indicador europeo Lden. A la nota de la calle se suman bares, locales de ocio nocturno, quejas por ruido y pisos turísticos a menos de 100 m, sobre todo entre las 22 y las 3 h. "Interior" usa la fachada al patio de manzana.</p>
+    <p>Datos: Open Data BCN (Ajuntament de Barcelona, CC BY 4.0) y OpenStreetMap. Es una estimación para validar, no una medición del piso.</p>
+  </footer>
+</div>
+
+<script>
+const DATOS = [{"direccion": "Carrer de Verdi 20", "grupo": "ruidosa", "barrio": "Vila de Gràcia", "aviso": "", "confianza": "alta", "exterior": {"db": [65.7, 64.7, 62.7, 59.8, 56.9, 54.4, 55.1, 56.3, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 60.0, 61.5, 62.5, 62.4, 63.8, 64.9], "nota": [89.5, 88.9, 86.1, 80.6, 73.1, 65.6, 66.9, 52.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 58.3, 74.0, 76.8, 78.0, 81.8, 89.0], "franjas": {"D": 54, "E": 78, "N": 80}, "global": 72, "mapa": {"D": "55 - 60 dB(A)", "E": "60 - 65 dB(A)", "N": "60 - 65 dB(A)"}}, "interior": {"db": [38.5, 36.5, 35.5, 34.5, 34.5, 36.5, 39.5, 38.3, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 38.0, 38.5, 37.9, 36.9, 37.4, 38.6], "nota": [39.1, 35.8, 34.1, 32.4, 32.4, 35.8, 40.9, 23.1, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.8, 30.8, 29.8, 28.2, 29.0, 39.3], "franjas": {"D": 22, "E": 29, "N": 36}, "global": 31, "mapa": {"D": "< 40 dB(A)", "E": "< 40 dB(A)", "N": "< 40 dB(A)"}}, "fuentes": {"trafico_noche": "45 - 50 dB(A)", "ocio_noche": "60 - 65 dB(A)"}, "focos": {"ocio": 1, "bares": 29, "quejas": 11, "turisticos": 10}, "sensor_m": 109}, {"direccion": "Plaça del Sol 12", "grupo": "ruidosa", "barrio": "Vila de Gràcia", "aviso": "", "confianza": "alta", "exterior": {"db": [70.8, 69.8, 67.8, 64.8, 61.8, 58.8, 56.5, 56.9, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 59.9, 61.4, 62.5, 62.5, 67.1, 69.3], "nota": [92.9, 92.5, 90.4, 86.1, 79.9, 72.9, 69.2, 53.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 58.2, 74.7, 77.7, 79.1, 85.9, 92.3], "franjas": {"D": 54, "E": 79, "N": 85}, "global": 74, "mapa": {"D": "55 - 60 dB(A)", "E": "60 - 65 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [48.5, 46.5, 45.5, 44.5, 44.5, 46.5, 49.5, 48.3, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 46.7, 45.5, 42.9, 41.9, 45.8, 48.0], "nota": [55.8, 52.4, 50.8, 49.1, 49.1, 52.4, 57.5, 38.8, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 36.1, 42.5, 38.1, 36.4, 42.9, 55.0], "franjas": {"D": 38, "E": 40, "N": 53}, "global": 46, "mapa": {"D": "45 - 50 dB(A)", "E": "40 - 45 dB(A)", "N": "45 - 50 dB(A)"}}, "fuentes": {"trafico_noche": "40 - 45 dB(A)", "ocio_noche": "65 - 70 dB(A)"}, "focos": {"ocio": 3, "bares": 30, "quejas": 2, "turisticos": 16}, "sensor_m": 39}, {"direccion": "Carrer Nou de la Rambla 30", "grupo": "ruidosa", "barrio": "el Raval", "aviso": "", "confianza": "media", "exterior": {"db": [65.6, 64.6, 62.6, 59.7, 57.1, 55.4, 58.8, 60.4, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 61.7, 60.5, 57.9, 56.9, 61.7, 64.1], "nota": [90.5, 89.9, 87.2, 81.6, 73.9, 67.3, 72.9, 59.0, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 61.1, 73.3, 71.2, 71.5, 81.0, 89.7], "franjas": {"D": 62, "E": 74, "N": 82}, "global": 74, "mapa": {"D": "60 - 65 dB(A)", "E": "55 - 60 dB(A)", "N": "60 - 65 dB(A)"}}, "interior": {"db": [38.5, 36.5, 35.5, 34.5, 34.5, 36.5, 39.5, 38.3, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 38.0, 38.5, 37.9, 36.9, 37.4, 38.6], "nota": [39.1, 35.8, 34.1, 32.4, 32.4, 35.8, 40.9, 23.1, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.2, 22.8, 30.8, 29.8, 28.2, 29.0, 39.3], "franjas": {"D": 22, "E": 29, "N": 36}, "global": 31, "mapa": {"D": "< 40 dB(A)", "E": "< 40 dB(A)", "N": "< 40 dB(A)"}}, "fuentes": {"trafico_noche": "50 - 55 dB(A)", "ocio_noche": "60 - 65 dB(A)"}, "focos": {"ocio": 2, "bares": 21, "quejas": 5, "turisticos": 45}, "sensor_m": 155}, {"direccion": "Carrer dels Escudellers 20", "grupo": "ruidosa", "barrio": "el Barri Gòtic", "aviso": "", "confianza": "alta", "exterior": {"db": [70.6, 69.6, 67.6, 64.7, 62.1, 60.4, 61.4, 61.5, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 66.7, 69.1], "nota": [93.7, 93.3, 91.3, 87.0, 80.8, 75.1, 76.5, 60.8, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 78.3, 79.3, 79.8, 86.9, 93.2], "franjas": {"D": 63, "E": 81, "N": 86}, "global": 78, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 44.5, 43.3, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 43.0, 43.5, 42.9, 41.9, 42.4, 43.6], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 49.2, 30.5, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 30.1, 39.1, 38.1, 36.4, 37.4, 47.6], "franjas": {"D": 29, "E": 38, "N": 45}, "global": 39, "mapa": {"D": "40 - 45 dB(A)", "E": "40 - 45 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "55 - 60 dB(A)", "ocio_noche": "65 - 70 dB(A)"}, "focos": {"ocio": 4, "bares": 47, "quejas": 12, "turisticos": 43}, "sensor_m": 33}, {"direccion": "Carrer de Blai 20", "grupo": "ruidosa", "barrio": "el Poble-sec", "aviso": "", "confianza": "baja", "exterior": {"db": [65.7, 64.7, 62.7, 59.8, 56.9, 54.4, 55.1, 56.3, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.5, 57.7, 57.8, 57.6, 57.3, 62.0, 64.3], "nota": [88.1, 87.4, 84.7, 79.4, 72.4, 65.6, 66.9, 52.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.2, 54.5, 67.0, 68.0, 68.8, 78.0, 87.1], "franjas": {"D": 54, "E": 70, "N": 79}, "global": 70, "mapa": {"D": "55 - 60 dB(A)", "E": "55 - 60 dB(A)", "N": "60 - 65 dB(A)"}}, "interior": {"db": [38.5, 36.5, 35.5, 34.5, 34.5, 36.5, 40.9, 41.2, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 43.0, 43.5, 42.9, 41.9, 40.4, 40.0], "nota": [39.1, 35.8, 34.1, 32.4, 32.4, 35.8, 43.1, 27.2, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 30.1, 39.1, 38.1, 36.4, 34.1, 41.6], "franjas": {"D": 29, "E": 37, "N": 37}, "global": 35, "mapa": {"D": "40 - 45 dB(A)", "E": "40 - 45 dB(A)", "N": "< 40 dB(A)"}}, "fuentes": {"trafico_noche": "45 - 50 dB(A)", "ocio_noche": "60 - 65 dB(A)"}, "focos": {"ocio": 0, "bares": 31, "quejas": 7, "turisticos": 35}, "sensor_m": 30}, {"direccion": "Carrer d'Aragó 300", "grupo": "ruidosa", "barrio": "Dreta de l'Eixample", "aviso": "", "confianza": "alta", "exterior": {"db": [68.5, 66.5, 65.5, 64.5, 64.5, 66.5, 73.5, 75.3, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 76.7, 75.5, 72.9, 71.9, 70.4, 70.0], "nota": [87.0, 85.4, 84.0, 82.0, 81.0, 82.3, 88.0, 81.1, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 82.5, 86.6, 84.8, 84.3, 83.7, 88.0], "franjas": {"D": 83, "E": 85, "N": 85}, "global": 84, "mapa": {"D": "75 - 80 dB(A)", "E": "70 - 75 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [58.5, 56.5, 55.5, 54.5, 54.5, 56.5, 60.9, 61.2, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 60.4, 60.0], "nota": [72.3, 69.1, 67.4, 65.8, 65.8, 69.1, 75.8, 60.4, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 72.4, 71.4, 69.8, 67.4, 74.6], "franjas": {"D": 63, "E": 70, "N": 70}, "global": 68, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "55 - 60 dB(A)"}}, "fuentes": {"trafico_noche": "65 - 70 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 7, "quejas": 1, "turisticos": 5}, "sensor_m": 26}, {"direccion": "Gran Via de les Corts Catalanes 600", "grupo": "ruidosa", "barrio": "Antiga Esquerra de l'Eixample", "aviso": "", "confianza": "media", "exterior": {"db": [68.5, 66.5, 65.5, 64.5, 64.5, 66.5, 73.5, 75.3, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 77.6, 76.7, 75.5, 72.9, 71.9, 70.4, 70.0], "nota": [89.3, 88.1, 86.4, 83.8, 81.7, 82.3, 88.0, 81.1, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 83.3, 82.5, 87.4, 86.0, 85.8, 85.8, 90.2], "franjas": {"D": 83, "E": 86, "N": 86}, "global": 85, "mapa": {"D": "75 - 80 dB(A)", "E": "70 - 75 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 48.5, 50.3, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 51.7, 50.5, 47.9, 46.9, 45.4, 45.0], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 55.9, 42.2, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 44.4, 50.8, 46.4, 44.8, 42.4, 50.0], "franjas": {"D": 46, "E": 46, "N": 46}, "global": 46, "mapa": {"D": "50 - 55 dB(A)", "E": "45 - 50 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "65 - 70 dB(A)", "ocio_noche": "40 - 45 dB(A)"}, "focos": {"ocio": 1, "bares": 23, "quejas": 0, "turisticos": 43}, "sensor_m": 253}, {"direccion": "Ronda del General Mitre 150", "grupo": "ruidosa", "barrio": "Sant Gervasi-Galvany", "aviso": "", "confianza": "media", "exterior": {"db": [68.5, 66.5, 65.5, 64.5, 64.5, 66.5, 70.9, 71.2, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 73.0, 73.5, 72.9, 71.9, 70.4, 70.0], "nota": [89.3, 88.0, 86.3, 83.7, 81.7, 82.3, 86.1, 76.3, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.6, 85.9, 86.0, 85.7, 85.7, 90.1], "franjas": {"D": 78, "E": 86, "N": 86}, "global": 84, "mapa": {"D": "70 - 75 dB(A)", "E": "70 - 75 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 52.4, 55.0, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 56.1, 53.8, 47.9, 46.9, 45.4, 45.0], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 62.4, 50.0, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 51.8, 56.4, 46.4, 44.8, 42.4, 50.0], "franjas": {"D": 54, "E": 47, "N": 47}, "global": 49, "mapa": {"D": "55 - 60 dB(A)", "E": "45 - 50 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "65 - 70 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 1, "bares": 5, "quejas": 5, "turisticos": 3}, "sensor_m": 208}, {"direccion": "Passeig de Joan de Borbó 50", "grupo": "ruidosa", "barrio": "la Barceloneta", "aviso": "", "confianza": "media", "exterior": {"db": [59.1, 57.5, 56.1, 54.5, 54.0, 55.5, 60.2, 60.9, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 60.5, 60.2], "nota": [82.3, 80.6, 77.3, 72.0, 67.4, 67.5, 74.9, 59.9, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 75.5, 75.7, 75.4, 75.6, 83.3], "franjas": {"D": 62, "E": 76, "N": 76}, "global": 72, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "55 - 60 dB(A)"}}, "interior": null, "fuentes": {"trafico_noche": "55 - 60 dB(A)", "ocio_noche": "50 - 55 dB(A)"}, "focos": {"ocio": 0, "bares": 17, "quejas": 13, "turisticos": 16}, "sensor_m": 181}, {"direccion": "Carrer d'Enric Granados 50", "grupo": "intermedia", "barrio": "Antiga Esquerra de l'Eixample", "aviso": "", "confianza": "alta", "exterior": {"db": [64.1, 63.1, 62.1, 60.9, 60.3, 60.7, 62.3, 61.9, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 62.4, 63.5], "nota": [84.9, 84.0, 82.1, 79.1, 76.5, 75.6, 77.6, 61.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 74.7, 74.5, 73.9, 76.0, 84.4], "franjas": {"D": 63, "E": 75, "N": 81}, "global": 74, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "60 - 65 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 45.9, 46.2, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 48.0, 48.5, 47.9, 46.9, 45.4, 45.0], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 51.4, 35.4, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 38.4, 47.5, 46.4, 44.8, 42.4, 50.0], "franjas": {"D": 38, "E": 45, "N": 45}, "global": 43, "mapa": {"D": "45 - 50 dB(A)", "E": "45 - 50 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "55 - 60 dB(A)", "ocio_noche": "55 - 60 dB(A)"}, "focos": {"ocio": 0, "bares": 13, "quejas": 1, "turisticos": 53}, "sensor_m": 17}, {"direccion": "Carrer del Parlament 30", "grupo": "intermedia", "barrio": "Sant Antoni", "aviso": "", "confianza": "alta", "exterior": {"db": [58.5, 56.5, 55.5, 54.5, 54.4, 56.4, 60.8, 61.2, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 60.4, 60.0], "nota": [80.9, 78.7, 75.7, 71.3, 67.9, 69.1, 75.8, 60.4, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 75.2, 75.3, 74.8, 74.7, 82.4], "franjas": {"D": 63, "E": 75, "N": 75}, "global": 71, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "55 - 60 dB(A)"}}, "interior": {"db": [38.5, 36.5, 35.5, 34.5, 34.5, 36.5, 52.0, 54.9, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 58.0, 58.5, 57.9, 56.9, 54.1, 51.3], "nota": [39.1, 35.8, 34.1, 32.4, 32.4, 35.8, 61.7, 49.8, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 55.1, 64.1, 63.1, 61.4, 56.9, 60.5], "franjas": {"D": 54, "E": 61, "N": 41}, "global": 49, "mapa": {"D": "55 - 60 dB(A)", "E": "55 - 60 dB(A)", "N": "< 40 dB(A)"}}, "fuentes": {"trafico_noche": "55 - 60 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 24, "quejas": 2, "turisticos": 48}, "sensor_m": 43}, {"direccion": "Carrer del Consell de Cent 250", "grupo": "intermedia", "barrio": "Antiga Esquerra de l'Eixample", "aviso": "El mapa es de 2017, antes del eje verde: hoy debería ser bastante más tranquila.", "confianza": "media", "exterior": {"db": [69.1, 68.1, 67.1, 65.9, 65.3, 65.7, 69.3, 70.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 71.7, 70.5, 67.9, 66.9, 67.4, 68.5], "nota": [87.2, 86.5, 85.2, 83.3, 81.8, 81.5, 84.9, 75.4, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 76.8, 82.3, 79.9, 79.1, 80.4, 86.8], "franjas": {"D": 78, "E": 80, "N": 85}, "global": 82, "mapa": {"D": "70 - 75 dB(A)", "E": "65 - 70 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 45.9, 46.2, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 48.0, 48.5, 47.9, 46.9, 45.4, 45.0], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 51.4, 35.4, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 38.4, 47.5, 46.4, 44.8, 42.4, 50.0], "franjas": {"D": 38, "E": 45, "N": 45}, "global": 43, "mapa": {"D": "45 - 50 dB(A)", "E": "45 - 50 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "60 - 65 dB(A)", "ocio_noche": "60 - 65 dB(A)"}, "focos": {"ocio": 0, "bares": 12, "quejas": 0, "turisticos": 15}, "sensor_m": 157}, {"direccion": "Rambla del Poblenou 60", "grupo": "intermedia", "barrio": "el Poblenou", "aviso": "", "confianza": "alta", "exterior": {"db": [59.8, 58.4, 56.8, 54.6, 53.3, 54.1, 59.4, 60.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 60.6, 60.4], "nota": [82.2, 80.8, 77.3, 71.5, 66.1, 65.2, 73.7, 59.3, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 75.2, 75.3, 74.8, 74.9, 82.8], "franjas": {"D": 62, "E": 75, "N": 75}, "global": 71, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "55 - 60 dB(A)"}}, "interior": {"db": [38.5, 36.5, 35.5, 34.5, 34.5, 36.5, 40.9, 41.2, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 43.0, 43.5, 42.9, 41.9, 40.4, 40.0], "nota": [39.1, 35.8, 34.1, 32.4, 32.4, 35.8, 43.1, 27.2, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 30.1, 39.1, 38.1, 36.4, 34.1, 41.6], "franjas": {"D": 29, "E": 37, "N": 37}, "global": 35, "mapa": {"D": "40 - 45 dB(A)", "E": "40 - 45 dB(A)", "N": "< 40 dB(A)"}}, "fuentes": {"trafico_noche": "55 - 60 dB(A)", "ocio_noche": "55 - 60 dB(A)"}, "focos": {"ocio": 0, "bares": 14, "quejas": 8, "turisticos": 6}, "sensor_m": 88}, {"direccion": "Carrer de Sants 100", "grupo": "intermedia", "barrio": "Sants", "aviso": "", "confianza": "media", "exterior": {"db": [68.5, 66.5, 65.5, 64.5, 64.5, 66.5, 70.9, 71.2, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 73.0, 73.5, 72.9, 71.9, 70.4, 70.0], "nota": [88.6, 87.3, 85.6, 83.2, 81.5, 82.3, 86.1, 76.3, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.6, 85.6, 85.6, 85.3, 85.1, 89.5], "franjas": {"D": 78, "E": 85, "N": 86}, "global": 83, "mapa": {"D": "70 - 75 dB(A)", "E": "70 - 75 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 45.9, 46.2, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 48.0, 48.5, 47.9, 46.9, 45.4, 45.0], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 51.4, 35.4, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 38.4, 47.5, 46.4, 44.8, 42.4, 50.0], "franjas": {"D": 38, "E": 45, "N": 45}, "global": 43, "mapa": {"D": "45 - 50 dB(A)", "E": "45 - 50 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "65 - 70 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 12, "quejas": 5, "turisticos": 15}, "sensor_m": 415}, {"direccion": "Carrer Gran de Sant Andreu 200", "grupo": "intermedia", "barrio": "Sant Andreu", "aviso": "", "confianza": "baja", "exterior": {"db": [58.5, 56.5, 55.5, 54.5, 54.4, 56.4, 63.5, 65.3, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 66.7, 65.5, 62.9, 61.9, 60.4, 60.0], "nota": [76.8, 74.1, 71.6, 68.4, 66.8, 69.1, 79.1, 67.2, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 69.4, 76.5, 73.3, 72.3, 71.0, 78.6], "franjas": {"D": 71, "E": 73, "N": 73}, "global": 72, "mapa": {"D": "65 - 70 dB(A)", "E": "60 - 65 dB(A)", "N": "55 - 60 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 57.0, 59.9, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 59.1, 56.3], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 70.0, 58.1, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 72.4, 71.4, 69.8, 65.2, 68.8], "franjas": {"D": 62, "E": 70, "N": 50}, "global": 58, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "55 - 60 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 2, "quejas": 3, "turisticos": 0}, "sensor_m": 416}, {"direccion": "Carrer de Pomaret 20", "grupo": "tranquila", "barrio": "Sant Gervasi-la Bonanova", "aviso": "", "confianza": "media", "exterior": {"db": [44.1, 42.5, 41.1, 39.5, 39.0, 40.5, 48.7, 50.8, 52.5, 52.5, 52.5, 52.5, 52.5, 52.5, 52.5, 52.5, 52.5, 52.5, 51.6, 50.4, 47.9, 46.9, 45.5, 45.2], "nota": [50.6, 47.9, 45.2, 41.9, 40.3, 42.5, 56.1, 43.0, 45.9, 45.9, 45.9, 45.9, 45.9, 45.9, 45.9, 45.9, 45.9, 45.9, 44.3, 51.3, 47.2, 45.8, 44.0, 52.3], "franjas": {"D": 46, "E": 47, "N": 47}, "global": 47, "mapa": {"D": "50 - 55 dB(A)", "E": "45 - 50 dB(A)", "N": "40 - 45 dB(A)"}}, "interior": null, "fuentes": {"trafico_noche": "40 - 45 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 0, "quejas": 1, "turisticos": 0}, "sensor_m": 1081}, {"direccion": "Carrer de Pere II de Montcada 10", "grupo": "tranquila", "barrio": "Pedralbes", "aviso": "", "confianza": "media", "exterior": {"db": [53.6, 51.6, 50.6, 49.5, 49.4, 51.4, 55.8, 56.2, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 58.0, 58.5, 57.9, 56.9, 55.5, 55.0], "nota": [64.3, 61.0, 59.3, 57.5, 57.3, 60.6, 68.0, 52.0, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 55.1, 64.1, 63.1, 61.4, 59.1, 66.7], "franjas": {"D": 54, "E": 62, "N": 62}, "global": 60, "mapa": {"D": "55 - 60 dB(A)", "E": "55 - 60 dB(A)", "N": "50 - 55 dB(A)"}}, "interior": null, "fuentes": {"trafico_noche": "50 - 55 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 0, "quejas": 0, "turisticos": 0}, "sensor_m": 1800}, {"direccion": "Carrer de Campoamor 30", "grupo": "tranquila", "barrio": "Horta", "aviso": "", "confianza": "media", "exterior": {"db": [53.6, 51.6, 50.6, 49.5, 49.4, 51.4, 58.5, 60.3, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 61.7, 60.5, 57.9, 56.9, 55.5, 55.0], "nota": [64.3, 61.0, 59.3, 57.5, 57.3, 60.6, 72.4, 58.8, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 61.1, 67.5, 63.1, 61.4, 59.1, 66.7], "franjas": {"D": 62, "E": 63, "N": 62}, "global": 62, "mapa": {"D": "60 - 65 dB(A)", "E": "55 - 60 dB(A)", "N": "50 - 55 dB(A)"}}, "interior": {"db": [38.5, 36.5, 35.5, 34.5, 34.5, 36.5, 40.9, 41.2, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 41.7, 40.5, 37.9, 36.9, 37.4, 38.6], "nota": [39.1, 35.8, 34.1, 32.4, 32.4, 35.8, 43.1, 27.2, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 27.8, 34.1, 29.8, 28.2, 29.0, 39.3], "franjas": {"D": 29, "E": 30, "N": 37}, "global": 33, "mapa": {"D": "40 - 45 dB(A)", "E": "< 40 dB(A)", "N": "< 40 dB(A)"}}, "fuentes": {"trafico_noche": "50 - 55 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 0, "quejas": 0, "turisticos": 0}, "sensor_m": 527}, {"direccion": "Carrer de la Mare de Déu del Coll 50", "grupo": "tranquila", "barrio": "el Coll", "aviso": "", "confianza": "media", "exterior": {"db": [58.5, 56.5, 55.5, 54.5, 54.4, 56.4, 60.8, 61.2, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 60.4, 60.0], "nota": [75.4, 72.6, 70.3, 67.5, 66.4, 69.1, 75.8, 60.4, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 73.3, 72.7, 71.5, 69.9, 77.4], "franjas": {"D": 63, "E": 72, "N": 72}, "global": 69, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "55 - 60 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 48.5, 50.3, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 52.6, 51.7, 50.5, 47.9, 46.9, 45.4, 45.0], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 55.9, 42.2, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 46.0, 44.4, 50.8, 46.4, 44.8, 42.4, 50.0], "franjas": {"D": 46, "E": 46, "N": 46}, "global": 46, "mapa": {"D": "50 - 55 dB(A)", "E": "45 - 50 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "55 - 60 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 0, "quejas": 2, "turisticos": 4}, "sensor_m": 290}, {"direccion": "Carrer de les Agudes 20", "grupo": "tranquila", "barrio": "Ciutat Meridiana", "aviso": "", "confianza": "media", "exterior": {"db": [53.6, 51.6, 50.6, 49.5, 49.4, 51.4, 55.8, 56.2, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 58.0, 58.5, 57.9, 56.9, 55.5, 55.0], "nota": [66.3, 63.0, 60.9, 58.5, 57.7, 60.6, 68.0, 52.0, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 55.1, 64.7, 63.9, 62.4, 60.5, 68.7], "franjas": {"D": 54, "E": 63, "N": 63}, "global": 60, "mapa": {"D": "55 - 60 dB(A)", "E": "55 - 60 dB(A)", "N": "50 - 55 dB(A)"}}, "interior": null, "fuentes": {"trafico_noche": "50 - 55 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 0, "quejas": 1, "turisticos": 0}, "sensor_m": 2553}, {"direccion": "Carrer de Tuset 20", "grupo": "control", "barrio": "Sant Gervasi-Galvany", "aviso": "", "confianza": "alta", "exterior": {"db": [70.6, 69.6, 67.6, 64.7, 62.1, 60.4, 61.4, 61.5, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.0, 63.5, 62.9, 61.9, 66.7, 69.1], "nota": [92.9, 92.5, 90.4, 86.2, 80.3, 75.1, 76.5, 60.8, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 62.6, 63.4, 77.5, 78.3, 78.6, 85.7, 92.3], "franjas": {"D": 63, "E": 80, "N": 86}, "global": 78, "mapa": {"D": "60 - 65 dB(A)", "E": "60 - 65 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [43.5, 41.5, 40.5, 39.5, 39.5, 41.5, 52.4, 55.0, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 56.1, 53.8, 47.9, 46.9, 45.4, 45.0], "nota": [47.4, 44.1, 42.4, 40.8, 40.8, 44.1, 62.4, 50.0, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 51.8, 56.4, 46.4, 44.8, 42.4, 50.0], "franjas": {"D": 54, "E": 47, "N": 47}, "global": 49, "mapa": {"D": "55 - 60 dB(A)", "E": "45 - 50 dB(A)", "N": "40 - 45 dB(A)"}}, "fuentes": {"trafico_noche": "55 - 60 dB(A)", "ocio_noche": "65 - 70 dB(A)"}, "focos": {"ocio": 7, "bares": 26, "quejas": 4, "turisticos": 4}, "sensor_m": 73}, {"direccion": "Travessera de Gràcia 81", "grupo": "control", "barrio": "Sant Gervasi-Galvany", "aviso": "", "confianza": "alta", "exterior": {"db": [68.3, 67.5, 67.0, 66.5, 66.4, 66.8, 69.7, 70.7, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 73.0, 73.5, 72.9, 71.9, 70.2, 69.5], "nota": [90.2, 89.7, 88.3, 86.1, 83.8, 82.6, 85.2, 75.6, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.6, 86.3, 86.5, 86.4, 86.5, 90.8], "franjas": {"D": 78, "E": 86, "N": 87}, "global": 84, "mapa": {"D": "70 - 75 dB(A)", "E": "70 - 75 dB(A)", "N": "65 - 70 dB(A)"}}, "interior": {"db": [53.5, 51.5, 50.5, 49.5, 49.5, 51.5, 55.9, 56.2, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 57.6, 58.0, 58.5, 57.9, 56.9, 55.4, 55.0], "nota": [64.1, 60.8, 59.1, 57.4, 57.4, 60.8, 68.1, 52.1, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 54.3, 55.1, 64.1, 63.1, 61.4, 59.1, 66.6], "franjas": {"D": 54, "E": 62, "N": 62}, "global": 60, "mapa": {"D": "55 - 60 dB(A)", "E": "55 - 60 dB(A)", "N": "50 - 55 dB(A)"}}, "fuentes": {"trafico_noche": "60 - 65 dB(A)", "ocio_noche": "55 - 60 dB(A)"}, "focos": {"ocio": 1, "bares": 13, "quejas": 8, "turisticos": 4}, "sensor_m": 101}, {"direccion": "Travessera de Gràcia 150", "grupo": "control", "barrio": "Vila de Gràcia", "aviso": "", "confianza": "alta", "exterior": {"db": [64.1, 62.5, 61.1, 59.5, 59.0, 60.5, 68.2, 70.2, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 72.6, 71.7, 70.5, 67.9, 66.9, 65.5, 65.2], "nota": [87.9, 86.7, 84.1, 79.8, 75.7, 75.3, 83.9, 74.9, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 76.8, 83.9, 82.3, 82.2, 82.7, 88.6], "franjas": {"D": 78, "E": 83, "N": 83}, "global": 81, "mapa": {"D": "70 - 75 dB(A)", "E": "65 - 70 dB(A)", "N": "60 - 65 dB(A)"}}, "interior": {"db": [38.5, 36.5, 35.5, 34.5, 34.5, 36.5, 40.9, 41.2, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 42.6, 43.0, 43.5, 42.9, 41.9, 40.4, 40.0], "nota": [39.1, 35.8, 34.1, 32.4, 32.4, 35.8, 43.1, 27.2, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 30.1, 39.1, 38.1, 36.4, 34.1, 41.6], "franjas": {"D": 29, "E": 37, "N": 37}, "global": 35, "mapa": {"D": "40 - 45 dB(A)", "E": "40 - 45 dB(A)", "N": "< 40 dB(A)"}}, "fuentes": {"trafico_noche": "60 - 65 dB(A)", "ocio_noche": "55 - 60 dB(A)"}, "focos": {"ocio": 1, "bares": 30, "quejas": 3, "turisticos": 29}, "sensor_m": 50}, {"direccion": "Travessera de Gràcia 300", "grupo": "control", "barrio": "Camp d'en Grassot i Gràcia Nova", "aviso": "", "confianza": "media", "exterior": {"db": [63.5, 61.5, 60.5, 59.5, 59.5, 61.5, 65.9, 66.2, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 67.6, 68.0, 68.5, 67.9, 66.9, 65.4, 65.0], "nota": [82.4, 80.3, 78.5, 76.0, 74.7, 76.6, 81.7, 68.7, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 70.9, 71.7, 80.1, 79.8, 79.0, 78.0, 83.8], "franjas": {"D": 71, "E": 79, "N": 79}, "global": 77, "mapa": {"D": "65 - 70 dB(A)", "E": "65 - 70 dB(A)", "N": "60 - 65 dB(A)"}}, "interior": {"db": [38.5, 36.5, 35.5, 34.5, 34.5, 36.5, 43.5, 45.3, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 47.6, 46.7, 45.5, 42.9, 41.9, 40.4, 40.0], "nota": [39.1, 35.8, 34.1, 32.4, 32.4, 35.8, 47.6, 33.9, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 37.6, 36.1, 42.5, 38.1, 36.4, 34.1, 41.6], "franjas": {"D": 37, "E": 38, "N": 37}, "global": 37, "mapa": {"D": "45 - 50 dB(A)", "E": "40 - 45 dB(A)", "N": "< 40 dB(A)"}}, "fuentes": {"trafico_noche": "60 - 65 dB(A)", "ocio_noche": "< 40 dB(A)"}, "focos": {"ocio": 0, "bares": 6, "quejas": 0, "turisticos": 45}, "sensor_m": 316}];
+
+const GRUPOS = [["control", "Calles de control"], ["ruidosa", "Ruidosas"], ["intermedia", "Intermedias"], ["tranquila", "Tranquilas"]];
+const NOMBRE_GRUPO = { control: "control", ruidosa: "hipótesis: ruidosa", intermedia: "hipótesis: intermedia", tranquila: "hipótesis: tranquila" };
+const FRANJA = Array.from({ length: 24 }, (_, h) => (h >= 7 && h < 19 ? "D" : h >= 19 && h < 23 ? "E" : "N"));
+const NOMBRE_FRANJA = { D: "Día (7–19 h)", E: "Tarde (19–23 h)", N: "Noche (23–7 h)" };
+
+const estado = { i: Math.max(0, DATOS.findIndex(d => d.direccion === "Carrer de Verdi 20")), lado: "exterior", modo: "hora", hora: 1, franja: "N" };
+
+const $ = id => document.getElementById(id);
+const hh = h => String(h).padStart(2, "0") + ":00";
+
+function nivelTexto(s) {
+  if (s <= 15) return "Muy tranquilo";
+  if (s <= 30) return "Tranquilo";
+  if (s <= 50) return "Moderado";
+  if (s <= 70) return "Ruidoso";
+  return "Muy ruidoso";
+}
+function colorNota(s) {
+  if (s >= 50) return `color-mix(in oklab, var(--loud) ${Math.round((s - 50) * 2)}%, var(--mid))`;
+  return `color-mix(in oklab, var(--quiet) ${Math.round((50 - s) * 2)}%, var(--mid))`;
+}
+function mediaEnergetica(dbs) {
+  return 10 * Math.log10(dbs.reduce((a, v) => a + Math.pow(10, v / 10), 0) / dbs.length);
+}
+function lado(d) {
+  return estado.lado === "interior" && d.interior ? d.interior : d.exterior;
+}
+function lectura(d) {
+  const s = lado(d);
+  if (estado.modo === "franja") {
+    const horas = [...Array(24).keys()].filter(h => FRANJA[h] === estado.franja);
+    return { nota: s.franjas[estado.franja], db: mediaEnergetica(horas.map(h => s.db[h])) };
+  }
+  return { nota: s.nota[estado.hora], db: s.db[estado.hora] };
+}
+
+function pintarDetalle() {
+  const d = DATOS[estado.i];
+  if (!d) return;
+  const s = lado(d);
+  $("calle-titulo").textContent = d.direccion;
+  $("barrio").textContent = d.barrio;
+  $("grupo").textContent = NOMBRE_GRUPO[d.grupo] || d.grupo;
+  $("confianza").textContent = "confianza " + d.confianza;
+  $("aviso").hidden = !d.aviso;
+  $("aviso").textContent = d.aviso || "";
+
+  const sinPatio = !d.interior;
+  if (sinPatio && estado.lado === "interior") estado.lado = "exterior";
+  $("lado-interior").disabled = sinPatio;
+  $("lado-interior").title = sinPatio ? "No hay datos de patio interior cerca de esta dirección" : "";
+  $("lado-exterior").setAttribute("aria-pressed", estado.lado === "exterior");
+  $("lado-interior").setAttribute("aria-pressed", estado.lado === "interior");
+  document.querySelectorAll("[data-franja]").forEach(b => b.setAttribute("aria-pressed", estado.modo === "franja" && b.dataset.franja === estado.franja));
+
+  const l = lectura(d);
+  const nota = Math.round(l.nota);
+  $("nota").textContent = nota;
+  $("muestra").style.background = colorNota(nota);
+  $("nivel").textContent = nivelTexto(nota);
+  const donde = estado.lado === "interior" ? "en el patio interior" : "en la fachada a la calle";
+  $("db").textContent = `≈ ${Math.round(l.db)} dB(A) ${donde}`;
+  const mapa = s.mapa[estado.modo === "franja" ? estado.franja : FRANJA[estado.hora]];
+  $("cuando").textContent = estado.modo === "franja"
+    ? `${NOMBRE_FRANJA[estado.franja]} · media de la franja · mapa oficial ${mapa}`
+    : `${hh(estado.hora)} · ${NOMBRE_FRANJA[FRANJA[estado.hora]].split(" ")[0].toLowerCase()} · mapa oficial de la franja ${mapa}`;
+  $("marca-barra").style.left = nota + "%";
+  $("hora").value = estado.hora;
+  $("hora-out").textContent = estado.modo === "franja" ? NOMBRE_FRANJA[estado.franja].split(" ")[0] : hh(estado.hora);
+
+  const f = d.focos;
+  const filas = [
+    ["Tráfico de noche (mapa)", d.fuentes.trafico_noche],
+    ["Ocio de noche (mapa)", d.fuentes.ocio_noche],
+    ["Locales de ocio nocturno · 100 m", f.ocio],
+    ["Bares y restaurantes · 100 m", f.bares],
+    ["Quejas por ruido 2025 · 100 m", f.quejas],
+    ["Pisos turísticos · 100 m", f.turisticos],
+    ["Sensor municipal más cercano", d.sensor_m >= 1000 ? (d.sensor_m / 1000).toFixed(1).replace(".", ",") + " km" : d.sensor_m + " m"],
+    ["Nota global del día", `${d.exterior.global} exterior` + (d.interior ? ` · ${d.interior.global} interior` : "")],
+  ];
+  const dl = $("porque");
+  dl.replaceChildren();
+  for (const [k, v] of filas) {
+    const wrap = document.createElement("div");
+    const dt = document.createElement("dt"); dt.textContent = k;
+    const dd = document.createElement("dd"); dd.textContent = v;
+    wrap.append(dt, dd); dl.append(wrap);
+  }
+  pintarGrafico(d);
+}
+
+const NS = "http://www.w3.org/2000/svg";
+const G = { w: 640, h: 230, l: 34, r: 14, t: 26, b: 26 };
+// El gráfico usa el ancho real en píxeles para que el texto no encoja en pantallas estrechas.
+function medirGrafico() {
+  const ancho = Math.round($("grafico").clientWidth) || 640;
+  G.w = ancho; G.h = ancho < 520 ? 210 : 240;
+  $("svg").setAttribute("viewBox", `0 0 ${G.w} ${G.h}`);
+}
+const xh = h => G.l + ((h + 0.5) / 24) * (G.w - G.l - G.r);
+const yv = v => G.t + (1 - v / 100) * (G.h - G.t - G.b);
+function el(tag, attrs, padre) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (padre) padre.append(e);
+  return e;
+}
+function pintarGrafico(d) {
+  medirGrafico();
+  const svg = $("svg");
+  svg.replaceChildren();
+  const defs = el("defs", {}, svg);
+  const grad = el("linearGradient", { id: "g-ruido", x1: 0, y1: yv(100), x2: 0, y2: yv(0), gradientUnits: "userSpaceOnUse" }, defs);
+  el("stop", { offset: "0%", style: "stop-color: var(--loud)" }, grad);
+  el("stop", { offset: "50%", style: "stop-color: var(--mid)" }, grad);
+  el("stop", { offset: "100%", style: "stop-color: var(--quiet)" }, grad);
+
+  // Franjas del mapa oficial.
+  const tramos = [["N", 0, 7, "Noche"], ["D", 7, 19, "Día"], ["E", 19, 23, "Tarde"], ["N", 23, 24, ""]];
+  for (const [fr, a, b, txt] of tramos) {
+    const activa = estado.modo === "franja" && estado.franja === fr;
+    el("rect", { x: xh(a - 0.5), y: G.t, width: xh(b - 0.5) - xh(a - 0.5), height: G.h - G.t - G.b, style: `fill: ${fr === "D" ? "transparent" : "var(--band)"}; ${activa ? "fill: var(--line);" : ""}` }, svg);
+    if (txt) { const t = el("text", { x: (xh(a - 0.5) + xh(b - 0.5)) / 2, y: 16, "text-anchor": "middle" }, svg); t.textContent = txt; }
+  }
+  for (const v of [0, 25, 50, 75, 100]) {
+    el("line", { x1: G.l, x2: G.w - G.r, y1: yv(v), y2: yv(v), style: `stroke: var(--line); stroke-width: 1; ${v === 50 ? "stroke-dasharray: 4 4; stroke: var(--line-2);" : ""}` }, svg);
+    const t = el("text", { x: G.l - 6, y: yv(v) + 4, "text-anchor": "end" }, svg); t.textContent = v;
+  }
+  for (const h of G.w < 520 ? [0, 6, 12, 18] : [0, 3, 6, 9, 12, 15, 18, 21]) {
+    const t = el("text", { x: xh(h), y: G.h - 8, "text-anchor": "middle" }, svg); t.textContent = String(h).padStart(2, "0") + "h";
+  }
+
+  const sel = lado(d);
+  const otro = estado.lado === "interior" ? d.exterior : d.interior;
+  const puntos = arr => arr.map((v, h) => `${xh(h).toFixed(1)},${yv(v).toFixed(1)}`).join(" ");
+  el("polygon", { points: `${xh(0)},${yv(0)} ${puntos(sel.nota)} ${xh(23)},${yv(0)}`, style: "fill: url(#g-ruido); fill-opacity: 0.35; stroke: none" }, svg);
+  if (otro) el("polyline", { points: puntos(otro.nota), style: "fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 5 4" }, svg);
+  el("polyline", { points: puntos(sel.nota), style: "fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round" }, svg);
+
+  if (estado.modo === "hora") {
+    const h = estado.hora, v = sel.nota[h];
+    el("line", { x1: xh(h), x2: xh(h), y1: G.t, y2: G.h - G.b, style: "stroke: var(--ink); stroke-width: 1" }, svg);
+    el("circle", { cx: xh(h), cy: yv(v), r: 5, style: "fill: var(--ink); stroke: var(--surface); stroke-width: 2" }, svg);
+  }
+  const zona = el("rect", { x: G.l, y: 0, width: G.w - G.l - G.r, height: G.h, style: "fill: transparent" }, svg);
+  zona.addEventListener("pointermove", e => moverPuntero(e, d));
+  zona.addEventListener("pointerdown", e => { moverPuntero(e, d, true); });
+  zona.addEventListener("pointerleave", () => { $("tip").hidden = true; });
+
+  const ley = $("leyenda");
+  ley.replaceChildren();
+  const item = (cls, txt) => { const s = document.createElement("span"); const i = document.createElement("i"); if (cls) i.className = cls; s.append(i, txt); ley.append(s); };
+  item("", estado.lado === "interior" ? "Interior (patio)" : "Exterior (fachada a la calle)");
+  if (otro) item("fant", estado.lado === "interior" ? "Exterior" : "Interior (patio)");
+}
+function horaDesdePuntero(e) {
+  const r = $("svg").getBoundingClientRect();
+  const x = ((e.clientX - r.left) / r.width) * G.w;
+  return Math.max(0, Math.min(23, Math.round(((x - G.l) / (G.w - G.l - G.r)) * 24 - 0.5)));
+}
+function moverPuntero(e, d, fijar) {
+  const h = horaDesdePuntero(e);
+  const s = lado(d);
+  const tip = $("tip");
+  const r = $("svg").getBoundingClientRect();
+  tip.hidden = false;
+  tip.style.left = (xh(h) / G.w) * r.width + "px";
+  tip.style.top = (yv(s.nota[h]) / G.h) * r.height - 10 + "px";
+  tip.replaceChildren();
+  const b = document.createElement("b"); b.textContent = Math.round(s.nota[h]);
+  tip.append(b, ` · ${hh(h)} · ≈ ${Math.round(s.db[h])} dB`);
+  if (fijar || e.buttons) { estado.modo = "hora"; estado.hora = h; pintarTodo(); }
+}
+
+function pintarLista() {
+  const cont = $("lista");
+  cont.replaceChildren();
+  $("nota-hora").textContent = estado.modo === "franja"
+    ? `Nota media de ${NOMBRE_FRANJA[estado.franja].toLowerCase()}, ${estado.lado === "interior" ? "interior" : "exterior"}.`
+    : `Nota a las ${hh(estado.hora)}, ${estado.lado === "interior" ? "interior" : "exterior"}.`;
+  for (const [g, titulo] of GRUPOS) {
+    const items = DATOS.map((d, i) => [d, i]).filter(([d]) => d.grupo === g);
+    if (!items.length) continue;
+    const h3 = document.createElement("h3"); h3.textContent = titulo;
+    const ul = document.createElement("ul");
+    for (const [d, i] of items) {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.className = "calle";
+      btn.setAttribute("aria-current", i === estado.i);
+      const nom = document.createElement("span"); nom.className = "nom"; nom.textContent = d.direccion;
+      const nota = Math.round(lectura(d).nota);
+      const sw = document.createElement("span"); sw.className = "sw"; sw.style.background = colorNota(nota);
+      const val = document.createElement("span"); val.className = "val"; val.textContent = nota;
+      btn.append(nom, sw, val);
+      btn.addEventListener("click", () => { estado.i = i; pintarTodo(); });
+      li.append(btn); ul.append(li);
+    }
+    cont.append(h3, ul);
+  }
+}
+
+function pintarTodo() { pintarDetalle(); pintarLista(); }
+
+$("hora").addEventListener("input", e => { estado.modo = "hora"; estado.hora = +e.target.value; pintarTodo(); });
+$("lado-exterior").addEventListener("click", () => { estado.lado = "exterior"; pintarTodo(); });
+$("lado-interior").addEventListener("click", () => { estado.lado = "interior"; pintarTodo(); });
+document.querySelectorAll("[data-franja]").forEach(b => b.addEventListener("click", () => {
+  estado.modo = "franja"; estado.franja = b.dataset.franja;
+  estado.hora = { D: 13, E: 21, N: 1 }[estado.franja];
+  pintarTodo();
+}));
+let espera;
+window.addEventListener("resize", () => { clearTimeout(espera); espera = setTimeout(() => pintarGrafico(DATOS[estado.i]), 120); });
+pintarTodo();
+</script>
