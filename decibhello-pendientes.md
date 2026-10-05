@@ -29,7 +29,7 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Comparar**: dos o tres pisos lado a lado, y la calle frente a la media del barrio y de la ciudad.
 
 ### 3. Producto usable por cualquiera
-- [ ] **Web pública**: hoy es un prototipo privado. Hace falta dominio, alojamiento y que cargue rápido en el móvil.
+- [ ] **Portal independiente propio**: DecibHello como web con marca, dominio y alojamiento propios, que funcione por sí sola (buscador, informe, mapa) sin depender de los portales inmobiliarios. La extensión de Chrome y los acuerdos con portales son vías de entrada a este portal, no lo sustituyen. Hoy es un prototipo privado: falta dominio, alojamiento, que cargue rápido en el móvil y que los datos se actualicen solos.
 - [ ] **Mapa** con la calle y los focos (bares, sensores, quejas) alrededor.
 - [ ] **Informe para guardar o enviar** (PDF o enlace) por dirección.
 - [ ] **Extensión de Chrome**: al abrir un anuncio (Idealista, Fotocasa, Habitaclia…), lee la zona o calle que la página ya muestra al usuario y enseña la nota de DecibHello en el propio anuncio, con enlace al informe completo. Revisar antes las condiciones de uso de cada portal y las normas de la Chrome Web Store (permisos mínimos, privacidad).
@@ -52,6 +52,6 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 1. Sensores + validación sobre el terreno (sin fiabilidad, no hay producto).
 2. Planta, orientación y avisos temporales en el visor.
 3. Entrevistas y lista de espera en paralelo.
-4. Web pública con mapa e informe.
+4. Portal independiente propio con buscador, mapa e informe.
 5. Opiniones de vecinos.
 6. Extensión de Chrome y acuerdos con portales.
