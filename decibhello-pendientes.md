@@ -32,7 +32,8 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Web pública**: hoy es un prototipo privado. Hace falta dominio, alojamiento y que cargue rápido en el móvil.
 - [ ] **Mapa** con la calle y los focos (bares, sensores, quejas) alrededor.
 - [ ] **Informe para guardar o enviar** (PDF o enlace) por dirección.
-- [ ] **Anuncios inmobiliarios**: extensión de navegador o acuerdos con portales.
+- [ ] **Extensión de Chrome**: al abrir un anuncio (Idealista, Fotocasa, Habitaclia…), lee la zona o calle que la página ya muestra al usuario y enseña la nota de DecibHello en el propio anuncio, con enlace al informe completo. Revisar antes las condiciones de uso de cada portal y las normas de la Chrome Web Store (permisos mínimos, privacidad).
+- [ ] **Acuerdos con portales inmobiliarios** para mostrar la nota en sus anuncios.
 - [ ] **Textos claros y aviso legal**: dejar claro que es una estimación, no una medición del piso.
 
 ### 4. Datos de la comunidad
@@ -53,4 +54,4 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 3. Entrevistas y lista de espera en paralelo.
 4. Web pública con mapa e informe.
 5. Opiniones de vecinos.
-6. Anuncios y acuerdos con portales.
+6. Extensión de Chrome y acuerdos con portales.
