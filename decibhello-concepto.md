@@ -76,7 +76,7 @@ Foco inicial: inquilinos y compradores en Barcelona. Merecen atención especial 
 - Extensión de navegador que muestre la puntuación en los portales.
 - API para inmobiliarias y portales.
 
-## 7. Fuentes de datos (a investigar)
+## 7. Fuentes de datos
 
 - Mapas estratégicos de ruido oficiales (directiva europea END) y mapas municipales.
 - Datos abiertos de tráfico, aeropuertos y ferrocarril.
@@ -87,17 +87,14 @@ Foco inicial: inquilinos y compradores en Barcelona. Merecen atención especial 
 
 Riesgos: cobertura desigual entre ciudades, datos desactualizados, mapas oficiales con media anual (no reflejan picos nocturnos).
 
-### Barcelona: fuentes concretas a comprobar
+### Barcelona
 
-Disponibilidad, licencia y fecha de actualización por verificar en cada caso:
+Investigación detallada en [decibhello-fuentes-datos-barcelona.md](decibhello-fuentes-datos-barcelona.md). Resumen:
 
-- **Mapa estratégico de ruido de Barcelona** (Ajuntament): niveles por tramo de calle y franja horaria.
-- **Red de sensores de ruido municipal**: mediciones continuas en puntos de la ciudad, publicadas a través de Open Data BCN y la plataforma Sentilo. Es la mejor fuente para ver patrones reales de noche y fin de semana.
-- **Open Data BCN**: licencias de terrazas, actividades y locales, intensidad de tráfico, obras en la vía pública.
-- **Quejas por ruido** al Ajuntament (IRIS), si se publican agregadas por zona.
-- **Aeropuerto de El Prat y AENA**: rutas de aproximación y despegue; afectan sobre todo a algunos municipios del área metropolitana.
-- **Rodalies, metro en superficie y grandes ejes** (Rondas, Diagonal, Gran Via, Aragó): ruido de fondo constante.
-- **OpenStreetMap**: bares, discotecas, colegios, mercados, hospitales.
+- **Base de la nota**: mapa estratégico de ruido municipal de 2022 (fase 4), por tramo de calle y por fachada, con día, tarde y noche y fuentes separadas (tráfico, ferrocarril, industria, ocio). Open Data BCN, licencia CC BY 4.0.
+- **Ruido real hora a hora**: red municipal de unos 200 sensores (Sentilo), con datos mensuales en Open Data BCN.
+- **Focos intermitentes**: censo de locales en planta baja, pisos turísticos, obras, quejas IRIS y OpenStreetMap.
+- **Secundarias en la ciudad**: aeropuerto de El Prat y ferrocarril (SICA).
 
 Factores propios de Barcelona que la nota debe recoger:
 - Ocio nocturno y terrazas, muy concentrados en algunos barrios.
