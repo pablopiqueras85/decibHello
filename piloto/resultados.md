@@ -38,7 +38,7 @@ El visor interactivo (`visor.html`) tiene un buscador para cualquier portal de B
 | Nota | Día | Tarde | Noche | Interior | Dirección | Hipótesis | Ruido noche (mapa) | Ocio / bares / quejas / HUT (100 m) | Confianza |
 |---|---|---|---|---|---|---|---|---|---|
 | 84 | 83 | 85 | 85 | 46 | Gran Via de les Corts Catalanes 600 | ruidosa | 65–70 | 0 / 21 / 0 / 43 | media |
-| 84 | 78 | 87 | 87 | 60 | Travessera de Gràcia 81 | control | 65–70 | 1 / 13 / 8 / 4 | alta |
+| 84 | 78 | 87 | 86 | 60 | Travessera de Gràcia 81 | control | 65–70 | 1 / 13 / 8 / 4 | alta |
 | 84 | 84 | 89 | 83 | 35 | Travessera de Gràcia 150 | control | 60–65 | 1 / 29 / 3 / 50 | alta |
 | 83 | 80 | 85 | 85 | 68 | Carrer d'Aragó 300 | ruidosa | 65–70 | 0 / 7 / 1 / 5 | medida |
 | 83 | 78 | 85 | 85 | — | Carrer de Sants 100 | intermedia | 65–70 | 0 / 17 / 4 / 4 | media |
@@ -78,8 +78,8 @@ Nota media de la noche (23–7 h) que empieza cada día: la del viernes va del v
 | Carrer de Martínez de la Rosa 20 | 75 | 75 | 78 | 80 | 85 | 84 | 74 | +10 |
 | Plaça del Sol 12 | 65 | 65 | 69 | 69 | 74 | 72 | 65 | +9 |
 | Carrer d'Enric Granados 50 | 68 | 71 | 72 | 74 | 77 | 75 | 68 | +9 |
+| Travessera de Gràcia 81 | 81 | 82 | 86 | 87 | 90 | 89 | 84 | +9 |
 | Travessera de Gràcia 150 | 78 | 79 | 82 | 83 | 87 | 86 | 78 | +9 |
-| Travessera de Gràcia 81 | 82 | 82 | 87 | 88 | 90 | 90 | 85 | +8 |
 | Rambla del Poblenou 60 | 68 | 70 | 71 | 71 | 75 | 76 | 70 | +7 |
 | Carrer Gran de Sant Andreu 200 | 70 | 71 | 72 | 73 | 77 | 76 | 70 | +7 |
 | Carrer de Blai 20 | 69 | 69 | 71 | 69 | 75 | 75 | 69 | +6 |

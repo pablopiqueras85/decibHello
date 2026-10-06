@@ -77,7 +77,7 @@ def perfil_horario(total, trafico=None, ocio_noche=None, dia=None):
     """Reparte los niveles oficiales de día, tarde y noche en 24 horas (índice = hora del reloj).
 
     Dentro de cada franja, el tráfico sigue PERFIL_TRAFICO y el ocio nocturno PERFIL_OCIO; el resto del ruido
-    se reparte plano. Se reescala para que la media energética de cada franja sea la del mapa oficial.
+    sigue la forma de ambos. Se reescala para que la media energética de cada franja sea la del mapa oficial.
     Con `dia` (0-6), el tráfico y el ocio se multiplican por su peso de ese día; sin `dia`, es la media anual.
     Las horas 0-6 son la madrugada que sigue al día elegido.
     """
@@ -106,8 +106,13 @@ def perfil_horario(total, trafico=None, ocio_noche=None, dia=None):
         # El resto del ruido (no atribuido a tráfico ni a ocio en el mapa) varía como la mezcla de ambos en esa franja.
         e_traf, e_ocio = sum(traf.values()), sum(ocio.values())
         f_resto = (e_traf * f_traf + e_ocio * f_ocio) / (e_traf + e_ocio) if e_traf + e_ocio else f_traf
+        # El resto (ruido sin fuente asignada en el mapa) sigue la forma horaria de tráfico + ocio de la franja,
+        # no un reparto plano: de madrugada baja como baja la actividad de la calle.
+        base = {h: traf[h] + ocio[h] for h in horas}
+        media_base = sum(base.values()) / len(horas)
+        forma_resto = {h: (base[h] / media_base if media_base else 1.0) for h in horas}
         for h in horas:
-            db[h] = 10 * math.log10((traf[h] * f_traf + ocio[h] * f_ocio + resto * f_resto) * ajuste)
+            db[h] = 10 * math.log10((traf[h] * f_traf + ocio[h] * f_ocio + resto * forma_resto[h] * f_resto) * ajuste)
     # Suaviza el salto entre franjas (18-19 h, 22-23 h) conservando la energía de cada pareja de horas.
     # Las 6 y las 7 no se mezclan: en un día de 7:00 a 7:00 pertenecen a mañanas distintas.
     for h1, h2 in ((18, 19), (22, 23)):

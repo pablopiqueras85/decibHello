@@ -318,7 +318,12 @@ function perfilHorario(total, trafico, ocioNoche, dia) {
     const fOcio = dia != null ? PESO_DIA_OCIO_NOCHE[dia] : 1;
     const eT = suma(traf), eO = suma(ocio);
     const fResto = eT + eO ? (eT * fTraf + eO * fOcio) / (eT + eO) : fTraf;
-    horas.forEach((h, i) => (db[h] = 10 * Math.log10((traf[i] * fTraf + ocio[i] * fOcio + resto * fResto) * ajuste)));
+    // El resto (sin fuente asignada) sigue la forma horaria de tráfico + ocio de la franja.
+    const mediaBase = (eT + eO) / n;
+    horas.forEach((h, i) => {
+      const forma = mediaBase ? (traf[i] + ocio[i]) / mediaBase : 1;
+      db[h] = 10 * Math.log10((traf[i] * fTraf + ocio[i] * fOcio + resto * forma * fResto) * ajuste);
+    });
   }
   for (const [h1, h2] of [[18, 19], [22, 23]]) {
     const e1 = energia(db[h1]), e2 = energia(db[h2]);

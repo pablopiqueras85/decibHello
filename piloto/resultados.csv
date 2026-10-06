@@ -20,7 +20,7 @@ Carrer de Campoamor 30,tranquila,62,62,63,62,,60 - 65 dB(A),55 - 60 dB(A),50 - 5
 Carrer de la Mare de Déu del Coll 50,tranquila,69,62,72,72,46,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),< 40 dB(A),0,0,2,3,300,42-58,media,,0,,13,1,medio,70,70,71,72,75,74,70
 Carrer de les Agudes 20,tranquila,60,54,63,63,,55 - 60 dB(A),55 - 60 dB(A),50 - 55 dB(A),50 - 55 dB(A),< 40 dB(A),0,0,1,0,2510,14-36,media,,0,,102,0,bajo,61,62,62,63,66,65,61
 Carrer de Tuset 20,control,75,67,74,80,48,60 - 65 dB(A),60 - 65 dB(A),65 - 70 dB(A),55 - 60 dB(A),65 - 70 dB(A),7,26,3,4,60,14-28,medida,Tuset 30,5,,23,0,bajo,68,70,78,81,83,83,67
-Travessera de Gràcia 81,control,84,78,87,87,60,70 - 75 dB(A),70 - 75 dB(A),65 - 70 dB(A),60 - 65 dB(A),55 - 60 dB(A),1,13,8,4,100,81-81,alta,,4,,23,4,medio,82,82,87,88,90,90,85
+Travessera de Gràcia 81,control,84,78,87,86,60,70 - 75 dB(A),70 - 75 dB(A),65 - 70 dB(A),60 - 65 dB(A),55 - 60 dB(A),1,13,8,4,100,81-81,alta,,4,,23,4,medio,81,82,86,87,90,89,84
 Travessera de Gràcia 150,control,84,84,89,83,35,70 - 75 dB(A),65 - 70 dB(A),60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),1,29,3,50,50,140-148,alta,,13,sí,8,0,medio,78,79,82,83,87,86,78
 Travessera de Gràcia 300,control,77,71,79,79,37,65 - 70 dB(A),65 - 70 dB(A),60 - 65 dB(A),60 - 65 dB(A),< 40 dB(A),0,7,0,25,300,282-298,media,,3,,23,0,bajo,77,78,79,79,82,81,77
 Carrer de Martínez de la Rosa 20,control,79,73,87,79,35,60 - 65 dB(A),60 - 65 dB(A),55 - 60 dB(A),55 - 60 dB(A),40 - 45 dB(A),3,27,5,57,190,8-42,media,,11,sí,8,5,alto,75,75,78,80,85,84,74
