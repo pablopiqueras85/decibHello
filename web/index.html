@@ -34,7 +34,7 @@ a { color: inherit; text-decoration-color: var(--accent); text-decoration-thickn
 .portada canvas, .portada video { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
 .portada video { object-fit: cover; opacity: 0; transition: opacity 1.2s ease; }
 .portada video.lista { opacity: 1; }
-.portada::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(13,17,23,.55) 0%, rgba(13,17,23,.15) 40%, rgba(13,17,23,.75) 100%); }
+.portada::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(13,17,23,.55) 0%, rgba(13,17,23,.1) 70%), linear-gradient(180deg, rgba(13,17,23,.55) 0%, rgba(13,17,23,.3) 40%, rgba(13,17,23,.8) 100%); }
 .marca { padding: 1.25rem 1rem 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem; max-width: 72rem; width: 100%; margin: 0 auto; }
 .logo { font-family: var(--display); font-weight: 800; font-size: 1.15rem; letter-spacing: -.01em; display: inline-flex; align-items: center; gap: .5rem; }
 .logo svg { width: 1.6rem; height: 1rem; }
@@ -591,7 +591,7 @@ if (!reduce && "IntersectionObserver" in window) {
     const fuentes = [["media/portada.webm", "video/webm"], ["media/portada.mp4", "video/mp4"]];
     for (const [src, type] of fuentes) { const s = document.createElement("source"); s.src = src; s.type = type; v.append(s); }
     v.poster = "media/portada.jpg";
-    v.addEventListener("playing", () => { v.classList.add("lista"); visible = false; $("credito-video").textContent = "Vídeo de la portada: ver créditos en web/CREDITOS.md."; }, { once: true });
+    v.addEventListener("playing", () => { v.classList.add("lista"); visible = false; $("credito-video").textContent = "Vídeo de la portada: plaça de Catalunya, Barcelona (Coverr, licencia Coverr)."; }, { once: true });
     v.load(); v.play().catch(() => {});
   }
 })();
