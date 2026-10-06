@@ -36,7 +36,7 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Estacionalidad**: verano (ventanas abiertas, terrazas) frente a invierno.
 - [x] **Obras públicas**: las obras en curso a menos de 25 m suman +2 dB de día laborable mientras duran (validado con sensores); el visor lista las obras a menos de 100 m con sus fechas (`piloto/obras_validacion.md`).
 - [ ] **Obras privadas** (rehabilitación de edificios, derribos, obra nueva): no hay datos públicos de licencias. Las grandes con andamio o grúa en la calle ya están en las obras públicas. Pedir licencias y permisos de andamios y grúas por transparencia (borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.15).
-- [ ] **Actualizar las obras solas**: hoy se cargan al regenerar el visor; en el portal, cada día.
+- [x] **Obras al día**: una tarea programada regenera y republica el visor cada mañana (6:47) con las obras del día.
 - [ ] **Otros avisos temporales**: fiestas mayores, conciertos.
 - [ ] **Comparar**: dos o tres pisos lado a lado, y la calle frente a la media del barrio y de la ciudad.
 

@@ -75,3 +75,9 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - **En la nota**: obra en curso a menos de 25 m → +2 dB de 8 a 18 h, de lunes a viernes, hasta la fecha de fin. Desaparece sola cuando termina. No suman las previstas, las paradas ni los grandes proyectos (túnel de la L9, Camp Nou…), que se muestran como aviso.
 - **En el visor**: bloque "Obras" con las obras a menos de 100 m (distancia, tipo, fechas y ficha) y cuánto cambia la nota.
 - **Pendiente**: obras privadas de edificios; actualización diaria en el portal.
+
+## Actualización del 6 de octubre: obras al día
+
+- Las **obras públicas** se actualizan a diario en Open Data BCN. Una tarea programada las descarga cada mañana a las 6:47, regenera el visor y lo republica en el mismo enlace.
+- Las **quejas vecinales (IRIS)** se publican cada trimestre (las de 2026 llegan a marzo): no sirven para un aviso del día, así que no se usan para obras.
+- Las **obras privadas** siguen pendientes de la solicitud de transparencia (borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.15).
