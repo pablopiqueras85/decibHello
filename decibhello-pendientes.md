@@ -59,7 +59,7 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Modelo de ingresos**: informe gratuito básico y completo de pago; licencia para inmobiliarias y portales.
 - [ ] **Mantenimiento de datos**: actualizar quejas, locales, pisos turísticos y sensores cada mes o trimestre de forma automática.
 - [x] **Siguiente ciudad: Madrid** (confirmado el 6 de octubre de 2026). Datos de 0 a 10: Barcelona 9,5 · Madrid 8 · Valencia 5 · L'Hospitalet + Badalona 3,5 · Sant Cugat 1. Informes en `investigacion/` (rama `agente/siguiente-ciudad`). El área metropolitana, como ampliación de Barcelona más adelante.
-- [ ] **Piloto de Madrid**: unas 3–4 semanas. Mapa 2021 en dB exactos cada 5 m, censo de locales con horarios, portales con coordenadas. Falta: sensores por hora (transparencia), ocio en el mapa (recalibrar con pocas estaciones) y situar en el mapa las quejas y los pisos turísticos.
+- [ ] **Piloto de Madrid** (en espera: Pablo prefiere terminar antes Barcelona, 6 oct): unas 3–4 semanas. Mapa 2021 en dB exactos cada 5 m, censo de locales con horarios, portales con coordenadas. Falta: sensores por hora (transparencia), ocio en el mapa (recalibrar con pocas estaciones) y situar en el mapa las quejas y los pisos turísticos.
 
 ### 6. Venta a portales y empresas (cuando haya portal público y validación)
 - [ ] **Estrategia extensión vs. portales**: la extensión sirve para medir interés, no para presionar. En la web de un portal que integre la nota, la extensión deja de mostrarse. El portal propio sigue siendo el centro.
