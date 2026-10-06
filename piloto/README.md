@@ -38,5 +38,5 @@ Una tarea programada ("DecibHello: actualizar obras del visor", de lunes a viern
 
 ## Comprobaciones
 
-- La nota del visor (JavaScript) y la de `calcular_nota.py` (Python) coinciden en las 26 direcciones del piloto: nota global, las 7 noches y el aviso de picos.
+- La nota del visor (JavaScript) y la de `calcular_nota.py` (Python) coinciden en las direcciones del piloto: nota global, las 7 noches y el aviso de picos. Se comprueba con `cd piloto/pruebas && npm install && node paridad.mjs` (0 diferencias).
 - Datos de sensores: de 7:00 a 23:59 la fecha registrada es la del día siguiente; `sensores.py` lo corrige.
