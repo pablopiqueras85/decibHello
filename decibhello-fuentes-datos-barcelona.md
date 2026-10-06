@@ -170,6 +170,26 @@ El paso de camiones de basura y de limpieza de madrugada da picos cortos e inten
 - **Validación**: con los sensores de 2023, una obra a menos de 25 m sube el ruido de día laborable unos 2 dB de media mientras dura, y hasta 8 dB en una reurbanización. Más lejos, casi nada (`piloto/obras_validacion.md`).
 - **Límites**: solo obras públicas. Las fechas son las previstas y el polígono marca todo el ámbito, no la fase del día. Las obras privadas de edificios no están.
 
+### 2.15 Obras privadas de edificios
+
+**No hay un dataset público con las licencias de obras privadas** (ni en Open Data BCN, revisados sus 555 datasets, ni en el Portal de Dades, que solo da recuentos por tipo de licencia). Lo que sí hay:
+
+- **Obras privadas que ocupan la calle**: el dataset de obras (2.14) incluye unas 75 obras de edificación de promotores privados (andamios y ocupaciones para rehabilitar o construir edificios), una docena de grúas y alcantarillados particulares. Ya cuentan en la nota.
+- **Quejas IRIS** (con coordenadas y fecha; 2026 llega hasta marzo):
+  - "Molèsties soroll a la via pública – Obres": ~300 al año; la mitad no tiene una obra pública cerca, así que son sobre todo obras privadas. Con los sensores de 2023 hay indicios de más ruido cerca (+0,2 a +4,4 dB), pero con muy pocos sensores para validarlo (2–7).
+  - "Sacs i contenidors runa": 600–900 incidencias al año. No predicen más ruido en la calle (efecto ≈ 0 dB): suelen ser reformas interiores, que molestan dentro del edificio.
+- **Precedente**: la GAIP (resolución 0240/2023) desestimó pedir un inventario de licencias de obras mayores de Gràcia de 1990–2016, porque había que revisar 3.000 expedientes en papel. Las licencias recientes se tramitan por eObres (en digital), así que una petición limitada a las obras recientes es más viable.
+
+Borrador de solicitud (por el Portal de Transparencia del Ajuntament):
+
+> Solicito, en formato reutilizable (CSV o similar), la relación de las licencias de obras mayores, los comunicados de obras con afectación a fachada o a la vía pública y los permisos de ocupación de la vía pública para andamios, grúas y contenedores de obra, concedidos o vigentes desde el 1 de enero de 2024, con estos campos:
+>
+> 1. Dirección (calle y número) o coordenadas.
+> 2. Tipo de obra o actuación (obra nueva, derribo, rehabilitación de fachada, ampliación, reforma, andamio, grúa…).
+> 3. Fecha de concesión y fechas previstas de inicio y fin, o periodo de ocupación de la vía pública.
+>
+> No solicito datos personales de los titulares. La finalidad es elaborar un servicio informativo sobre el ruido urbano para la ciudadanía. Solicito además, si es posible, que esta información se publique en Open Data BCN.
+
 ## 3. Cómo se accede a los datos
 
 - **Ficheros tabulares (CSV)**: se leen sin problema por la API del portal (`datastore_search` y `datastore_search_sql`), con consultas y filtros. Así funcionan el MES por tramo, el censo de locales, los pisos turísticos, IRIS y la lista de sensores.
