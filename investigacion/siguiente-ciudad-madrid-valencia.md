@@ -76,8 +76,11 @@ Estimación orientativa en días de trabajo de un agente, con revisión de Pablo
 | Visor, buscador y pruebas (móvil y escritorio) | 3–4 días | 3–4 días |
 | **Total** | **≈ 3–4 semanas** | **≈ 4–5 semanas + esperar la respuesta de transparencia (plazo legal de un mes)** |
 
+## Decisión
+
+**6 de octubre de 2026: Pablo confirma Madrid como siguiente ciudad.**
+
 ## Qué necesito de Pablo
 
-1. Confirmar Madrid como siguiente ciudad, teniendo en cuenta también la votación de la web.
-2. Enviar la solicitud de transparencia al Ayuntamiento de Madrid (datos por hora de las 31 estaciones y horarios de recogida). Si quiere, preparo el borrador.
-3. Para Madrid no hace falta descargar nada a mano: todo se baja de forma automática.
+1. Enviar la solicitud de transparencia al Ayuntamiento de Madrid (datos por hora de las 31 estaciones y horarios de recogida). Borrador listo en [solicitud-transparencia-madrid.md](solicitud-transparencia-madrid.md).
+2. Para Madrid no hace falta descargar nada a mano: todo se baja de forma automática.

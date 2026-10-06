@@ -8,7 +8,7 @@ La comparación centrada solo en Madrid y Valencia, con la nota de 0 a 10 y la e
 
 ## 1. Conclusión
 
-**La siguiente ciudad debería ser Madrid.**
+**La siguiente ciudad es Madrid** (confirmado por Pablo el 6 de octubre de 2026).
 
 - Tiene casi todo lo que usa Barcelona, y en algunas cosas más: mapa de ruido de 2021 en dB exactos cada 5 m, censo de locales **con horario**, terrazas con horario y anchura de calle medida.
 - Su gran hueco: los sensores **no publican datos por hora**. Solo publican un dato por franja (día, tarde y noche) y por día, desde 1998 hasta ayer. Con eso salen los pesos por día de la semana, pero no la forma de cada hora.
