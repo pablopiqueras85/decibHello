@@ -20,15 +20,17 @@ Este fichero sirve para retocar el guion sin leer el código. Cada bloque dice a
 | 8 | 22:00 | noche | **"La noche del lunes, Tuset saca un 60. La del viernes, un 93."** + barras de la semana | El día de la semana importa |
 | 9 | 0:00 | noche | **"Mismo portal. Otro piso."** Exterior 75, interior 25 | Exterior frente a interior |
 | 10 | 2:00 | noche | **"Así es un informe."** Hoja de Tuset 20 + enlace al visor | Qué recibe el usuario |
+| 10b | 3:00 | noche | **"Busca tu calle."** Buscador real (motor común `decibhello.js`): dirección o enlace de Google Maps → nota, franjas, noches, exterior/interior, picos, obras y enlace al visor | Que cualquiera pruebe su calle |
 | 11 | 4:00 | madrugada | **"Apúntate antes de firmar."** + formulario | La acción |
+| 11b | 5:30 | madrugada | **"¿Y después de Barcelona?"** Botones con foto: Barcelona (activa, abre el buscador), área metropolitana, Madrid, Valencia y "Otra ciudad". Voto de un toque con contador, sin correo (colección `votos`) | Medir qué ciudad abrir después |
 | 12 | 6:30 | amanecer | **Pie**: fuentes y créditos | |
 
 Todas las cifras salen del piloto (`piloto/resultados.csv`, `piloto/resultados.md` y el visor). No hay testimonios ni cifras inventadas.
 
 ## Ideas abiertas para retocar
 
+- **Páginas por ciudad** con mapa y calles más y menos ruidosas: más adelante.
 - **Extensión de Chrome** (maqueta hecha, bloque 3b): el formulario tiene la casilla "Avísame también cuando salga la extensión"; el panel de inscripciones muestra quién la marcó. Por decidir: si el recuadro va al lado de las fotos (como ahora) o como franja encima del precio, y qué pasa cuando el anuncio no trae la calle.
-- **Buscador dentro de la página**: en el bloque 10, en lugar del enlace al visor, un buscador real de calle (hoy el visor es privado).
 - **El marcador**: que avise con una pegatina cuando cruza un umbral ("Ahora es muy ruidoso"), o que suene un clic suave al pasar de franja (solo si el usuario lo activa).
 - **Ritmo**: decidir si cada bloque debe caer en su hora exacta (hoy la hora la marca la posición en la página y es aproximada).
 - **Otras calles**: repetir el viaje con Pomaret 20 como contraste ("el mismo viernes en una calle tranquila").

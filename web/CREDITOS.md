@@ -15,5 +15,15 @@
 ## Maqueta de la extensión
 - El anuncio, la dirección web (ejemplo.com) y la fachada son inventados y dibujados a mano. No se usan logotipos ni capturas de portales reales.
 
+## Fotos de ciudades (Wikimedia Commons)
+- Barcelona: "Barcelona Skyline as seen from Parc Güell", Chris Koerner, CC BY 2.0. https://commons.wikimedia.org/wiki/File:Barcelona_Skyline_as_seen_from_Parc_G%C3%BCell.jpg → `media/ciudad-barcelona.jpg`
+- Madrid: "Madrid - Madrid skyline - 140314 195825", Barcex, CC BY-SA 3.0. https://commons.wikimedia.org/wiki/File:Madrid_-_Madrid_skyline_-_140314_195825.jpg → `media/ciudad-madrid.jpg`
+- Valencia: "Skyline València", Francesc Fort, CC BY-SA 4.0. https://commons.wikimedia.org/wiki/File:Skyline_Val%C3%A8ncia.jpg → `media/ciudad-valencia.jpg`
+- Reducidas a 900 px de ancho, sin otros cambios. El crédito va en el pie de la página.
+- Área metropolitana: sin foto todavía (Commons limitó las descargas). Fondo propio de puntos. Pendiente: una foto de L'Hospitalet o Badalona con licencia CC, o una de Pablo.
+
+## Buscador
+- `decibhello.js` es `piloto/paquete/decibhello.js` (motor común que genera `piloto/calcular_nota.py`). La web lo publica junto a la página y lo carga solo al acercarse al buscador.
+
 ## Tipografías
 - Gloock, Hanken Grotesk e IBM Plex Mono (Google Fonts, licencia SIL Open Font License).

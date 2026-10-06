@@ -18,6 +18,8 @@
   color-scheme: light;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body { margin: 0; background: var(--cielo); color: var(--tinta); font-family: var(--body); font-size: 1rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
@@ -131,10 +133,10 @@ input[type="range"] { width: 100%; accent-color: var(--rojo); height: 2rem; }
 @media (min-width: 720px) { .informe { transform: rotate(-.8deg); padding: 2rem; } }
 .informe .cab { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; font-family: var(--mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--papel-gris); border-bottom: 1px dashed var(--papel-gris); padding-bottom: .7rem; }
 .informe .dir { font-family: var(--display); font-size: 1.9rem; line-height: 1.05; }
-.informe .principal { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
-.informe .principal .cifra { font-family: var(--display); font-size: 5.5rem; line-height: .85; }
-.informe .principal .etq { font-family: var(--display); font-size: 1.5rem; line-height: 1.1; }
-.informe .principal .sub { font-size: .9rem; color: var(--papel-gris); }
+:is(.informe, .resultado) .principal { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+:is(.informe, .resultado) .principal .cifra { font-family: var(--display); font-size: 5.5rem; line-height: .85; }
+:is(.informe, .resultado) .principal .etq { font-family: var(--display); font-size: 1.5rem; line-height: 1.1; }
+:is(.informe, .resultado) .principal .sub { font-size: .9rem; color: var(--papel-gris); }
 .regla { position: relative; height: 8px; background: linear-gradient(90deg, var(--verde), #9DB758 30%, var(--amarillo) 50%, #E58A3A 70%, var(--rojo)); }
 .regla i { position: absolute; top: -6px; width: 3px; height: 20px; background: var(--papel-tinta); transform: translateX(-50%); }
 .regla-ejes { display: flex; justify-content: space-between; font-family: var(--mono); font-size: .64rem; color: var(--papel-gris); margin-top: .35rem; text-transform: uppercase; letter-spacing: .06em; }
@@ -224,6 +226,49 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
 @media (max-width: 640px) { .nav-cuerpo { grid-template-columns: 1fr; } .nav-pestana { max-width: 9rem; } }
 .casilla-ext { display: grid; grid-template-columns: 1.3rem 1fr; gap: .6rem; font-size: .9rem; align-items: start; }
 .casilla-ext input { width: 1.1rem; height: 1.1rem; margin-top: .2rem; accent-color: var(--rojo); }
+
+/* ---------- Buscador ---------- */
+.buscador { max-width: 40rem; margin: 3rem auto 0; padding: 1.25rem; }
+@media (min-width: 720px) { .buscador { padding: 1.75rem; } }
+.busca-fila { display: flex; gap: .5rem; }
+.busca-fila input { flex: 1; min-width: 0; font: 1.1rem var(--body); padding: .75rem .1rem; border: 0; border-bottom: 2px solid var(--papel-tinta); background: transparent; color: var(--papel-tinta); border-radius: 0; }
+.busca-fila input:focus { outline: none; border-bottom-color: var(--rojo); }
+.busca-ayuda { font-size: .85rem; color: var(--papel-gris); margin-top: .6rem; }
+.sugerencias { list-style: none; margin: .4rem 0 0; padding: 0; border: 1px solid var(--papel-linea); background: #fff; }
+.sugerencias button { display: block; width: 100%; text-align: left; font: .95rem var(--body); padding: .55rem .7rem; background: none; border: 0; border-bottom: 1px solid var(--papel-linea); color: var(--papel-tinta); cursor: pointer; }
+.sugerencias li:last-child button { border-bottom: 0; }
+.sugerencias button:hover, .sugerencias button:focus-visible { background: #F1EFE7; }
+.busca-estado { margin-top: 1rem; font-size: .95rem; }
+.busca-estado a { color: inherit; }
+.resultado { margin-top: 1.25rem; display: grid; gap: 1rem; border-top: 1px dashed var(--papel-gris); padding-top: 1.1rem; }
+.resultado .dir { font-family: var(--display); font-size: 1.7rem; line-height: 1.05; }
+.resultado .barrio { font-family: var(--mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--papel-gris); margin-top: .3rem; }
+.mini-noches { display: flex; gap: 3px; align-items: flex-end; height: 2.6rem; }
+.mini-noches i { flex: 1 1 0; display: block; background: var(--papel-tinta); }
+.mini-noches i.fuerte { background: var(--rojo); }
+.mini-dias { display: flex; gap: 3px; font: .6rem var(--mono); color: var(--papel-gris); text-align: center; margin-top: .25rem; }
+.mini-dias span { flex: 1 1 0; }
+
+/* ---------- Ciudades ---------- */
+.ciudades { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; max-width: 52rem; margin: 3rem auto 0; }
+.ciudad { position: relative; min-height: 9.5rem; border: 0; padding: 0; cursor: pointer; overflow: hidden; color: #fff; text-align: left; background: #2A3242 center / cover no-repeat; font: inherit; display: flex; align-items: flex-end; }
+.ciudad::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,13,18,.05) 20%, rgba(10,13,18,.78)); transition: background .3s; }
+.ciudad:hover::before { background: linear-gradient(180deg, rgba(10,13,18,.15) 0%, rgba(10,13,18,.85)); }
+.ciudad > span:not(.peg) { position: relative; padding: .9rem; display: grid; gap: .2rem; width: 100%; }
+.ciudad .nombre { font-family: var(--display); font-size: clamp(1.5rem, 4.5vw, 2.3rem); line-height: 1; }
+.ciudad .sub { font-size: .8rem; color: #DCDDE0; }
+.ciudad .cuenta { font-family: var(--mono); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; color: #E8E6DF; }
+.ciudad .peg { position: absolute; top: .7rem; left: .7rem; z-index: 1; }
+.ciudad.activa { grid-column: 1 / -1; min-height: 13rem; }
+.ciudad.activa .nombre { font-size: clamp(2.2rem, 7vw, 3.6rem); }
+.ciudad.metro { background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.18) 1px, transparent 1.5px), linear-gradient(135deg, #3A4A63, #1E2635); background-size: 7px 7px, cover; }
+.ciudad.otra { background: transparent; border: 1.5px dashed color-mix(in srgb, var(--tinta) 55%, transparent); color: var(--tinta); }
+.ciudad.otra::before { display: none; }
+.ciudad.otra .sub, .ciudad.otra .cuenta { color: var(--tinta2); }
+.ciudad[aria-pressed="true"] { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+.otra-ciudad { max-width: 52rem; margin: .8rem auto 0; display: flex; gap: .5rem; flex-wrap: wrap; }
+.otra-ciudad input { flex: 1 1 14rem; min-width: 0; font: 1rem var(--body); padding: .65rem .8rem; border: 1px solid var(--tinta2); background: transparent; color: var(--tinta); border-radius: 0; }
+.voto-estado { max-width: 52rem; margin: 1rem auto 0; font-size: .95rem; color: var(--tinta); text-align: center; }
 @media (prefers-reduced-motion: reduce) { .frase .w, .frase .w.off { opacity: 1; filter: none; transition: none; } }
 </style>
 
@@ -281,7 +326,7 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
     <p class="frase media">La nota, dentro del anuncio.</p>
     <div class="texto" style="margin-top:2.5rem">
       <p>Queremos llevar DecibHello a los anuncios con una extensión para Chrome. Abres un piso en tu portal de siempre y, al lado de las fotos, aparece la nota de esa calle.</p>
-      <p>La extensión solo lee la calle que el anuncio ya enseña. Si no pone el número, usa el tramo de la calle. Para el informe completo, un clic.</p>
+      <p>Si el anuncio no dice la dirección exacta, la escribes tú una vez. Para el informe completo, un clic.</p>
     </div>
     <div class="navegador" aria-label="Maqueta: anuncio de ejemplo con la extensión de DecibHello">
       <div class="nav-barra" aria-hidden="true">
@@ -297,7 +342,7 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
         </div>
         <aside class="widget" aria-label="Recuadro de la extensión DecibHello">
           <div class="w-cab"><span><svg viewBox="0 0 26 16" aria-hidden="true"><path d="M1 8h3l2-6 3 12 3-9 2 5 2-2h9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>DecibHello</span><small>Extensión</small></div>
-          <div class="w-calle">Carrer de Tuset 20 · leído del anuncio</div>
+          <div class="w-calle">Carrer de Tuset 20 · calle confirmada</div>
           <div class="w-nota"><span class="cifra" id="x-nota">75</span><div><div class="etq" id="x-etq">Ruidoso</div><div class="sub" id="x-sub">Más ruidosa que el 76 % de Barcelona</div></div></div>
           <div class="w-lado" role="group" aria-label="Orientación del piso">
             <button type="button" id="x-ext" aria-pressed="true">Da a la calle</button><button type="button" id="x-int" aria-pressed="false">Da al patio</button>
@@ -405,9 +450,25 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
         <li><b>Obras públicas:</b> ninguna a menos de 100 m en el cálculo del piloto.</li>
         <li><b>Origen:</b> sensor municipal de Tuset 30 (2023). Mapa oficial: 60–65 dB de día, 65–70 de noche.</li>
       </ul>
-      <a class="boton" href="https://claude.ai/artifact/AoLUjYUaWy6arbZLiL9vje" target="_blank" rel="noopener">Probar con otra calle →</a>
+      <a class="boton" href="#buscador">Busca tu calle ↓</a>
     </article>
-    <p class="leyenda">El buscador es un prototipo privado</p>
+  </section>
+
+  <section class="bloque" id="buscador">
+    <p class="frase">Busca tu calle.</p>
+    <div class="texto" style="margin-top:2rem"><p>Escribe la calle y el número, o pega un enlace de Google Maps. Funciona con cualquier portal de Barcelona.</p></div>
+    <div class="buscador papel" role="search">
+      <form class="busca-fila" id="busca-form" autocomplete="off">
+        <label class="sr" for="busca">Calle y número o enlace de Google Maps</label>
+        <input type="text" id="busca" placeholder="Carrer de Tuset 20" role="combobox" aria-expanded="false" aria-controls="sugerencias" aria-autocomplete="list" enterkeyhint="search">
+        <button class="boton" type="submit">Ver nota</button>
+      </form>
+      <ul class="sugerencias" id="sugerencias" role="listbox" hidden></ul>
+      <p class="busca-ayuda" id="busca-ayuda">Los anuncios de portales (Idealista, Fotocasa…) no traen la dirección en el enlace: escribe la calle que pone el anuncio.</p>
+      <div class="busca-estado" id="busca-estado" role="status"></div>
+      <div class="resultado" id="resultado" hidden></div>
+    </div>
+    <p class="leyenda">Estimación con datos públicos · el informe completo, con la curva de 24 horas y las obras, está en el visor</p>
   </section>
 
   <section class="bloque" id="lista">
@@ -443,12 +504,30 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
       <div class="tabla-env"><table><thead><tr><th>Fecha</th><th>Correo</th><th>Busca</th><th>Zona</th><th>Extensión</th></tr></thead><tbody id="panel-filas"></tbody></table></div>
     </div>
   </section>
+
+  <section class="bloque" id="ciudades">
+    <p class="frase media">¿Y después de Barcelona?</p>
+    <div class="texto" style="margin-top:2rem"><p>Hoy DecibHello solo funciona en Barcelona. Vota dónde quieres que abramos después. Basta un toque y no hace falta correo.</p></div>
+    <div class="ciudades" id="lista-ciudades">
+      <button type="button" class="ciudad activa" data-ciudad="barcelona" style="background-image:url('media/ciudad-barcelona.jpg')"><span class="peg verde">Activa</span><span><span class="nombre">Barcelona</span><span class="sub">172.000 portales con nota</span><span class="cuenta">Buscar una calle →</span></span></button>
+      <button type="button" class="ciudad metro" data-ciudad="area-metropolitana" aria-pressed="false"><span><span class="nombre">Área metropolitana</span><span class="sub">L'Hospitalet, Badalona, Sant Cugat…</span><span class="cuenta" data-cuenta="area-metropolitana">Votar</span></span></button>
+      <button type="button" class="ciudad" data-ciudad="madrid" aria-pressed="false" style="background-image:url('media/ciudad-madrid.jpg')"><span><span class="nombre">Madrid</span><span class="cuenta" data-cuenta="madrid">Votar</span></span></button>
+      <button type="button" class="ciudad" data-ciudad="valencia" aria-pressed="false" style="background-image:url('media/ciudad-valencia.jpg')"><span><span class="nombre">Valencia</span><span class="cuenta" data-cuenta="valencia">Votar</span></span></button>
+      <button type="button" class="ciudad otra" data-ciudad="otra" aria-pressed="false" aria-controls="otra-ciudad"><span><span class="nombre">Otra ciudad</span><span class="sub">Escríbela tú</span><span class="cuenta" data-cuenta="otra">Votar</span></span></button>
+    </div>
+    <form class="otra-ciudad" id="otra-ciudad" hidden>
+      <label class="sr" for="otra-nombre">Nombre de la ciudad</label>
+      <input type="text" id="otra-nombre" maxlength="40" placeholder="Por ejemplo, Sevilla">
+      <button class="boton" type="submit">Votar esta ciudad</button>
+    </form>
+    <p class="voto-estado" id="voto-estado" role="status"></p>
+  </section>
 </main>
 
 <footer>
   <div class="marca-pie">DecibHello</div>
   <p>Datos: Ajuntament de Barcelona, <a href="https://opendata-ajuntament.barcelona.cat/" target="_blank" rel="noopener">Open Data BCN</a> (mapa estratégico de ruido 2017, sensores de ruido 2023, locales de ocio, obras públicas y quejas IRIS). Elaboración propia. Las notas son estimaciones del piloto, no mediciones de cada vivienda.</p>
-  <p>Vídeo de la portada: plaça de Catalunya, Barcelona (Coverr, licencia Coverr).</p>
+  <p>Vídeo de la portada: plaça de Catalunya, Barcelona (Coverr, licencia Coverr). Fotos de ciudades en Wikimedia Commons: Barcelona, Chris Koerner (CC BY 2.0); Madrid, Barcex (CC BY-SA 3.0); Valencia, Francesc Fort (CC BY-SA 4.0).</p>
   <p class="mono">© 2026 DecibHello · Barcelona</p>
 </footer>
 
@@ -606,6 +685,142 @@ function pintarGraficos() { actualizar(); pintarNoches(); pintarCalles(); }
 pintarGraficos();
 let tRes; addEventListener("resize", () => { clearTimeout(tRes); tRes = setTimeout(() => { pintarGraficos(); alBajar(); }, 120); });
 alBajar();
+
+// ---------- Buscador (motor común: decibhello.js, generado en piloto/; se carga solo cuando hace falta) ----------
+let motor = null;
+function cargarMotor() {
+  if (!motor) motor = new Promise((ok, mal) => {
+    if (window.DecibHello) return ok(window.DecibHello);
+    const sc = document.createElement("script"); sc.src = "decibhello.js"; sc.async = true;
+    sc.onload = () => window.DecibHello ? ok(window.DecibHello) : mal(); sc.onerror = mal;
+    document.head.append(sc);
+  });
+  return motor;
+}
+(function buscador() {
+  const input = $("busca"), lista = $("sugerencias"), estado = $("busca-estado"), out = $("resultado");
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(e => { if (e[0].isIntersecting) { cargarMotor().catch(() => {}); io.disconnect(); } }, { rootMargin: "900px 0px" });
+    io.observe($("buscador"));
+  }
+  input.addEventListener("focus", () => cargarMotor().catch(() => {}));
+  const cerrar = () => { lista.hidden = true; input.setAttribute("aria-expanded", "false"); };
+  let tSug;
+  input.addEventListener("input", () => {
+    clearTimeout(tSug);
+    tSug = setTimeout(async () => {
+      const t = input.value.trim();
+      if (t.length < 3 || /^https?:/i.test(t)) return cerrar();
+      let D; try { D = await cargarMotor(); } catch { return; }
+      const ops = D.sugerencias(t, 6);
+      if (!ops.length) return cerrar();
+      const num = (t.match(/(\d+)\s*$/) || [])[1];
+      lista.replaceChildren(...ops.map(o => { const li = document.createElement("li"); li.setAttribute("role", "option"); const b = document.createElement("button"); b.type = "button";
+        b.textContent = o.calle + (num ? " " + num : ""); b.addEventListener("click", () => { clearTimeout(tSug); input.value = b.textContent; cerrar(); mostrar(D.elegirCalle(o.ci, num ? +num : null)); }); li.append(b); return li; }));
+      lista.hidden = false; input.setAttribute("aria-expanded", "true");
+    }, 120);
+  });
+  input.addEventListener("keydown", e => { if (e.key === "Escape") cerrar(); if (e.key === "ArrowDown" && !lista.hidden) { e.preventDefault(); lista.querySelector("button")?.focus(); } });
+  lista.addEventListener("keydown", e => {
+    const bs = [...lista.querySelectorAll("button")], i = bs.indexOf(document.activeElement);
+    if (e.key === "ArrowDown") { e.preventDefault(); bs[Math.min(bs.length - 1, i + 1)]?.focus(); }
+    if (e.key === "ArrowUp") { e.preventDefault(); i <= 0 ? input.focus() : bs[i - 1].focus(); }
+    if (e.key === "Escape") { cerrar(); input.focus(); }
+  });
+  $("busca-form").addEventListener("submit", async e => {
+    e.preventDefault(); clearTimeout(tSug); cerrar();
+    estado.textContent = "Buscando…"; out.hidden = true;
+    let D; try { D = await cargarMotor(); } catch { estado.textContent = "No se ha podido cargar el buscador. Recarga la página e inténtalo otra vez."; return; }
+    mostrar(D.buscar(input.value));
+  });
+  function mostrar(r) {
+    out.hidden = true; estado.replaceChildren();
+    if (r.tipo === "vacio") { estado.textContent = "Escribe una calle y un número."; return; }
+    if (r.tipo === "aviso") { estado.innerHTML = r.html; return; } // texto fijo del motor común, sin datos del usuario
+    if (r.tipo === "fuera") { estado.textContent = "Ese punto está fuera de Barcelona. De momento solo tenemos Barcelona: vota más abajo dónde abrir después."; return; }
+    if (r.tipo === "sin_resultado") { estado.textContent = "No encuentro esa calle en Barcelona. Revisa cómo se escribe o prueba con el nombre en catalán."; return; }
+    if (r.tipo === "varias") {
+      estado.append("¿Cuál de estas?");
+      const ul = document.createElement("ul"); ul.className = "sugerencias";
+      r.opciones.forEach(o => { const li = document.createElement("li"); const b = document.createElement("button"); b.type = "button"; b.textContent = o.calle + (o.numero ? " " + o.numero : "");
+        b.addEventListener("click", () => mostrar(window.DecibHello.elegirCalle(o.ci, o.numero))); li.append(b); ul.append(li); });
+      estado.append(ul); return;
+    }
+    const x = r.informe, n = Math.round(x.nota), pc = x.percentil;
+    const avisos = [];
+    if (r.sinNumero) avisos.push("Sin número: enseñamos un tramo de la calle. Añade el número para afinar.");
+    else if (!r.exacto) avisos.push(`No encuentro ese número exacto: enseñamos el tramo más cercano (portales ${x.portales[0]}–${x.portales[1]}).`);
+    if (r.distancia > 60) avisos.push("El punto del mapa está algo lejos del portal más cercano: comprueba la dirección.");
+    const h = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+    const cab = h("div"); cab.append(h("div", "dir", `${x.calle}${r.numero ? " " + r.numero : ""}`), h("div", "barrio", [x.barrio, `portales ${x.portales[0]}–${x.portales[1]}`].filter(Boolean).join(" · ")));
+    const pri = h("div", "principal"); const tx = h("div"); tx.append(h("div", "etq", x.etiqueta), h("div", "sub", pc >= 50 ? `Más ruidosa que el ${pc} % de los portales de Barcelona` : `Más tranquila que el ${100 - pc} % de los portales de Barcelona`));
+    pri.append(h("span", "cifra", n), tx);
+    const regla = h("div"); const rg = h("div", "regla"); const mk = h("i"); mk.style.left = n + "%"; rg.append(mk); const ej = h("div", "regla-ejes"); ej.append(h("span", null, "0 muy tranquilo"), h("span", null, "100 muy ruidoso")); regla.append(rg, ej);
+    const fr = h("dl", "franjas"); [["Día 7–19", "D"], ["Tarde 19–23", "E"], ["Noche 23–7", "N"]].forEach(([t, k]) => { const d = h("div"); d.append(h("dt", null, t), h("dd", null, Math.round(x.franjas[k]))); fr.append(d); });
+    const noc = h("div"); noc.append(h("div", "momento", "Noches de la semana")); const mb = h("div", "mini-noches"); mb.setAttribute("role", "img");
+    mb.setAttribute("aria-label", "Nota de la noche de lunes a domingo: " + x.noches.map(Math.round).join(", "));
+    x.noches.forEach(v => { const i = h("i", v >= 80 ? "fuerte" : ""); i.style.height = Math.max(4, Math.round(v)) + "%"; mb.append(i); });
+    const md = h("div", "mini-dias"); "LMXJVSD".split("").forEach(c => md.append(h("span", null, c))); noc.append(mb, md);
+    const ul = h("ul", "lineas");
+    const li = (b, t) => { const e = h("li"); e.append(h("b", null, b), " " + t); ul.append(e); };
+    li(x.interior ? `Exterior ${n}, interior ${Math.round(x.interior.nota)}.` : "Exterior.", x.interior ? "El piso que da al patio de manzana suena distinto." : "No hay datos del patio interior de este tramo.");
+    const dn = x.noches.map(Math.round), max = Math.max(...dn);
+    li("Noche más ruidosa:", `${DIAS.filter((_, d) => dn[d] === max).join(" y ")} (${max}).`);
+    li(`Picos nocturnos: ${x.picos}.`, "Camiones de recogida, calle estrecha y quejas cercanas.");
+    const obras = x.obras.length;
+    li("Obras públicas:", x.obraSuma ? "hay una en curso a menos de 25 m y suma ruido de día laborable." : obras ? `${obras} a menos de 100 m (ninguna suma ahora).` : "ninguna a menos de 100 m.");
+    li("Origen:", x.sensor ? `sensor municipal de ${x.sensor} (2023).` : `mapa oficial de ruido (noche ${x.mapa.N}) y modelo DecibHello.`);
+    const extra = avisos.length ? h("p", "busca-ayuda", avisos.join(" ")) : null;
+    const a = h("a", "boton", "Informe completo en el visor →"); a.href = "https://claude.ai/artifact/AoLUjYUaWy6arbZLiL9vje"; a.target = "_blank"; a.rel = "noopener";
+    out.replaceChildren(...[cab, extra, pri, regla, fr, noc, ul, a].filter(Boolean));
+    out.hidden = false;
+  }
+})();
+
+// ---------- Ciudades: Barcelona abre el buscador; el resto, voto de un toque ----------
+(async function ciudades() {
+  const estado = $("voto-estado"), otraForm = $("otra-ciudad");
+  const CONOCIDAS = ["area-metropolitana", "madrid", "valencia"];
+  let db = null, user = null, miId = null, miVoto = null;
+  document.querySelectorAll(".ciudad").forEach(b => b.addEventListener("click", () => {
+    const c = b.dataset.ciudad;
+    if (c === "barcelona") { $("buscador").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); setTimeout(() => $("busca").focus({ preventScroll: true }), reduce ? 0 : 700); return; }
+    if (c === "otra") { otraForm.hidden = false; $("otra-nombre").focus(); return; }
+    votar(c);
+  }));
+  otraForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const t = $("otra-nombre").value.trim().replace(/\s+/g, " ").slice(0, 40);
+    if (t.length < 2) { estado.textContent = "Escribe el nombre de la ciudad."; return; }
+    votar(t);
+  });
+  const nombre = c => ({ "area-metropolitana": "el área metropolitana", madrid: "Madrid", valencia: "Valencia" })[c] || c;
+  function marcar() {
+    document.querySelectorAll(".ciudad[aria-pressed]").forEach(b => {
+      const c = b.dataset.ciudad;
+      b.setAttribute("aria-pressed", miVoto != null && (c === miVoto || (c === "otra" && !CONOCIDAS.includes(miVoto))));
+    });
+  }
+  async function votar(c) {
+    estado.textContent = "Guardando tu voto…";
+    try {
+      if (!db || !miId) throw 0;
+      await db.doc("votos/" + miId).set({ ciudad: c, fecha: new Date().toISOString() });
+      miVoto = c; marcar(); otraForm.hidden = true;
+      estado.textContent = `Gracias. Tu voto es para ${nombre(c)}. Puedes cambiarlo cuando quieras.`;
+    } catch { estado.textContent = "No hemos podido guardar tu voto desde aquí. Esta versión de prueba solo admite personas invitadas a la página."; }
+  }
+  if (!window.claude?.use) return;
+  [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+  if (!db || !user) return;
+  miId = await user.id();
+  db.collection("votos").onSnapshot(snap => {
+    const cuenta = { otra: 0 };
+    snap.docs.forEach(d => { const v = (d.data() || {}).ciudad; if (!v) return; const k = CONOCIDAS.includes(v) ? v : "otra"; cuenta[k] = (cuenta[k] || 0) + 1; if (d.id === miId) miVoto = v; });
+    document.querySelectorAll("[data-cuenta]").forEach(e => { const n = cuenta[e.dataset.cuenta] || 0; e.textContent = n ? `${n} voto${n === 1 ? "" : "s"} · votar` : "Votar"; });
+    marcar();
+  }, () => {});
+})();
 
 // ---------- Maqueta de la extensión: exterior / interior ----------
 (function () {
