@@ -14,7 +14,9 @@ Prototipo que calcula una nota de ruido de 0 a 100 (100 = muy ruidoso) para cual
 | `sensores.py` | Analiza los datos por hora de los sensores municipales: perfiles por hora y día, nivel medido por sensor y comparación con el mapa oficial. |
 | `calcular_nota.py` | Calcula el piloto (`direcciones.txt`) y construye el visor. |
 | `direcciones.txt` | Direcciones del piloto y de control. |
-| `visor_plantilla.html` | Plantilla del visor; `visor.html` es el resultado con los datos dentro. |
+| `motor.js` | Copia en JavaScript del modelo, más el índice y el buscador. La usan el visor y la web. |
+| `visor_plantilla.html` | Plantilla del visor; `visor.html` es el resultado con el motor y los datos dentro. |
+| `paquete/decibhello.js` | Motor y datos en un solo fichero para otras páginas (generado; no editar). API: `DecibHello.buscar(texto)`, `elegirCalle(ci, numero)`, `informe(ci, rango, dia)`, `sugerencias(texto)`. |
 | `resultados.md` / `resultados.csv` | Notas del piloto y conclusiones. |
 | `validacion_sensores.md` | Sensores frente al mapa oficial. |
 | `perfiles_sensores.json`, `perfiles_por_sensor.json` | Perfiles medidos que usan el modelo y el visor. |
@@ -38,5 +40,5 @@ Una tarea programada ("DecibHello: actualizar obras del visor", de lunes a viern
 
 ## Comprobaciones
 
-- La nota del visor (JavaScript) y la de `calcular_nota.py` (Python) coinciden en las direcciones del piloto: nota global, las 7 noches y el aviso de picos. Se comprueba con `cd piloto/pruebas && npm install && node paridad.mjs` (0 diferencias).
+- La nota del visor (JavaScript) y la de `calcular_nota.py` (Python) coinciden en las direcciones del piloto: nota global, las 7 noches y el aviso de picos. Se comprueba con `cd piloto/pruebas && npm install && node paridad.mjs` (0 diferencias), que prueba también el paquete.
 - Datos de sensores: de 7:00 a 23:59 la fecha registrada es la del día siguiente; `sensores.py` lo corrige.
