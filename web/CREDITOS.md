@@ -10,7 +10,10 @@
   - Autor: Coverr no lo indica en la ficha.
   - Lo descargó Pablo (1080p, 12,9 s). Comprimido sin sonido a 1280×720 y 25 fps: `media/portada.mp4` (H.264, 0,8 MB) y `media/portada.webm` (VP9, 0,5 MB). Imagen fija: `media/portada.jpg` (segundo 5).
   - Ojo: la plaza sale casi vacía. Si aparece un vídeo del Eixample o de Gràcia con gente y coches, se puede cambiar dejando los mismos nombres de fichero.
-- Si el vídeo no carga, o con "reducir movimiento", la portada muestra una ilustración animada propia (trama del Eixample dibujada en canvas, sin derechos de terceros).
+- Si el vídeo no carga, o con "reducir movimiento", la portada muestra la imagen fija `media/portada.jpg`.
+
+## Maqueta de la extensión
+- El anuncio, la dirección web (ejemplo.com) y la fachada son inventados y dibujados a mano. No se usan logotipos ni capturas de portales reales.
 
 ## Tipografías
-- Schibsted Grotesk, Source Serif 4 e IBM Plex Mono (Google Fonts, licencia SIL Open Font License).
+- Gloock, Hanken Grotesk e IBM Plex Mono (Google Fonts, licencia SIL Open Font License).

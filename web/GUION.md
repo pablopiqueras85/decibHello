@@ -12,6 +12,7 @@ Este fichero sirve para retocar el guion sin leer el código. Cada bloque dice a
 | 1 | 7:00–9:00 | mañana | **Presentación**: esta página es un viernes en Tuset 20 | Explicar el juego del scroll y el marcador |
 | 2 | 10:00 | mañana | **"Visitas el piso un martes a las once. Hay luz. Firmas."** + pegatinas (terraza, camión, bar musical, hora punta, obras) | El problema: el ruido se descubre tarde |
 | 3 | 12:00 | mediodía | **"Las fotos no tienen sonido."** + escala 0–100 | Los datos existen pero no se ven; qué es la nota |
+| 3b | 13:30–14:30 | mediodía | **"La nota, dentro del anuncio."** Maqueta de la extensión de Chrome: navegador con un anuncio inventado (ejemplo.com), icono con la nota 75 en la barra y recuadro con nota, exterior/interior, noches de la semana y enlace al informe. Pegatinas "próximamente" y "para Chrome de ordenador" | Enseñar la vía de entrada desde los portales y medir interés (casilla en el formulario) |
 | 4 | 15:00 | tarde | **"El mismo portal suena distinto cada día."** + gráfico con deslizador (día elegido frente al lunes) | Momento interactivo |
 | 5 | 17:00 | tarde | **"Tres calles, tres maneras de vivir."** Pomaret 19, Tuset 75, Gran Via 98 | Comparar calles |
 | 6 | 19:00 | atardecer | **"Barcelona es ruidosa de noche."** 35 % tranquilo, 23 % moderado, 42 % ruidoso | El problema es de toda la ciudad |
@@ -26,7 +27,7 @@ Todas las cifras salen del piloto (`piloto/resultados.csv`, `piloto/resultados.m
 
 ## Ideas abiertas para retocar
 
-- **Extensión de Chrome**: el sitio natural es justo después del bloque 3 ("Las fotos no tienen sonido"). Ahí se habla de los anuncios, así que encaja enseñar un anuncio de ejemplo con la nota de DecibHello encima, con una pegatina "Extensión de Chrome · próximamente". El anuncio debe ser inventado y marcado como ejemplo: sin logotipos ni capturas de portales reales. Otra opción es mostrarla como segunda vía en el formulario ("Avísame cuando salga la extensión").
+- **Extensión de Chrome** (maqueta hecha, bloque 3b): el formulario tiene la casilla "Avísame también cuando salga la extensión"; el panel de inscripciones muestra quién la marcó. Por decidir: si el recuadro va al lado de las fotos (como ahora) o como franja encima del precio, y qué pasa cuando el anuncio no trae la calle.
 - **Buscador dentro de la página**: en el bloque 10, en lugar del enlace al visor, un buscador real de calle (hoy el visor es privado).
 - **El marcador**: que avise con una pegatina cuando cruza un umbral ("Ahora es muy ruidoso"), o que suene un clic suave al pasar de franja (solo si el usuario lo activa).
 - **Ritmo**: decidir si cada bloque debe caer en su hora exacta (hoy la hora la marca la posición en la página y es aproximada).
