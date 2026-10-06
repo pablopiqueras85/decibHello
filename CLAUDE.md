@@ -7,6 +7,7 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 - `decibhello-concepto.md`: idea, escala, competencia y modelo de negocio.
 - `decibhello-fuentes-datos-barcelona.md`: fuentes de datos, cómo se accede y borradores de solicitudes de transparencia (2.13 recogida de basuras, 2.15 obras privadas).
 - `decibhello-pendientes.md`: pendientes y hoja de ruta. **Léelo antes de empezar** y márcalo al terminar algo.
+- `decibhello-agentes.md`: equipo de agentes (sesiones, ramas, carpetas) y cómo se les despierta.
 - `decibhello-actualizacion.md`: registro de cambios para el usuario, por fechas. Añade una sección cuando cambies algo que él note.
 - `piloto/`: el prototipo de Barcelona (ver `piloto/README.md`). `servicios-ia-y-skool.md` es de otro proyecto: no lo toques.
 
