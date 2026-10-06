@@ -388,13 +388,15 @@ const cacheCalc = new Map();
 const ZB = DATOS.zona_bares;
 const esZonaBares = r => r.sensor < 0 && r.solo_bares >= ZB.minimo;
 function calcular(r, dia = estado.dia) {
-  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + dia;
+  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.noches + "|" + dia;
   if (cacheCalc.has(clave)) return cacheCalc.get(clave);
   const t = IX.tramos[r.tramo];
   const b = k => bandaDb(+t[IX.campos_tramo.indexOf(k)]);
   const sensor = r.sensor >= 0 ? DATOS.sensores[r.sensor] : null;
   const zb = esZonaBares(r) ? ZB.correccion : { D: 0, E: 0, N: 0 };
   const dbExt = sensor ? perfilMedido(sensor.db, dia) : perfilHorario({ D: b("TOTAL_D") + zb.D, E: b("TOTAL_E") + zb.E, N: b("TOTAL_N") + zb.N }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"), dia);
+  // Horarios de los locales de noche cercanos: más ruido las noches en que abren de madrugada (no si hay sensor).
+  if (!sensor && r.noches >= 0 && dia != null) HORAS.N.forEach(h => (dbExt[h] += IX.ajustes_noche[r.noches][dia]));
   const notasExt = notasHorarias(dbExt, sensor ? 0 : extraFocos(r.ocio, r.bares, r.quejas, r.turisticos), dia);
   const ext = { db: dbExt, nota: notasExt, ...resumen(notasExt), mapa: { D: IX.bandas[+t[0]], E: IX.bandas[+t[1]], N: IX.bandas[+t[2]] } };
   let int = null;
@@ -404,7 +406,8 @@ function calcular(r, dia = estado.dia) {
     const notasInt = notasHorarias(dbInt, 0, dia);
     int = { db: dbInt, nota: notasInt, ...resumen(notasInt), mapa: { D: IX.bandas[+p[0]], E: IX.bandas[+p[1]], N: IX.bandas[+p[2]] } };
   }
-  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor };
+  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor,
+    ajusteNoches: !sensor && r.noches >= 0 ? IX.ajustes_noche[r.noches] : null };
   cacheCalc.set(clave, res);
   return res;
 }
@@ -645,6 +648,7 @@ function pintarDetalle() {
     ["Pisos turísticos · 100 m", r.turisticos],
     ["Origen del dato", res.sensor ? `medición del sensor de ${res.sensor.calle} (${res.sensor.dias} días de 2023)` : esZonaBares(r) ? "mapa oficial 2017 + modelo + corrección por zona de bares" : "mapa oficial 2017 + modelo"],
     ["Bares (sin restaurantes) · 100 m", r.solo_bares],
+    ["Locales de noche a 150 m (horarios)", res.ajusteNoches ? "noches más ruidosas: " + DIAS.filter((_, d) => res.ajusteNoches[d] >= 1).join(", ") || "sin noches destacadas" : res.sensor ? "incluido en la medición" : "ninguno"],
     ["Sensor municipal más cercano", r.sensor_dam >= 100 ? (r.sensor_dam / 100).toFixed(1).replace(".", ",") + " km" : r.sensor_dam * 10 + " m"],
     ["Mismo tramo", `portales ${r.ini}–${r.fin} (lado ${lado})`],
     ["Nota global del día", `${Math.round(res.exterior.global)} exterior` + (res.interior ? ` · ${Math.round(res.interior.global)} interior` : "")],

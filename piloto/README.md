@@ -9,6 +9,7 @@ Prototipo que calcula una nota de ruido de 0 a 100 (100 = muy ruidoso) para cual
 | `modelo.py` | El modelo de la nota (franjas, horas, días, focos, picos nocturnos). El visor tiene una copia en JavaScript. |
 | `indice.py` | Construye el índice de toda la ciudad: cada portal oficial con su tramo del mapa de ruido, su patio, focos cercanos, anchura de calle y quejas. |
 | `ocio_oculto.py` | Prueba si las pistas públicas (bares, terrazas, quejas…) predicen dónde el mapa se queda corto; de ahí sale la corrección de la zona de bares (`ocio_oculto.md`). |
+| `horarios_ocio.py` | Lee los horarios de discotecas, bares musicales y coctelerías y calcula qué noches abren de madrugada cerca de cada portal. |
 | `sensores.py` | Analiza los datos por hora de los sensores municipales: perfiles por hora y día, nivel medido por sensor y comparación con el mapa oficial. |
 | `calcular_nota.py` | Calcula el piloto (`direcciones.txt`) y construye el visor. |
 | `direcciones.txt` | Direcciones del piloto y de control. |

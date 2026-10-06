@@ -82,3 +82,12 @@ De noche ninguna pista supera claramente el azar. Por la tarde, el número de ba
 Se aplica de día y por la tarde (donde mejora y el mapa no modela el ocio). De noche no, porque no mejora.
 Afecta a unos 1.000 tramos de la ciudad (2,6 %), y nunca a calles sin bares.
 
+
+## Horarios de los locales de noche (añadido el 6 de octubre)
+
+Pista nueva propuesta tras ver Tuset: los días que abren de madrugada las discotecas, bares musicales y coctelerías cercanos (Open Data BCN, "espais de música i copes", 342 locales, 150 con horario publicado; `horarios_ocio.py`).
+
+- Los locales de noche **no predicen el nivel medio** de la noche, pero sí **cómo se reparte en la semana**. Con 6 o más bares musicales o discotecas a menos de 300 m, el salto entre viernes/sábado y lunes/martes es de +4,4 dB de mediana; sin ninguno, +0,8 dB.
+- Con los horarios de los locales a menos de 150 m, el error del reparto por día (validado por distritos) baja de 1,49 a 1,41 dB en los sensores con locales cerca. En Tuset, donde las discotecas abren de miércoles a sábado, el lunes pasa de −1,3 dB (media de la ciudad) a −5,7 dB (medido: −9,7 dB).
+- Se aplica a unos 7.900 tramos sin sensor. Donde hay sensor no hace falta: la medición ya lo recoge.
+- Además, los sensores se usan ahora también para los portales de la misma calle a menos de 120 m (Tuset 20 usa el sensor de Tuset 30).

@@ -53,11 +53,20 @@ def buscar(indice, calle, numero):
     return r, min(abs(numero - r[0]), abs(numero - r[1])) <= TOLERANCIA_NUMERO
 
 
-def anclar_sensores(indice, perfiles, radio=60):
+def nucleo_calle(nombre):
+    """Palabras propias del nombre de una calle (sin tipo de vía, partículas ni número): 'Carrer de Tuset' -> {'tuset'}."""
+    tipos = {"carrer", "avinguda", "passeig", "placa", "plaça", "ronda", "rambla", "passatge", "travessera", "via", "gran", "cami", "camí", "baixada", "pujada", "carretera", "moll"}
+    part = {"de", "del", "d", "la", "les", "el", "els", "dels", "l", "i"}
+    t = re.sub(r"[^a-z0-9 ]", " ", normalizar(re.sub(r"\s+\d+\s*$", "", nombre))).split()
+    return frozenset(w for w in t if w not in tipos and w not in part)
+
+
+def anclar_sensores(indice, perfiles, radio=60, radio_calle=120):
     """Marca los rangos del mismo tramo que un sensor municipal, a menos de `radio` m: allí se usa lo medido.
 
     Se toma el rango más cercano al sensor y se anclan los rangos con su mismo tramo del mapa, para no pasar a la
-    calle de al lado. Añade el campo 'sensor' (índice en `perfiles`, o -1) a cada rango del índice.
+    calle de al lado. Además, los rangos de la MISMA calle que el sensor a menos de `radio_calle` m (Tuset 20 con el
+    sensor de Tuset 30). Añade el campo 'sensor' (índice en `perfiles`, o -1) a cada rango del índice.
     """
     campos = indice["campos_rango"]
     n = len(campos)
@@ -67,6 +76,8 @@ def anclar_sensores(indice, perfiles, radio=60):
         for k in range(0, len(pl), n):
             todos.append((c, k, 41.3 + pl[k + ilat] / 1e5, 2.0 + pl[k + ilon] / 1e5, pl[k + itr]))
     lat = np.array([t[2] for t in todos]); lon = np.array([t[3] for t in todos]); tr = np.array([t[4] for t in todos])
+    nucleos = [nucleo_calle(nombre) for nombre, _ in indice["calles"]]
+    calle_de = np.array([t[0] for t in todos])
     asignado = np.full(len(todos), -1); dist = np.full(len(todos), np.inf)
     for si, p in enumerate(perfiles):
         d = np.hypot((lon - p["lon"]) * 83300, (lat - p["lat"]) * 110540)
@@ -75,6 +86,10 @@ def anclar_sensores(indice, perfiles, radio=60):
             continue
         cerca = (tr == tr[j]) & (d <= radio) & (d < dist)
         asignado[cerca], dist[cerca] = si, d[cerca]
+        propia = nucleo_calle(p["calle"])
+        if propia:
+            misma = np.array([nucleos[c] == propia for c in calle_de]) & (d <= radio_calle) & (d < dist)
+            asignado[misma], dist[misma] = si, d[misma]
     # Reconstruir los planos con el campo nuevo al final de cada rango.
     nuevos = {}
     for (c, k, *_), si in zip(todos, asignado):
@@ -89,6 +104,41 @@ def anclar_sensores(indice, perfiles, radio=60):
     return int((asignado >= 0).sum())
 
 
+def ajustar_noches(indice):
+    """Ajuste por noche de la semana según los locales abiertos de madrugada cerca (horarios_ocio.py).
+    Añade 'noches' (índice en indice['ajustes_noche'], o -1 si no hay locales cerca)."""
+    import horarios_ocio
+    from pyproj import Transformer
+    campos = indice["campos_rango"]
+    n = len(campos)
+    ilat, ilon = campos.index("lat_e5"), campos.index("lon_e5")
+    t = Transformer.from_crs("EPSG:4326", "EPSG:25831", always_xy=True)
+    puntos = [(c, k) for c, (_, pl) in enumerate(indice["calles"]) for k in range(0, len(pl), n)]
+    x, y = t.transform([2.0 + indice["calles"][c][1][k + ilon] / 1e5 for c, k in puntos],
+                       [41.3 + indice["calles"][c][1][k + ilat] / 1e5 for c, k in puntos])
+    carga = horarios_ocio.carga_en_puntos(np.c_[x, y])
+    tabla, idx = [], {}
+    nuevos = {}
+    for (c, k), cg in zip(puntos, carga):
+        i = -1
+        if cg.sum() > 0:
+            aj = tuple(modelo.ajuste_noches(cg.tolist()))
+            if aj not in idx:
+                idx[aj] = len(tabla)
+                tabla.append(list(aj))
+            i = idx[aj]
+        nuevos.setdefault(c, []).append((k, i))
+    for c, lst in nuevos.items():
+        pl = indice["calles"][c][1]
+        out = []
+        for k, i in lst:
+            out += pl[k:k + n] + [i]
+        indice["calles"][c][1] = out
+    indice["campos_rango"] = campos + ["noches"]
+    indice["ajustes_noche"] = tabla
+    return sum(1 for _, lst in nuevos.items() for _, i in lst if i >= 0)
+
+
 def mapa_tramo(indice, i):
     t = indice["tramos"][i]
     return {campo: indice["bandas"][int(t[k])] for k, campo in enumerate(indice["campos_tramo"])}
@@ -99,6 +149,7 @@ def main():
     f_sens = AQUI / "perfiles_por_sensor.json"
     perfiles = json.loads(f_sens.read_text(encoding="utf-8")) if f_sens.exists() else []
     print(f"rangos con medición de sensor: {anclar_sensores(indice, perfiles)}")
+    print(f"rangos con ajuste por horarios de locales: {ajustar_noches(indice)}")
     campos = indice["campos_rango"]
     filas = []
     for info in leer_direcciones():
@@ -108,14 +159,15 @@ def main():
         mapa = mapa_tramo(indice, v["tramo"])
         medido = perfiles[v["sensor"]]["db"] if v["sensor"] >= 0 else None
         zona_bares = medido is None and v["solo_bares"] >= modelo.ZONA_BARES_MIN
+        aj = indice["ajustes_noche"][v["noches"]] if v["noches"] >= 0 and medido is None else None
         res = modelo.calcular(mapa, {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]},
-                              medido=medido, zona_bares=zona_bares)
+                              medido=medido, zona_bares=zona_bares, ajuste_noche=aj)
         interior = None
         if v["patio"] >= 0:
             mp = mapa_tramo(indice, v["patio"])
             interior = modelo.calcular({f"TOTAL_{f}": mp[f"TOTAL_{f}"] for f in "DEN"})
         focos = {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]}
-        noches = {modelo.DIAS[d]: round(modelo.calcular(mapa, focos, d, medido, zona_bares)["franjas"]["N"]) for d in range(7)}
+        noches = {modelo.DIAS[d]: round(modelo.calcular(mapa, focos, d, medido, zona_bares, aj)["franjas"]["N"]) for d in range(7)}
         confianza = "alta" if v["sensor_dam"] <= RADIO_SENSOR_DAM else "media"
         if not exacto:
             confianza = "baja"

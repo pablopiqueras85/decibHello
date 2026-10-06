@@ -18,6 +18,9 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 ### 1. Que la nota sea fiable (lo más importante)
 - [x] **Calibrar con mediciones reales**: perfiles por hora y día de la semana medidos con los sensores, y nivel medido en 352 tramos con sensor.
 - [x] **Ocio infravalorado de día y de tarde**: corregido en las zonas de bares (≥ 10 bares a 100 m), validado con sensores por distritos (`piloto/ocio_oculto.md`).
+- [x] **Reparto semanal del ocio nocturno**: horarios de discotecas y bares musicales cercanos (Open Data BCN) y sensores de la misma calle. Tuset ya usa su sensor.
+- [ ] **Escala en lo más alto**: Tuset un viernes a la 1:00 mide ~70 dB y sale con nota 86; para ti es un 100. Recalibrar la parte alta de la escala cuando tengamos tus notas a ciegas de todas las calles de control.
+- [ ] **Limitadores de sonido de los locales**: las discotecas y bares musicales deben tener un limitador-registrador que envía datos al Ajuntament, pero no son públicos. Pedirlos por transparencia (miden dentro del local, no el ruido de la gente en la calle).
 - [ ] **Ocio infravalorado de noche**: ninguna pista pública lo predice (probado con bares, terrazas, quejas por motivo, pisos turísticos, plazas). Solo se resuelve midiendo: mediciones con el móvil, opiniones de vecinos, más sensores.
 - [ ] **Validación sobre el terreno**: medir con sonómetro o móvil en 20–30 portales, de día y de noche, entre semana y en fin de semana, y comparar con la nota. Sin esto no podemos decir cuánto acierta.
 - [ ] **Mapa de ruido 2022**: pasar del de 2017 (por tramo) al ráster de 2022, para recoger cambios como los ejes verdes (Consell de Cent).

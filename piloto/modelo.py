@@ -51,6 +51,10 @@ REPARTO_FOCOS = {19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 
 # Zona de bares (validado con sensores, ver ocio_oculto.md): con 10 o más bares a menos de 100 m, el mapa 2017 se
 # queda corto de día y por la tarde (el mapa no modela ocio fuera de la noche). Corrección prudente: el percentil 25
 # de lo que midieron los sensores en esas zonas. De noche las pistas no predicen el error, así que no se corrige.
+# Horarios de los locales de noche (discotecas, bares musicales, coctelerías): las noches en que hay más locales
+# abiertos de madrugada a menos de 150 m son más ruidosas. Coeficiente ajustado con los sensores (horarios_ocio.py):
+# dB extra por unidad de log(1 + carga de esa noche), respecto a la media de la semana del propio tramo.
+K_HORARIOS = 2.79
 ZONA_BARES_MIN = 10
 CORRECCION_ZONA_BARES = {"D": 6.0, "E": 8.8, "N": 0.0}
 # Un "día" va de las 7:00 a las 7:00 del día siguiente: la noche del viernes (23-7 h) es la que empieza el viernes.
@@ -151,7 +155,16 @@ def perfil_medido(db_dias, dia=None):
     return [10 * math.log10(sum(energia(db_dias[d][h]) for d in range(7)) / 7) for h in range(24)]
 
 
-def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False):
+def ajuste_noches(carga):
+    """dB a sumar a cada noche (lunes..domingo) según los locales abiertos de madrugada; media energética 0 en la semana."""
+    lc = [math.log1p(c) for c in carga]
+    media = sum(lc) / 7
+    g = [10 ** (K_HORARIOS * (v - media) / 10) for v in lc]
+    mg = sum(g) / 7
+    return [round(10 * math.log10(x / mg), 1) for x in g]
+
+
+def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False, ajuste_noche=None):
     """mapa: {'TOTAL_D':banda,...,'TRANSIT_N':banda,'OCI_N':banda} (texto de banda o dB); dia: 0-6 o None (media anual).
     medido: perfil de un sensor municipal cercano (7 x 24 dB). Si se da, sustituye al mapa y no se suman focos,
     porque la medición ya los incluye."""
@@ -165,6 +178,9 @@ def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False):
     trafico = {f: db_de(mapa[f"TRANSIT_{f}"]) for f in "DEN"} if "TRANSIT_D" in mapa else None
     ocio = db_de(mapa["OCI_N"]) if "OCI_N" in mapa else None
     db = perfil_horario(total, trafico, ocio, dia)
+    if ajuste_noche is not None and dia is not None:
+        for h in HORAS["N"]:
+            db[h] += ajuste_noche[dia]
     notas = notas_horarias(db, extra_focos(**focos) if focos else 0, dia)
     franjas, global_ = resumen(notas)
     return {"db": db, "notas": notas, "franjas": franjas, "global": global_}

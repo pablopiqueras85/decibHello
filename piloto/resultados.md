@@ -20,10 +20,11 @@ Es una **primera versión para aprender**, no una nota definitiva: los pesos y u
    - tráfico de día: sábado −1,2 dB, domingo −2,2 dB;
    - ocio de noche: viernes +2,7 dB y sábado +2,4 dB; lunes −2,6, martes −2,5 y domingo −3,0 (el jueves queda en la media);
    - el ruido de noche no atribuido a ninguna fuente sigue la mezcla de tráfico y ocio de la calle.
-7. **Donde hay sensor, manda la medición**: los portales del mismo tramo que un sensor municipal, a menos de 60 m, usan su nivel medido en 2023, día por día y hora por hora, en lugar del mapa y el modelo (352 tramos de la ciudad). Ahí no se suman focos, porque la medición ya los incluye.
-8. **Zona de bares**: en tramos sin sensor con 10 o más bares a menos de 100 m (sin contar restaurantes), se suman +6 dB de día y +8,8 dB por la tarde. El mapa oficial no modela el ocio fuera de la noche, y los sensores en zonas así lo confirman (ver `ocio_oculto.md`). De noche no se corrige, porque ninguna pista pública predice ese error.
-9. **Notas por franja** = media de sus horas. **Nota global** = 30 % día + 20 % tarde + 50 % noche.
-10. **Confianza**:
+7. **Donde hay sensor, manda la medición**: los portales del mismo tramo que un sensor municipal a menos de 60 m, o de la misma calle a menos de 120 m (933 tramos), usan su nivel medido en 2023, día por día y hora por hora, en lugar del mapa y el modelo (352 tramos de la ciudad). Ahí no se suman focos, porque la medición ya los incluye.
+8. **Horarios de los locales de noche**: discotecas, bares musicales y coctelerías a menos de 150 m, con los días que abren de madrugada (Open Data BCN, espacios de música y copas). Las noches con más locales abiertos suben y las demás bajan, sin cambiar la media de la semana: unos 2,8 dB por cada vez que se duplica la carga de esa noche, ajustado con los sensores (ver `ocio_oculto.md`).
+9. **Zona de bares**: en tramos sin sensor con 10 o más bares a menos de 100 m (sin contar restaurantes), se suman +6 dB de día y +8,8 dB por la tarde. El mapa oficial no modela el ocio fuera de la noche, y los sensores en zonas así lo confirman (ver `ocio_oculto.md`). De noche no se corrige, porque ninguna pista pública predice ese error.
+10. **Notas por franja** = media de sus horas. **Nota global** = 30 % día + 20 % tarde + 50 % noche.
+11. **Confianza**:
    - medida: el dato sale de un sensor del mismo tramo;
    - alta: hay sensor a menos de 150 m;
    - media: no hay sensor cerca;
@@ -42,19 +43,19 @@ El visor interactivo (`visor.html`) tiene un buscador para cualquier portal de B
 | 83 | 80 | 85 | 85 | 68 | Carrer d'Aragó 300 | ruidosa | 65–70 | 0 / 7 / 1 / 5 | medida |
 | 83 | 78 | 85 | 85 | — | Carrer de Sants 100 | intermedia | 65–70 | 0 / 17 / 4 / 4 | media |
 | 82 | 78 | 84 | 84 | 48 | Ronda del General Mitre 150 | ruidosa | 65–70 | 0 / 2 / 2 / 2 | media |
-| 80 | 65 | 87 | 86 | 46 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 29 / 2 / 16 | alta |
-| 79 | 62 | 81 | 87 | 39 | Carrer d'Escudellers 20 | ruidosa | 65–70 | 3 / 45 / 12 / 43 | alta |
+| 79 | 72 | 77 | 83 | 39 | Carrer d'Escudellers 20 | ruidosa | 65–70 | 3 / 45 / 12 / 43 | medida |
 | 79 | 73 | 87 | 79 | 35 | Carrer de Martínez de la Rosa 20 | control | 55–60 | 3 / 27 / 5 / 57 | media |
-| 78 | 62 | 80 | 86 | 48 | Carrer de Tuset 20 | control | 65–70 | 7 / 26 / 3 / 4 | alta |
 | 77 | 65 | 85 | 80 | 31 | Carrer de Verdi 20 | ruidosa | 60–65 | 0 / 35 / 8 / 26 | alta |
-| 77 | 73 | 85 | 76 | 48 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | alta |
 | 77 | 71 | 79 | 79 | 37 | Travessera de Gràcia 300 | control | 60–65 | 0 / 7 / 0 / 25 | media |
+| 75 | 67 | 74 | 80 | 48 | Carrer de Tuset 20 | control | 65–70 | 7 / 26 / 3 / 4 | medida |
 | 74 | 62 | 73 | 81 | 31 | Carrer Nou de la Rambla 30 | ruidosa | 60–65 | 1 / 21 / 5 / 44 | media |
 | 74 | 71 | 82 | 73 | 35 | Carrer de Blai 20 | ruidosa | 60–65 | 0 / 31 / 4 / 51 | medida |
 | 73 | 69 | 80 | 73 | 35 | Rambla del Poblenou 60 | intermedia | 55–60 | 0 / 12 / 6 / 5 | medida |
 | 72 | 67 | 74 | 74 | 43 | Carrer del Consell de Cent 250 | intermedia | 65–70 | 0 / 14 / 0 / 18 | medida |
 | 72 | 71 | 74 | 73 | 56 | Carrer Gran de Sant Andreu 200 | intermedia | 55–60 | 0 / 2 / 5 / 0 | media |
 | 71 | 65 | 74 | 73 | 43 | Carrer d'Enric Granados 50 | intermedia | 60–65 | 0 / 13 / 1 / 53 | medida |
+| 71 | 66 | 78 | 72 | 48 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | medida |
+| 70 | 62 | 82 | 70 | 46 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 29 / 2 / 16 | medida |
 | 69 | 62 | 72 | 72 | 46 | Carrer de la Mare de Déu del Coll 50 | tranquila | 55–60 | 0 / 0 / 2 / 3 | media |
 | 64 | 54 | 68 | 68 | — | Passeig de Joan de Borbó Comte de Barcelona 50 | ruidosa | 50–55 | 0 / 15 / 13 / 10 | media |
 | 62 | 62 | 63 | 62 | — | Carrer de Campoamor 30 | tranquila | 50–55 | 0 / 0 / 0 / 0 | media |
@@ -70,31 +71,31 @@ Nota media de la noche (23–7 h) que empieza cada día: la del viernes va del v
 <!-- semana:inicio -->
 | Dirección | Lun | Mar | Mié | Jue | Vie | Sáb | Dom | Vie − lun |
 |---|---|---|---|---|---|---|---|---|
-| Carrer Nou de la Rambla 30 | 76 | 77 | 79 | 81 | 86 | 85 | 76 | +10 |
+| Carrer de Tuset 20 | 68 | 70 | 78 | 81 | 83 | 83 | 67 | +15 |
+| Carrer de Verdi 20 | 74 | 74 | 79 | 81 | 86 | 85 | 75 | +12 |
+| Carrer Nou de la Rambla 30 | 75 | 76 | 78 | 82 | 87 | 86 | 74 | +12 |
 | Passeig de Joan de Borbó Comte de Barcelona 50 | 64 | 65 | 67 | 68 | 74 | 72 | 64 | +10 |
-| Carrer de Martínez de la Rosa 20 | 75 | 76 | 78 | 80 | 85 | 84 | 75 | +10 |
-| Carrer de Verdi 20 | 76 | 76 | 79 | 80 | 85 | 85 | 75 | +9 |
+| Carrer de Martínez de la Rosa 20 | 75 | 75 | 78 | 80 | 85 | 84 | 74 | +10 |
+| Plaça del Sol 12 | 65 | 65 | 69 | 69 | 74 | 72 | 65 | +9 |
 | Carrer d'Enric Granados 50 | 68 | 71 | 72 | 74 | 77 | 75 | 68 | +9 |
-| Plaça del Sol 12 | 82 | 83 | 85 | 86 | 90 | 90 | 82 | +8 |
-| Carrer d'Escudellers 20 | 83 | 84 | 86 | 87 | 91 | 90 | 83 | +8 |
-| Carrer del Parlament 30 | 73 | 74 | 75 | 76 | 81 | 80 | 73 | +8 |
+| Travessera de Gràcia 150 | 78 | 79 | 82 | 83 | 87 | 86 | 78 | +9 |
+| Travessera de Gràcia 81 | 82 | 82 | 87 | 88 | 90 | 90 | 85 | +8 |
 | Rambla del Poblenou 60 | 68 | 70 | 71 | 71 | 75 | 76 | 70 | +7 |
-| Carrer de Tuset 20 | 83 | 83 | 85 | 86 | 90 | 90 | 82 | +7 |
-| Travessera de Gràcia 150 | 80 | 80 | 82 | 83 | 87 | 86 | 79 | +7 |
+| Carrer Gran de Sant Andreu 200 | 70 | 71 | 72 | 73 | 77 | 76 | 70 | +7 |
 | Carrer de Blai 20 | 69 | 69 | 71 | 69 | 75 | 75 | 69 | +6 |
-| Carrer Gran de Sant Andreu 200 | 71 | 71 | 72 | 73 | 77 | 76 | 70 | +6 |
 | Carrer de Pomaret 20 | 44 | 44 | 45 | 46 | 50 | 48 | 44 | +6 |
+| Carrer d'Escudellers 20 | 80 | 81 | 82 | 82 | 85 | 85 | 80 | +5 |
+| Carrer de Sants 100 | 83 | 84 | 85 | 85 | 88 | 87 | 83 | +5 |
 | Carrer de la Mare de Déu del Coll 50 | 70 | 70 | 71 | 72 | 75 | 74 | 70 | +5 |
 | Carrer de les Agudes 20 | 61 | 62 | 62 | 63 | 66 | 65 | 61 | +5 |
-| Travessera de Gràcia 81 | 85 | 85 | 86 | 87 | 90 | 89 | 84 | +5 |
 | Travessera de Gràcia 300 | 77 | 78 | 79 | 79 | 82 | 81 | 77 | +5 |
 | Gran Via de les Corts Catalanes 600 | 83 | 84 | 84 | 85 | 87 | 86 | 83 | +4 |
 | Carrer del Consell de Cent 250 | 72 | 74 | 74 | 75 | 76 | 75 | 71 | +4 |
-| Carrer de Sants 100 | 84 | 84 | 85 | 85 | 88 | 87 | 83 | +4 |
 | Ronda del General Mitre 150 | 83 | 83 | 84 | 84 | 86 | 85 | 83 | +3 |
 | Carrer de Pere II de Montcada 10 | 61 | 61 | 62 | 62 | 64 | 63 | 60 | +3 |
 | Carrer de Campoamor 30 | 61 | 61 | 62 | 62 | 64 | 63 | 60 | +3 |
 | Carrer d'Aragó 300 | 84 | 85 | 85 | 85 | 86 | 86 | 85 | +2 |
+| Carrer del Parlament 30 | 72 | 71 | 70 | 71 | 73 | 73 | 69 | +1 |
 <!-- semana:fin -->
 
 ## Picos nocturnos: camiones de recogida y limpieza
