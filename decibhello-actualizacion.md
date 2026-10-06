@@ -78,6 +78,6 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 
 ## Actualización del 6 de octubre: obras al día
 
-- Las **obras públicas** se actualizan a diario en Open Data BCN. Una tarea programada las descarga cada mañana a las 6:47, regenera el visor y lo republica en el mismo enlace.
+- Las **obras públicas** se actualizan a diario en Open Data BCN. Una tarea programada las descarga de lunes a viernes a las 6:47, regenera el visor y lo republica en el mismo enlace.
 - Las **quejas vecinales (IRIS)** se publican cada trimestre (las de 2026 llegan a marzo): no sirven para un aviso del día, así que no se usan para obras.
 - Las **obras privadas** siguen pendientes de la solicitud de transparencia (borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.15).
