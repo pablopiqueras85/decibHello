@@ -39,6 +39,9 @@ if PERFILES:
     PESO_DIA_TRAFICO = {f: _normalizar(PERFILES["trafico"]["pesos_dia"][f]) for f in "DEN"}
     PESO_DIA_OCIO_NOCHE = _normalizar(PERFILES["ocio"]["pesos_dia"]["N"])
     PESO_DIA_OCIO_TARDE = _normalizar(PERFILES["ocio"]["pesos_dia"]["E"])
+    # Pesos por día y hora (más finos: el domingo por la mañana baja más que el domingo por la tarde).
+    PESO_DIA_HORA_TRAFICO = PERFILES["trafico"].get("pesos_dia_hora")
+    PESO_DIA_HORA_OCIO = PERFILES["ocio"].get("pesos_dia_hora")
 else:  # supuestos v0
     PERFIL_TRAFICO = [-6, -8, -9, -10, -10, -8, -4, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -3, -4, -5]
     PERFIL_OCIO = {23: 0, 0: 0, 1: -1, 2: -3, 3: -6, 4: -9, 5: -12, 6: -15}
@@ -46,6 +49,7 @@ else:  # supuestos v0
                         "N": _normalizar([0.85, 0.85, 0.9, 1.0, 1.25, 1.3, 0.8])}
     PESO_DIA_OCIO_NOCHE = _normalizar([0.2, 0.25, 0.35, 0.7, 1.0, 1.0, 0.3])
     PESO_DIA_OCIO_TARDE = _normalizar([0.6, 0.6, 0.7, 0.85, 1.0, 1.0, 0.7])
+    PESO_DIA_HORA_TRAFICO = PESO_DIA_HORA_OCIO = None
 # Reparto horario de los focos intermitentes (bares, quejas, pisos turísticos): peso 1 = todo el extra en esa hora.
 REPARTO_FOCOS = {19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 3: 0.5, 4: 0.2}
 # Zona de bares (validado con sensores, ver ocio_oculto.md): con 10 o más bares a menos de 100 m, el mapa 2017 se
@@ -112,7 +116,11 @@ def perfil_horario(total, trafico=None, ocio_noche=None, dia=None):
         media_base = sum(base.values()) / len(horas)
         forma_resto = {h: (base[h] / media_base if media_base else 1.0) for h in horas}
         for h in horas:
-            db[h] = 10 * math.log10((traf[h] * f_traf + ocio[h] * f_ocio + resto * forma_resto[h] * f_resto) * ajuste)
+            ft, fo, fr = f_traf, f_ocio, f_resto
+            if dia is not None and PESO_DIA_HORA_TRAFICO:
+                ft, fo = PESO_DIA_HORA_TRAFICO[dia][h], PESO_DIA_HORA_OCIO[dia][h]
+                fr = (traf[h] * ft + ocio[h] * fo) / (traf[h] + ocio[h]) if traf[h] + ocio[h] else ft
+            db[h] = 10 * math.log10((traf[h] * ft + ocio[h] * fo + resto * forma_resto[h] * fr) * ajuste)
     # Suaviza el salto entre franjas (18-19 h, 22-23 h) conservando la energía de cada pareja de horas.
     # Las 6 y las 7 no se mezclan: en un día de 7:00 a 7:00 pertenecen a mañanas distintas.
     for h1, h2 in ((18, 19), (22, 23)):

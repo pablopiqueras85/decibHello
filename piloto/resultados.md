@@ -72,10 +72,10 @@ Nota media de la noche (23–7 h) que empieza cada día: la del viernes va del v
 | Dirección | Lun | Mar | Mié | Jue | Vie | Sáb | Dom | Vie − lun |
 |---|---|---|---|---|---|---|---|---|
 | Carrer de Tuset 20 | 68 | 70 | 78 | 81 | 83 | 83 | 67 | +15 |
-| Carrer de Verdi 20 | 74 | 74 | 79 | 81 | 86 | 85 | 75 | +12 |
-| Carrer Nou de la Rambla 30 | 75 | 76 | 78 | 82 | 87 | 86 | 74 | +12 |
-| Passeig de Joan de Borbó Comte de Barcelona 50 | 64 | 65 | 67 | 68 | 74 | 72 | 64 | +10 |
-| Carrer de Martínez de la Rosa 20 | 75 | 75 | 78 | 80 | 85 | 84 | 74 | +10 |
+| Carrer de Verdi 20 | 74 | 75 | 79 | 81 | 85 | 85 | 76 | +11 |
+| Carrer Nou de la Rambla 30 | 75 | 76 | 79 | 82 | 86 | 86 | 75 | +11 |
+| Carrer de Martínez de la Rosa 20 | 74 | 75 | 78 | 80 | 85 | 83 | 74 | +11 |
+| Passeig de Joan de Borbó Comte de Barcelona 50 | 64 | 65 | 66 | 68 | 74 | 72 | 63 | +10 |
 | Plaça del Sol 12 | 65 | 65 | 69 | 69 | 74 | 72 | 65 | +9 |
 | Carrer d'Enric Granados 50 | 68 | 71 | 72 | 74 | 77 | 75 | 68 | +9 |
 | Travessera de Gràcia 81 | 81 | 82 | 86 | 87 | 90 | 89 | 84 | +9 |
@@ -83,17 +83,17 @@ Nota media de la noche (23–7 h) que empieza cada día: la del viernes va del v
 | Rambla del Poblenou 60 | 68 | 70 | 71 | 71 | 75 | 76 | 70 | +7 |
 | Carrer Gran de Sant Andreu 200 | 70 | 71 | 72 | 73 | 77 | 76 | 70 | +7 |
 | Carrer de Blai 20 | 69 | 69 | 71 | 69 | 75 | 75 | 69 | +6 |
-| Carrer de Pomaret 20 | 44 | 44 | 45 | 46 | 50 | 48 | 44 | +6 |
 | Carrer d'Escudellers 20 | 80 | 81 | 82 | 82 | 85 | 85 | 80 | +5 |
 | Carrer de Sants 100 | 83 | 84 | 85 | 85 | 88 | 87 | 83 | +5 |
-| Carrer de la Mare de Déu del Coll 50 | 70 | 70 | 71 | 72 | 75 | 74 | 70 | +5 |
-| Carrer de les Agudes 20 | 61 | 62 | 62 | 63 | 66 | 65 | 61 | +5 |
-| Travessera de Gràcia 300 | 77 | 78 | 79 | 79 | 82 | 81 | 77 | +5 |
+| Carrer de Pomaret 20 | 44 | 44 | 45 | 46 | 49 | 48 | 43 | +5 |
+| Carrer de la Mare de Déu del Coll 50 | 70 | 70 | 71 | 72 | 75 | 73 | 69 | +5 |
+| Carrer de les Agudes 20 | 61 | 61 | 62 | 63 | 66 | 64 | 61 | +5 |
+| Travessera de Gràcia 300 | 77 | 78 | 78 | 79 | 82 | 80 | 77 | +5 |
 | Gran Via de les Corts Catalanes 600 | 83 | 84 | 84 | 85 | 87 | 86 | 83 | +4 |
 | Carrer del Consell de Cent 250 | 72 | 74 | 74 | 75 | 76 | 75 | 71 | +4 |
+| Carrer de Pere II de Montcada 10 | 60 | 61 | 61 | 62 | 64 | 62 | 60 | +4 |
+| Carrer de Campoamor 30 | 60 | 61 | 61 | 62 | 64 | 62 | 60 | +4 |
 | Ronda del General Mitre 150 | 83 | 83 | 84 | 84 | 86 | 85 | 83 | +3 |
-| Carrer de Pere II de Montcada 10 | 61 | 61 | 62 | 62 | 64 | 63 | 60 | +3 |
-| Carrer de Campoamor 30 | 61 | 61 | 62 | 62 | 64 | 63 | 60 | +3 |
 | Carrer d'Aragó 300 | 84 | 85 | 85 | 85 | 86 | 86 | 85 | +2 |
 | Carrer del Parlament 30 | 72 | 71 | 70 | 71 | 73 | 73 | 69 | +1 |
 <!-- semana:fin -->

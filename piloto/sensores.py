@@ -80,8 +80,14 @@ def perfiles(df):
         forma = 10 * np.log10(forma.div(forma.groupby("Id_Instal").transform("max"))).groupby("h").median()
         pesos = x.groupby(["Id_Instal", "f", "dia"]).r.mean().groupby(["f", "dia"]).median().unstack()
         pesos = pesos.div(pesos.mean(axis=1), axis=0)
+        # Pesos por día y hora: cada hora del día d respecto a la media de los 7 días a esa misma hora.
+        e = lab[lab.Font == font].groupby(["Id_Instal", "dia", "h"]).e.mean()
+        rel = e / e.groupby(["Id_Instal", "h"]).transform("mean")
+        dh = rel.groupby(["dia", "h"]).median().unstack()
+        dh = dh / dh.mean(axis=0)
         out[clave] = {"sensores": int(x.Id_Instal.nunique()), "forma_horaria_db": [round(v, 1) for v in forma.tolist()],
-                      "pesos_dia": {f: [round(v, 3) for v in pesos.loc[f].tolist()] for f in "DEN"}}
+                      "pesos_dia": {f: [round(v, 3) for v in pesos.loc[f].tolist()] for f in "DEN"},
+                      "pesos_dia_hora": [[round(float(v), 3) for v in dh.loc[d].tolist()] for d in range(7)]}
     return out
 
 

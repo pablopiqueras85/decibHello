@@ -287,6 +287,8 @@ const REPARTO_FOCOS = { 19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2
 const PESO_DIA_TRAFICO = { D: normalizarPesos(PS.trafico.pesos_dia.D), E: normalizarPesos(PS.trafico.pesos_dia.E), N: normalizarPesos(PS.trafico.pesos_dia.N) };
 const PESO_DIA_OCIO_NOCHE = normalizarPesos(PS.ocio.pesos_dia.N);
 const PESO_DIA_OCIO_TARDE = normalizarPesos(PS.ocio.pesos_dia.E);
+const PESO_DIA_HORA_TRAFICO = PS.trafico.pesos_dia_hora || null;
+const PESO_DIA_HORA_OCIO = PS.ocio.pesos_dia_hora || null;
 const energia = db => Math.pow(10, db / 10);
 const suma = a => a.reduce((x, y) => x + y, 0);
 
@@ -322,7 +324,12 @@ function perfilHorario(total, trafico, ocioNoche, dia) {
     const mediaBase = (eT + eO) / n;
     horas.forEach((h, i) => {
       const forma = mediaBase ? (traf[i] + ocio[i]) / mediaBase : 1;
-      db[h] = 10 * Math.log10((traf[i] * fTraf + ocio[i] * fOcio + resto * forma * fResto) * ajuste);
+      let ft = fTraf, fo = fOcio, fr = fResto;
+      if (dia != null && PESO_DIA_HORA_TRAFICO) {
+        ft = PESO_DIA_HORA_TRAFICO[dia][h]; fo = PESO_DIA_HORA_OCIO[dia][h];
+        fr = traf[i] + ocio[i] ? (traf[i] * ft + ocio[i] * fo) / (traf[i] + ocio[i]) : ft;
+      }
+      db[h] = 10 * Math.log10((traf[i] * ft + ocio[i] * fo + resto * forma * fr) * ajuste);
     });
   }
   for (const [h1, h2] of [[18, 19], [22, 23]]) {
