@@ -21,8 +21,9 @@ Es una **primera versión para aprender**, no una nota definitiva: los pesos y u
    - ocio de noche: viernes +2,7 dB y sábado +2,4 dB; lunes −2,6, martes −2,5 y domingo −3,0 (el jueves queda en la media);
    - el ruido de noche no atribuido a ninguna fuente sigue la mezcla de tráfico y ocio de la calle.
 7. **Donde hay sensor, manda la medición**: los portales del mismo tramo que un sensor municipal, a menos de 60 m, usan su nivel medido en 2023, día por día y hora por hora, en lugar del mapa y el modelo (352 tramos de la ciudad). Ahí no se suman focos, porque la medición ya los incluye.
-8. **Notas por franja** = media de sus horas. **Nota global** = 30 % día + 20 % tarde + 50 % noche.
-9. **Confianza**:
+8. **Zona de bares**: en tramos sin sensor con 10 o más bares a menos de 100 m (sin contar restaurantes), se suman +6 dB de día y +8,8 dB por la tarde. El mapa oficial no modela el ocio fuera de la noche, y los sensores en zonas así lo confirman (ver `ocio_oculto.md`). De noche no se corrige, porque ninguna pista pública predice ese error.
+9. **Notas por franja** = media de sus horas. **Nota global** = 30 % día + 20 % tarde + 50 % noche.
+10. **Confianza**:
    - medida: el dato sale de un sensor del mismo tramo;
    - alta: hay sensor a menos de 150 m;
    - media: no hay sensor cerca;
@@ -37,20 +38,20 @@ El visor interactivo (`visor.html`) tiene un buscador para cualquier portal de B
 |---|---|---|---|---|---|---|---|---|---|
 | 84 | 83 | 85 | 85 | 46 | Gran Via de les Corts Catalanes 600 | ruidosa | 65–70 | 0 / 21 / 0 / 43 | media |
 | 84 | 78 | 87 | 87 | 60 | Travessera de Gràcia 81 | control | 65–70 | 1 / 13 / 8 / 4 | alta |
+| 84 | 84 | 89 | 83 | 35 | Travessera de Gràcia 150 | control | 60–65 | 1 / 29 / 3 / 50 | alta |
 | 83 | 80 | 85 | 85 | 68 | Carrer d'Aragó 300 | ruidosa | 65–70 | 0 / 7 / 1 / 5 | medida |
 | 83 | 78 | 85 | 85 | — | Carrer de Sants 100 | intermedia | 65–70 | 0 / 17 / 4 / 4 | media |
 | 82 | 78 | 84 | 84 | 48 | Ronda del General Mitre 150 | ruidosa | 65–70 | 0 / 2 / 2 / 2 | media |
-| 81 | 78 | 83 | 82 | 35 | Travessera de Gràcia 150 | control | 60–65 | 1 / 29 / 3 / 50 | alta |
+| 80 | 65 | 87 | 86 | 46 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 29 / 2 / 16 | alta |
 | 79 | 62 | 81 | 87 | 39 | Carrer d'Escudellers 20 | ruidosa | 65–70 | 3 / 45 / 12 / 43 | alta |
+| 79 | 73 | 87 | 79 | 35 | Carrer de Martínez de la Rosa 20 | control | 55–60 | 3 / 27 / 5 / 57 | media |
 | 78 | 62 | 80 | 86 | 48 | Carrer de Tuset 20 | control | 65–70 | 7 / 26 / 3 / 4 | alta |
+| 77 | 65 | 85 | 80 | 31 | Carrer de Verdi 20 | ruidosa | 60–65 | 0 / 35 / 8 / 26 | alta |
+| 77 | 73 | 85 | 76 | 48 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | alta |
 | 77 | 71 | 79 | 79 | 37 | Travessera de Gràcia 300 | control | 60–65 | 0 / 7 / 0 / 25 | media |
-| 75 | 54 | 79 | 86 | 46 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 29 / 2 / 16 | alta |
 | 74 | 62 | 73 | 81 | 31 | Carrer Nou de la Rambla 30 | ruidosa | 60–65 | 1 / 21 / 5 / 44 | media |
 | 74 | 71 | 82 | 73 | 35 | Carrer de Blai 20 | ruidosa | 60–65 | 0 / 31 / 4 / 51 | medida |
-| 74 | 62 | 79 | 79 | 35 | Carrer de Martínez de la Rosa 20 | control | 55–60 | 3 / 27 / 5 / 57 | media |
 | 73 | 69 | 80 | 73 | 35 | Rambla del Poblenou 60 | intermedia | 55–60 | 0 / 12 / 6 / 5 | medida |
-| 72 | 54 | 76 | 80 | 31 | Carrer de Verdi 20 | ruidosa | 60–65 | 0 / 35 / 8 / 26 | alta |
-| 72 | 62 | 76 | 76 | 48 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | alta |
 | 72 | 67 | 74 | 74 | 43 | Carrer del Consell de Cent 250 | intermedia | 65–70 | 0 / 14 / 0 / 18 | medida |
 | 72 | 71 | 74 | 73 | 56 | Carrer Gran de Sant Andreu 200 | intermedia | 55–60 | 0 / 2 / 5 / 0 | media |
 | 71 | 65 | 74 | 73 | 43 | Carrer d'Enric Granados 50 | intermedia | 60–65 | 0 / 13 / 1 / 53 | medida |
@@ -69,17 +70,17 @@ Nota media de la noche (23–7 h) que empieza cada día: la del viernes va del v
 <!-- semana:inicio -->
 | Dirección | Lun | Mar | Mié | Jue | Vie | Sáb | Dom | Vie − lun |
 |---|---|---|---|---|---|---|---|---|
-| Carrer de Verdi 20 | 75 | 76 | 78 | 80 | 85 | 85 | 75 | +10 |
 | Carrer Nou de la Rambla 30 | 76 | 77 | 79 | 81 | 86 | 85 | 76 | +10 |
 | Passeig de Joan de Borbó Comte de Barcelona 50 | 64 | 65 | 67 | 68 | 74 | 72 | 64 | +10 |
-| Carrer de Martínez de la Rosa 20 | 75 | 75 | 77 | 79 | 85 | 83 | 74 | +10 |
+| Carrer de Martínez de la Rosa 20 | 75 | 76 | 78 | 80 | 85 | 84 | 75 | +10 |
+| Carrer de Verdi 20 | 76 | 76 | 79 | 80 | 85 | 85 | 75 | +9 |
 | Carrer d'Enric Granados 50 | 68 | 71 | 72 | 74 | 77 | 75 | 68 | +9 |
-| Carrer del Parlament 30 | 72 | 73 | 75 | 76 | 81 | 79 | 72 | +9 |
-| Plaça del Sol 12 | 82 | 82 | 85 | 86 | 90 | 90 | 81 | +8 |
+| Plaça del Sol 12 | 82 | 83 | 85 | 86 | 90 | 90 | 82 | +8 |
 | Carrer d'Escudellers 20 | 83 | 84 | 86 | 87 | 91 | 90 | 83 | +8 |
+| Carrer del Parlament 30 | 73 | 74 | 75 | 76 | 81 | 80 | 73 | +8 |
 | Rambla del Poblenou 60 | 68 | 70 | 71 | 71 | 75 | 76 | 70 | +7 |
 | Carrer de Tuset 20 | 83 | 83 | 85 | 86 | 90 | 90 | 82 | +7 |
-| Travessera de Gràcia 150 | 79 | 79 | 81 | 82 | 86 | 86 | 79 | +7 |
+| Travessera de Gràcia 150 | 80 | 80 | 82 | 83 | 87 | 86 | 79 | +7 |
 | Carrer de Blai 20 | 69 | 69 | 71 | 69 | 75 | 75 | 69 | +6 |
 | Carrer Gran de Sant Andreu 200 | 71 | 71 | 72 | 73 | 77 | 76 | 70 | +6 |
 | Carrer de Pomaret 20 | 44 | 44 | 45 | 46 | 50 | 48 | 44 | +6 |
@@ -142,7 +143,7 @@ Falta lo más importante, que no es público: la ubicación de los contenedores 
 2. **Cambia el orden según la hora.** A la 1:00 encabezan las calles de ocio (Escudellers, Plaça del Sol, Nou de la Rambla). A las 13:00 encabezan las grandes vías de tráfico (Gran Via, Aragó, Ronda del General Mitre). En la nota global de todo el día sigue pesando más el tráfico, porque está presente las 24 horas. Por eso tiene sentido enseñar la curva por horas y no solo una cifra.
 3. **El patio interior cambia mucho la experiencia.** La nota interior suele estar entre 25 y 45 puntos por debajo de la exterior. Hay excepciones: en Aragó 300 y Gran de Sant Andreu 200 la diferencia es de solo 15–16, porque su patio también es ruidoso. El informe debe distinguir siempre piso exterior e interior.
 4. **El día de la semana importa sobre todo en las calles de ocio.** De la noche del lunes a la del viernes, Verdi, Nou de la Rambla o Martínez de la Rosa suben unos 10 puntos; Gran Via, Sants o Ronda del General Mitre, 3–4; Aragó, solo 2. Con pesos medidos por los sensores.
-5. **El mapa oficial acierta en las calles de tráfico, pero se queda corto en el ocio.** Comparado con 140 sensores (ver `validacion_sensores.md`): en los de tráfico la diferencia mediana de noche es de +0,9 dB; en los de ocio, +2,6 dB, con casos de +18 a +27 dB en calles pequeñas y plazas de Gràcia, el Born o Sant Antoni (Raspall, Puigmartí, Fonollar, Comte Borrell). Los bares, quejas y la anchura de la calle apenas explican esa diferencia, así que no se ha inventado una corrección: donde hay sensor se usa lo medido.
+5. **El mapa oficial acierta en las calles de tráfico, pero se queda corto en el ocio.** Comparado con 140 sensores (ver `validacion_sensores.md`): en los de tráfico la diferencia mediana de noche es de +0,9 dB; en los de ocio, +2,6 dB, con casos de +18 a +27 dB en calles pequeñas y plazas de Gràcia, el Born o Sant Antoni (Raspall, Puigmartí, Fonollar, Comte Borrell). Con 140 sensores y validación por distritos (`ocio_oculto.md`): de día y por la tarde, la cantidad de bares sí predice cuánto se queda corto el mapa, y se corrige en las zonas de bares; de noche ninguna pista pública lo predice, así que solo una medición lo resuelve.
 6. **Consell de Cent confirma el efecto del eje verde.** El sensor de Consell de Cent 238 mide 6,6 dB menos de noche que el mapa 2017. Con la medición, su nota baja de 82 a 72.
 7. **Barcelona es ruidosa de noche.** Con la referencia de la OMS (45 dB = 50 puntos), casi ninguna fachada a la calle baja de 50. Es coherente con los datos (el 76 % de los tramos supera 45 dB de noche), pero quizá convenga una escala relativa a Barcelona además de la absoluta.
 
@@ -152,7 +153,7 @@ Falta lo más importante, que no es público: la ubicación de los contenedores 
 - **Bandas de 5 dB**: el mapa no da cifras exactas, así que dos calles en la misma banda empatan.
 - **Ubicación del portal**: la geolocalización a veces cae dentro de la manzana. En Blai y Gran de Sant Andreu el tramo está a más de 40 m (confianza baja).
 - **Curva horaria**: fuera de los tramos con sensor, la forma por horas es la media medida de los sensores de su tipo, no la de cada calle.
-- **Ocio infravalorado**: en calles pequeñas y plazas con mucha vida nocturna, el mapa puede quedarse 10–25 dB corto de noche. Sin sensor cerca, la nota de esas calles es probablemente baja.
+- **Ocio infravalorado de noche**: en calles pequeñas y plazas con mucha vida nocturna, el mapa puede quedarse 10–25 dB corto de noche, y no hay forma fiable de detectarlo con datos públicos. De día y por la tarde se corrige en las zonas de bares.
 - **Picos cortos** (camiones, gritos): los datos por hora no los ven. Hacen falta los datos minuto a minuto (pendiente).
 - **Día de la semana**: pesos medidos en 2023; podrían cambiar con los años.
 

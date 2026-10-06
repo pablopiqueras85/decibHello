@@ -385,13 +385,16 @@ const CALLES = IX.calles.map(([nombre, planos]) => {
   return { nombre, rangos, ...tokensCalle(nombre) };
 });
 const cacheCalc = new Map();
+const ZB = DATOS.zona_bares;
+const esZonaBares = r => r.sensor < 0 && r.solo_bares >= ZB.minimo;
 function calcular(r, dia = estado.dia) {
-  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + dia;
+  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + dia;
   if (cacheCalc.has(clave)) return cacheCalc.get(clave);
   const t = IX.tramos[r.tramo];
   const b = k => bandaDb(+t[IX.campos_tramo.indexOf(k)]);
   const sensor = r.sensor >= 0 ? DATOS.sensores[r.sensor] : null;
-  const dbExt = sensor ? perfilMedido(sensor.db, dia) : perfilHorario({ D: b("TOTAL_D"), E: b("TOTAL_E"), N: b("TOTAL_N") }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"), dia);
+  const zb = esZonaBares(r) ? ZB.correccion : { D: 0, E: 0, N: 0 };
+  const dbExt = sensor ? perfilMedido(sensor.db, dia) : perfilHorario({ D: b("TOTAL_D") + zb.D, E: b("TOTAL_E") + zb.E, N: b("TOTAL_N") + zb.N }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"), dia);
   const notasExt = notasHorarias(dbExt, sensor ? 0 : extraFocos(r.ocio, r.bares, r.quejas, r.turisticos), dia);
   const ext = { db: dbExt, nota: notasExt, ...resumen(notasExt), mapa: { D: IX.bandas[+t[0]], E: IX.bandas[+t[1]], N: IX.bandas[+t[2]] } };
   let int = null;
@@ -594,10 +597,10 @@ function pintarDetalle() {
   $("confianza").textContent = "confianza " + estado.confianza;
   $("grupo").hidden = !estado.grupo;
   $("grupo").textContent = estado.grupo ? NOMBRE_GRUPO[estado.grupo] : "";
-  // Validación con sensores: en calles con mucha vida nocturna el mapa oficial se queda corto de noche (hasta 25 dB).
-  const ocioSinSensor = r.sensor < 0 && (r.ocio >= 1 || r.bares >= 15)
-    ? "Calle con mucha vida nocturna y sin sensor municipal en el tramo: en sitios así, los sensores miden de noche bastante más ruido que el mapa oficial, así que la nota nocturna probablemente se queda corta." : "";
-  const avisos = [estado.origen, estado.aviso, ocioSinSensor].filter(Boolean).join(" ");
+  // Zona de bares (validado con sensores): el mapa oficial se queda corto de día y por la tarde; ya se corrige.
+  const zonaBares = esZonaBares(r)
+    ? `Zona de bares (${r.solo_bares} bares a menos de 100 m): el mapa oficial no cuenta el ocio de día ni de tarde, y los sensores municipales en zonas así miden bastante más. Se han sumado +${ZB.correccion.D} dB de día y +${ZB.correccion.E} dB por la tarde (estimación prudente).` : "";
+  const avisos = [estado.origen, estado.aviso, zonaBares].filter(Boolean).join(" ");
   $("aviso").hidden = !avisos;
   $("aviso").textContent = avisos;
 
@@ -640,7 +643,8 @@ function pintarDetalle() {
     ["Bares y restaurantes · 100 m", r.bares],
     ["Quejas por ruido 2025 · 100 m", r.quejas],
     ["Pisos turísticos · 100 m", r.turisticos],
-    ["Origen del dato", res.sensor ? `medición del sensor de ${res.sensor.calle} (${res.sensor.dias} días de 2023)` : "mapa oficial 2017 + modelo"],
+    ["Origen del dato", res.sensor ? `medición del sensor de ${res.sensor.calle} (${res.sensor.dias} días de 2023)` : esZonaBares(r) ? "mapa oficial 2017 + modelo + corrección por zona de bares" : "mapa oficial 2017 + modelo"],
+    ["Bares (sin restaurantes) · 100 m", r.solo_bares],
     ["Sensor municipal más cercano", r.sensor_dam >= 100 ? (r.sensor_dam / 100).toFixed(1).replace(".", ",") + " km" : r.sensor_dam * 10 + " m"],
     ["Mismo tramo", `portales ${r.ini}–${r.fin} (lado ${lado})`],
     ["Nota global del día", `${Math.round(res.exterior.global)} exterior` + (res.interior ? ` · ${Math.round(res.interior.global)} interior` : "")],

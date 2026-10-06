@@ -48,6 +48,11 @@ else:  # supuestos v0
     PESO_DIA_OCIO_TARDE = _normalizar([0.6, 0.6, 0.7, 0.85, 1.0, 1.0, 0.7])
 # Reparto horario de los focos intermitentes (bares, quejas, pisos turísticos): peso 1 = todo el extra en esa hora.
 REPARTO_FOCOS = {19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 3: 0.5, 4: 0.2}
+# Zona de bares (validado con sensores, ver ocio_oculto.md): con 10 o más bares a menos de 100 m, el mapa 2017 se
+# queda corto de día y por la tarde (el mapa no modela ocio fuera de la noche). Corrección prudente: el percentil 25
+# de lo que midieron los sensores en esas zonas. De noche las pistas no predicen el error, así que no se corrige.
+ZONA_BARES_MIN = 10
+CORRECCION_ZONA_BARES = {"D": 6.0, "E": 8.8, "N": 0.0}
 # Un "día" va de las 7:00 a las 7:00 del día siguiente: la noche del viernes (23-7 h) es la que empieza el viernes.
 
 
@@ -146,7 +151,7 @@ def perfil_medido(db_dias, dia=None):
     return [10 * math.log10(sum(energia(db_dias[d][h]) for d in range(7)) / 7) for h in range(24)]
 
 
-def calcular(mapa, focos=None, dia=None, medido=None):
+def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False):
     """mapa: {'TOTAL_D':banda,...,'TRANSIT_N':banda,'OCI_N':banda} (texto de banda o dB); dia: 0-6 o None (media anual).
     medido: perfil de un sensor municipal cercano (7 x 24 dB). Si se da, sustituye al mapa y no se suman focos,
     porque la medición ya los incluye."""
@@ -156,7 +161,7 @@ def calcular(mapa, focos=None, dia=None, medido=None):
         franjas, global_ = resumen(notas)
         return {"db": db, "notas": notas, "franjas": franjas, "global": global_}
     db_de = lambda v: v if isinstance(v, (int, float)) else banda_a_db(v)
-    total = {f: db_de(mapa[f"TOTAL_{f}"]) for f in "DEN"}
+    total = {f: db_de(mapa[f"TOTAL_{f}"]) + (CORRECCION_ZONA_BARES[f] if zona_bares else 0) for f in "DEN"}
     trafico = {f: db_de(mapa[f"TRANSIT_{f}"]) for f in "DEN"} if "TRANSIT_D" in mapa else None
     ocio = db_de(mapa["OCI_N"]) if "OCI_N" in mapa else None
     db = perfil_horario(total, trafico, ocio, dia)

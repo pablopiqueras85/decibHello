@@ -17,7 +17,8 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 
 ### 1. Que la nota sea fiable (lo más importante)
 - [x] **Calibrar con mediciones reales**: perfiles por hora y día de la semana medidos con los sensores, y nivel medido en 352 tramos con sensor.
-- [ ] **Ocio infravalorado por el mapa**: en plazas y calles pequeñas con vida nocturna el mapa se queda hasta 25 dB corto de noche. Buscar cómo detectarlo sin sensor (opiniones de vecinos, mediciones con el móvil, terrazas).
+- [x] **Ocio infravalorado de día y de tarde**: corregido en las zonas de bares (≥ 10 bares a 100 m), validado con sensores por distritos (`piloto/ocio_oculto.md`).
+- [ ] **Ocio infravalorado de noche**: ninguna pista pública lo predice (probado con bares, terrazas, quejas por motivo, pisos turísticos, plazas). Solo se resuelve midiendo: mediciones con el móvil, opiniones de vecinos, más sensores.
 - [ ] **Validación sobre el terreno**: medir con sonómetro o móvil en 20–30 portales, de día y de noche, entre semana y en fin de semana, y comparar con la nota. Sin esto no podemos decir cuánto acierta.
 - [ ] **Mapa de ruido 2022**: pasar del de 2017 (por tramo) al ráster de 2022, para recoger cambios como los ejes verdes (Consell de Cent).
 - [ ] **Explicar la incertidumbre**: mostrar un margen ("entre 70 y 80") además de la cifra.

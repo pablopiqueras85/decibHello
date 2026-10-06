@@ -17,7 +17,7 @@ Con los datos de los sensores que pasaste, la nota ya no depende de supuestos m�
    - en zonas de ocio se queda corto: +2,6 dB de mediana y **hasta +18 a +27 dB** en plazas y calles pequeñas de Gràcia, el Born y Sant Antoni (Raspall, Puigmartí, Fonollar, Comte Borrell);
    - Consell de Cent confirma el eje verde: el sensor mide 6,6 dB menos que el mapa de 2017, y su nota baja de 82 a 72.
    - Probé si bares, quejas o anchura de la calle explican esa diferencia: apenas (mejora de 0,2–0,3 dB). No he inventado una corrección.
-5. **Aviso nuevo en el visor**: en calles con mucha vida nocturna y sin sensor, avisa de que la nota de noche probablemente se queda corta.
+5. ~~Aviso nuevo en el visor sobre la noche en calles de ocio~~: retirado el 6 de octubre, porque los datos no lo respaldan (ver abajo).
 6. **Documentación**: informe del piloto actualizado (`piloto/resultados.md`), `piloto/README.md` con cómo regenerarlo todo, fuentes de datos y pendientes al día.
 7. **Comprobado**: el visor y el cálculo en Python dan exactamente las mismas notas en las 26 direcciones (nota global, 7 noches y aviso de picos).
 
@@ -39,3 +39,14 @@ Con los datos de los sensores que pasaste, la nota ya no depende de supuestos m�
 - Cómo detectar el ocio que el mapa no ve en calles sin sensor (opiniones de vecinos, mediciones con móvil).
 - Pasar del mapa de 2017 al de 2022.
 - El resto, en `decibhello-pendientes.md`.
+
+## Actualización del 6 de octubre: el ruido de ocio que el mapa no ve
+
+Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
+
+- **Pistas nuevas**: bares (sin restaurantes), bares musicales y discotecas, locales abiertos 24 h, terrazas con su número de mesas, quejas por motivo (gente en la calle, salida de locales, músicos, fiestas, terrazas), pisos turísticos, plazas, anchura de la calle y los componentes del propio mapa.
+- **Entrenamiento con 140 sensores**, validando por distritos (el modelo nunca ve el distrito que se evalúa).
+- **La trampa**: un modelo con todo parecía mejorar mucho, pero la mejora venía del nivel del propio mapa. Los sensores en zonas "tranquilas" del mapa se pusieron por quejas, así que esa regla subiría el ruido de calles de verdad tranquilas. **No se aplica.**
+- **De noche, ninguna pista pública predice dónde se equivoca el mapa.** Retirado el aviso nocturno que puse anoche.
+- **De día y por la tarde, sí**: con 10 o más bares a menos de 100 m, el mapa se queda corto (mediana +7 dB de día y +12 dB por la tarde). El mapa no modela el ocio fuera de la noche. Se corrige con una estimación prudente: **+6 dB de día y +8,8 dB por la tarde**, en ~1.000 tramos (2,6 % de la ciudad). En esos sensores, el error de tarde baja de 11 a 4 dB.
+- **Para la noche hace falta medir**: mediciones con el móvil, opiniones de vecinos o más sensores.
