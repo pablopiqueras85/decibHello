@@ -50,8 +50,6 @@ else:  # supuestos v0
     PESO_DIA_OCIO_NOCHE = _normalizar([0.2, 0.25, 0.35, 0.7, 1.0, 1.0, 0.3])
     PESO_DIA_OCIO_TARDE = _normalizar([0.6, 0.6, 0.7, 0.85, 1.0, 1.0, 0.7])
     PESO_DIA_HORA_TRAFICO = PESO_DIA_HORA_OCIO = None
-# Reparto horario de los focos intermitentes (bares, quejas, pisos turísticos): peso 1 = todo el extra en esa hora.
-REPARTO_FOCOS = {19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 3: 0.5, 4: 0.2}
 # Zona de bares (validado con sensores, ver ocio_oculto.md): con 10 o más bares a menos de 100 m, el mapa 2017 se
 # queda corto de día y por la tarde (el mapa no modela ocio fuera de la noche). Corrección prudente: el percentil 25
 # de lo que midieron los sensores en esas zonas. De noche las pistas no predicen el error, así que no se corrige.
@@ -138,27 +136,14 @@ def suavizar_extremos(v):
     return v
 
 
-def peso_focos(h, dia):
-    """Peso de los focos intermitentes en la hora h: reparto horario y, si hay día, su peso semanal."""
-    peso = REPARTO_FOCOS.get(h, 0)
-    if dia is not None and peso:
-        peso *= PESO_DIA_OCIO_TARDE[dia] if FRANJA[h] == "E" else PESO_DIA_OCIO_NOCHE[dia]
-    return peso
-
-
-def notas_horarias(db, extra, dia=None):
-    """Nota 0-100 de cada hora: nivel respecto al umbral de su franja + focos intermitentes repartidos por hora."""
-    return [suavizar_extremos(50 + (db[h] - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB + extra * peso_focos(h, dia)) for h in range(24)]
+def notas_horarias(db, dia=None):
+    """Nota 0-100 de cada hora a partir de su nivel en dB: la MISMA fórmula para todo (medido o estimado)."""
+    return [suavizar_extremos(50 + (db[h] - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB) for h in range(24)]
 
 
 def resumen(notas):
     franjas = {f: sum(notas[h] for h in HORAS[f]) / len(HORAS[f]) for f in "DEN"}
     return franjas, sum(PESOS[f] * franjas[f] for f in "DEN")
-
-
-def extra_focos(ocio, bares, quejas, turisticos):
-    """Puntos extra por focos intermitentes a menos de 100 m (máximo 25, en las horas punta del ocio)."""
-    return min(10, 4 * ocio) + min(6, 1.2 * math.sqrt(bares)) + min(6, 2 * math.sqrt(quejas)) + min(3, math.sqrt(turisticos) / 3)
 
 
 def perfil_medido(db_dias, dia=None):
@@ -178,12 +163,13 @@ def ajuste_noches(carga):
 
 
 def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False, ajuste_noche=None):
+    # focos: se mantiene por compatibilidad; ya no suma puntos. Todo pasa por los dB (validado con sensores).
     """mapa: {'TOTAL_D':banda,...,'TRANSIT_N':banda,'OCI_N':banda} (texto de banda o dB); dia: 0-6 o None (media anual).
     medido: perfil de un sensor municipal cercano (7 x 24 dB). Si se da, sustituye al mapa y no se suman focos,
     porque la medición ya los incluye."""
     if medido is not None:
         db = perfil_medido(medido, dia)
-        notas = notas_horarias(db, 0, dia)
+        notas = notas_horarias(db, dia)
         franjas, global_ = resumen(notas)
         return {"db": db, "notas": notas, "franjas": franjas, "global": global_}
     db_de = lambda v: v if isinstance(v, (int, float)) else banda_a_db(v)
@@ -194,7 +180,7 @@ def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False, ajuste_n
     if ajuste_noche is not None and dia is not None:
         for h in HORAS["N"]:
             db[h] += ajuste_noche[dia]
-    notas = notas_horarias(db, extra_focos(**focos) if focos else 0, dia)
+    notas = notas_horarias(db, dia)
     franjas, global_ = resumen(notas)
     return {"db": db, "notas": notas, "franjas": franjas, "global": global_}
 

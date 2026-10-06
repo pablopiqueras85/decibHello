@@ -262,7 +262,7 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
   </main>
 
   <footer class="pie">
-    <p><strong>Cómo se calcula (v0).</strong> Base: mapa estratégico de ruido de Barcelona de 2017 (día, tarde y noche, en franjas de 5 dB) en el tramo de calle de cada portal. El reparto hora a hora es una estimación: sigue la forma típica del tráfico y del ocio nocturno y respeta la media oficial de cada franja. De noche el mismo ruido puntúa más, como en el indicador europeo Lden. El día de la semana reparte esa media anual con pesos supuestos (más ocio de jueves a sábado, menos tráfico de día el fin de semana), pendientes de calibrar con los sensores municipales; cada día va de las 7:00 a las 7:00 del siguiente. Se suman bares, locales de ocio nocturno, quejas por ruido y pisos turísticos a menos de 100 m, sobre todo entre las 22 y las 3 h. "Interior" usa la fachada al patio de manzana.</p>
+    <p><strong>Cómo se calcula.</strong> Toda nota sale de la misma forma: el nivel de ruido en decibelios de cada hora, convertido a 0–100 con una única fórmula (de noche el mismo ruido puntúa más, como en el indicador europeo Lden). Donde hay un sensor municipal en el tramo o en la misma calle, ese nivel es el medido en 2023, día a día y hora a hora. En el resto se estima con el mapa estratégico de ruido de 2017 y patrones medidos por los sensores (forma de cada hora y de cada día de la semana), más dos correcciones validadas con ellos: zonas con muchos bares (de día y tarde) y noches en que abren los locales cercanos. Cada día va de las 7:00 a las 7:00 del siguiente. "Interior" usa la fachada al patio de manzana.</p>
     <p>Cubre Barcelona ciudad. Datos: Open Data BCN (Ajuntament de Barcelona, CC BY 4.0): mapa de ruido, portales y calles, censo de locales, quejas IRIS, pisos turísticos y sensores. Es una estimación para validar, no una medición del piso.</p>
   </footer>
 </div>
@@ -283,7 +283,6 @@ const normalizarPesos = p => { const m = p.reduce((a, b) => a + b, 0) / p.length
 const PS = DATOS.perfiles;
 const PERFIL_TRAFICO = PS.trafico.forma_horaria_db;
 const PERFIL_OCIO = (() => { const f = PS.ocio.forma_horaria_db, hs = [23, 0, 1, 2, 3, 4, 5, 6], m = Math.max(...hs.map(h => f[h])), o = {}; hs.forEach(h => (o[h] = Math.round((f[h] - m) * 10) / 10)); return o; })();
-const REPARTO_FOCOS = { 19: 0.3, 20: 0.4, 21: 0.5, 22: 0.7, 23: 1, 0: 1, 1: 1, 2: 0.8, 3: 0.5, 4: 0.2 };
 const PESO_DIA_TRAFICO = { D: normalizarPesos(PS.trafico.pesos_dia.D), E: normalizarPesos(PS.trafico.pesos_dia.E), N: normalizarPesos(PS.trafico.pesos_dia.N) };
 const PESO_DIA_OCIO_NOCHE = normalizarPesos(PS.ocio.pesos_dia.N);
 const PESO_DIA_OCIO_TARDE = normalizarPesos(PS.ocio.pesos_dia.E);
@@ -344,13 +343,9 @@ function suavizarExtremos(v) {
   if (v < 30) return 30 - 30 * (1 - Math.exp(-(30 - v) / 30));
   return v;
 }
-function pesoFocos(h, dia) {
-  let p = REPARTO_FOCOS[h] || 0;
-  if (dia != null && p) p *= FRANJA[h] === "E" ? PESO_DIA_OCIO_TARDE[dia] : PESO_DIA_OCIO_NOCHE[dia];
-  return p;
-}
-function notasHorarias(db, extra, dia) {
-  return db.map((v, h) => suavizarExtremos(50 + (v - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB + extra * pesoFocos(h, dia)));
+// Misma fórmula para todo: la nota de cada hora sale solo de su nivel en dB (medido o estimado).
+function notasHorarias(db) {
+  return db.map((v, h) => suavizarExtremos(50 + (v - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB));
 }
 function resumen(notas) {
   const franjas = {};
@@ -360,9 +355,6 @@ function resumen(notas) {
 function perfilMedido(dbDias, dia) {
   if (dia != null) return dbDias[dia].slice();
   return Array.from({ length: 24 }, (_, h) => 10 * Math.log10(dbDias.reduce((a, d) => a + energia(d[h]), 0) / 7));
-}
-function extraFocos(ocio, bares, quejas, turisticos) {
-  return Math.min(10, 4 * ocio) + Math.min(6, 1.2 * Math.sqrt(bares)) + Math.min(6, 2 * Math.sqrt(quejas)) + Math.min(3, Math.sqrt(turisticos) / 3);
 }
 function avisoPicos(anchoM, quejas) {
   const estrecha = anchoM >= 0 && anchoM < 12;
@@ -409,13 +401,13 @@ function calcular(r, dia = estado.dia) {
   const dbExt = sensor ? perfilMedido(sensor.db, dia) : perfilHorario({ D: b("TOTAL_D") + zb.D, E: b("TOTAL_E") + zb.E, N: b("TOTAL_N") + zb.N }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"), dia);
   // Horarios de los locales de noche cercanos: más ruido las noches en que abren de madrugada (no si hay sensor).
   if (!sensor && r.noches >= 0 && dia != null) HORAS.N.forEach(h => (dbExt[h] += IX.ajustes_noche[r.noches][dia]));
-  const notasExt = notasHorarias(dbExt, sensor ? 0 : extraFocos(r.ocio, r.bares, r.quejas, r.turisticos), dia);
+  const notasExt = notasHorarias(dbExt);
   const ext = { db: dbExt, nota: notasExt, ...resumen(notasExt), mapa: { D: IX.bandas[+t[0]], E: IX.bandas[+t[1]], N: IX.bandas[+t[2]] } };
   let int = null;
   if (r.patio >= 0) {
     const p = IX.tramos[r.patio];
     const dbInt = perfilHorario({ D: bandaDb(+p[0]), E: bandaDb(+p[1]), N: bandaDb(+p[2]) }, null, null, dia);
-    const notasInt = notasHorarias(dbInt, 0, dia);
+    const notasInt = notasHorarias(dbInt);
     int = { db: dbInt, nota: notasInt, ...resumen(notasInt), mapa: { D: IX.bandas[+p[0]], E: IX.bandas[+p[1]], N: IX.bandas[+p[2]] } };
   }
   const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor,
