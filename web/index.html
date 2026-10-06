@@ -1,0 +1,639 @@
+<title>DecibHello</title>
+<meta name="description" content="Una nota de ruido de 0 a 100 para cada portal de Barcelona, hora a hora. Apúntate a la lista de espera.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Schibsted+Grotesk:wght@500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Ensayo de una columna: portada nocturna a pantalla completa y, debajo, lectura pausada sobre papel frío con gráficos dibujados a mano. */
+:root {
+  --bg: #F4F6F7; --fg: #12171D; --muted: #56606B; --line: #D5DBE0; --card: #FFFFFF;
+  --accent: #D2461E; --calm: #2F7FB8; --soft: #E8ECEF;
+  --hero-bg: #0D1117; --hero-fg: #F2F4F5; --hero-muted: #A9B3BD; --hero-glow: #F0A04B;
+  --display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --col: 40rem;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1318; --fg: #E8ECEF; --muted: #9AA5B1; --line: #29323C; --card: #161C23;
+  --accent: #E2592A; --calm: #4A8FC4; --soft: #1C232B; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0F1318; --fg: #E8ECEF; --muted: #9AA5B1; --line: #29323C; --card: #161C23;
+  --accent: #E2592A; --calm: #4A8FC4; --soft: #1C232B; color-scheme: dark }
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 1.125rem; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Portada ---------- */
+.portada { position: relative; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; background: var(--hero-bg); color: var(--hero-fg); overflow: hidden; isolation: isolate; }
+.portada canvas, .portada video { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
+.portada video { object-fit: cover; opacity: 0; transition: opacity 1.2s ease; }
+.portada video.lista { opacity: 1; }
+.portada::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(13,17,23,.55) 0%, rgba(13,17,23,.15) 40%, rgba(13,17,23,.75) 100%); }
+.marca { padding: 1.25rem 1rem 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem; max-width: 72rem; width: 100%; margin: 0 auto; }
+.logo { font-family: var(--display); font-weight: 800; font-size: 1.15rem; letter-spacing: -.01em; display: inline-flex; align-items: center; gap: .5rem; }
+.logo svg { width: 1.6rem; height: 1rem; }
+.marca a.cta-mini { font-family: var(--display); font-weight: 700; font-size: .9rem; color: var(--hero-fg); text-decoration: none; border: 1.5px solid rgba(242,244,245,.5); padding: .45rem .9rem; border-radius: 99px; }
+.marca a.cta-mini:hover { background: rgba(242,244,245,.12); }
+.portada-texto { align-self: end; padding: 0 1rem 2rem; max-width: 72rem; width: 100%; margin: 0 auto; }
+.antetitulo { font-family: var(--mono); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--hero-muted); margin: 0 0 1rem; }
+.portada h1 { font-family: var(--display); font-weight: 800; font-size: clamp(2.9rem, 9.5vw, 7.5rem); line-height: .92; letter-spacing: -.035em; margin: 0; max-width: 11ch; text-wrap: balance; }
+.portada h1 em { font-style: normal; color: var(--hero-glow); }
+.portada .entradilla { font-size: clamp(1.1rem, 2.4vw, 1.4rem); max-width: 34ch; color: var(--hero-fg); margin: 1.5rem 0 0; opacity: .92; }
+.bajar { justify-self: center; padding: 0 1rem 1.5rem; font-family: var(--mono); font-size: .75rem; letter-spacing: .3em; text-transform: uppercase; color: var(--hero-muted); text-decoration: none; display: grid; justify-items: center; gap: .5rem; }
+.bajar span.linea { width: 1px; height: 2.5rem; background: linear-gradient(var(--hero-muted), transparent); animation: caer 2.2s ease-in-out infinite; transform-origin: top; }
+@keyframes caer { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bajar span.linea { animation: none; } }
+
+/* ---------- Ensayo ---------- */
+main { padding-inline: 1rem; }
+.capitulo { max-width: var(--col); margin: 0 auto; padding-block: clamp(4rem, 12vw, 8rem) 0; }
+.capitulo > * + * { margin-top: 1.1rem; }
+.num { font-family: var(--mono); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h2 { font-family: var(--display); font-weight: 800; font-size: clamp(2.1rem, 6vw, 3.6rem); line-height: 1; letter-spacing: -.03em; margin: .4rem 0 0; text-wrap: balance; }
+h3 { font-family: var(--display); font-weight: 700; font-size: 1.25rem; line-height: 1.2; margin: 0; }
+p { margin: 0; }
+.capitulo p { max-width: 62ch; }
+.destacado { font-family: var(--display); font-weight: 700; font-size: clamp(1.45rem, 3.8vw, 2rem); line-height: 1.15; letter-spacing: -.015em; text-wrap: balance; padding-block: 1rem; }
+.destacado mark { background: none; color: var(--accent); }
+.nota-pie { font-family: var(--mono); font-size: .78rem; line-height: 1.5; color: var(--muted); }
+
+/* Figuras: más anchas que el texto en escritorio */
+figure { margin: 2.5rem 0 0; }
+.ancha { width: min(52rem, calc(100vw - 2rem)); margin-left: 50%; transform: translateX(-50%); }
+figcaption { font-family: var(--mono); font-size: .78rem; color: var(--muted); margin-top: .75rem; line-height: 1.5; }
+.grafico { width: 100%; }
+.grafico svg { display: block; width: 100%; height: auto; overflow: visible; }
+.grafico text { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+.grafico .eje { stroke: var(--line); stroke-width: 1; }
+.grafico .rejilla { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 4; }
+
+/* Deslizador */
+.juego { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem 1rem 1rem; }
+.lecturas { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end; }
+.lectura { min-width: 0; }
+.lectura .quien { font-family: var(--mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .4rem; }
+.punto { width: .7rem; height: .7rem; border-radius: 50%; display: inline-block; flex: none; }
+.lectura .cifra { font-family: var(--display); font-weight: 800; font-size: clamp(3rem, 12vw, 5rem); line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.lectura .etq { font-family: var(--display); font-weight: 700; font-size: 1rem; }
+.lectura .db { font-family: var(--mono); font-size: .78rem; color: var(--muted); }
+.lectura.ref .cifra { color: var(--muted); font-size: clamp(2.2rem, 8vw, 3.2rem); }
+.mandos { display: grid; gap: .9rem; margin-top: 1rem; }
+.dias { display: flex; gap: .35rem; }
+.dias button { font: 600 .85rem/1 var(--display); flex: 1 1 0; min-width: 0; max-width: 3.2rem; padding: .55rem .6rem; border-radius: 99px; border: 1.5px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; }
+.dias button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.hora-fila { display: grid; grid-template-columns: auto 1fr; gap: .8rem; align-items: center; }
+.hora-fila output { font-family: var(--mono); font-size: 1rem; font-weight: 500; min-width: 7.5ch; font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; accent-color: var(--accent); height: 2rem; }
+.momento { font-family: var(--mono); font-size: .78rem; color: var(--muted); }
+
+/* Escala */
+.escala { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; margin-top: 1.5rem; }
+.escala div { padding: .55rem .5rem .5rem; font-family: var(--mono); font-size: .7rem; line-height: 1.3; color: var(--fg); background: var(--soft); min-width: 0; }
+.escala div b { display: block; font-family: var(--display); font-size: .85rem; }
+.escala div:first-child { border-radius: 8px 0 0 8px; } .escala div:last-child { border-radius: 0 8px 8px 0; }
+.escala i { display: block; height: 4px; border-radius: 2px; margin-bottom: .45rem; font-style: normal; }
+
+/* Fuentes */
+.fuentes { list-style: none; padding: 0; margin: 2rem 0 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.fuentes li { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); }
+.fuentes .que { font-family: var(--mono); font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); padding-top: .25rem; }
+.fuentes h3 { margin-bottom: .25rem; }
+.fuentes p { font-size: 1rem; color: var(--muted); }
+
+/* Informe de ejemplo */
+.informe { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 1.25rem; display: grid; gap: 1.1rem; box-shadow: 0 1px 0 var(--line), 0 18px 40px -28px rgba(18,23,29,.35); }
+.informe header { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; align-items: baseline; }
+.informe .dir { font-family: var(--display); font-weight: 800; font-size: 1.35rem; letter-spacing: -.01em; }
+.chip { font-family: var(--mono); font-size: .72rem; padding: .2rem .55rem; border-radius: 99px; background: var(--soft); color: var(--fg); white-space: nowrap; }
+.nota-grande { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.nota-grande .cifra { font-family: var(--display); font-weight: 800; font-size: 4.5rem; line-height: .9; letter-spacing: -.04em; }
+.nota-grande .etq { font-family: var(--display); font-weight: 700; font-size: 1.3rem; }
+.nota-grande .sub { font-size: .95rem; color: var(--muted); }
+.barra { position: relative; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #3E8E7E, #8DB255 30%, #E3B23C 50%, #E07B39 70%, #C73A1E); }
+.barra .marca-nota { position: absolute; top: -5px; width: 4px; height: 20px; border-radius: 2px; background: var(--fg); box-shadow: 0 0 0 2px var(--card); transform: translateX(-50%); }
+.barra-ejes { display: flex; justify-content: space-between; font-family: var(--mono); font-size: .7rem; color: var(--muted); margin-top: .35rem; }
+.datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.datos div { background: var(--soft); padding: .6rem .7rem; min-width: 0; }
+.datos div:first-child { border-radius: 8px 0 0 8px; } .datos div:last-child { border-radius: 0 8px 8px 0; }
+.datos dt { font-family: var(--mono); font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.datos dd { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.datos dd small { font-family: var(--mono); font-weight: 400; font-size: .7rem; color: var(--muted); display: block; }
+.avisos { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; font-size: .97rem; }
+.avisos li { display: grid; grid-template-columns: 1.4rem 1fr; gap: .4rem; align-items: start; }
+.avisos svg { width: 1.1rem; height: 1.1rem; margin-top: .25rem; }
+.boton { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--display); font-weight: 700; font-size: 1rem; text-decoration: none; padding: .8rem 1.2rem; border-radius: 99px; background: var(--fg); color: var(--bg); border: 0; cursor: pointer; justify-self: start; }
+.boton:hover { opacity: .9; }
+.boton.acento { background: var(--accent); color: #fff; }
+
+/* Formulario */
+.alta { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 1.5rem 1.25rem; display: grid; gap: 1.2rem; }
+.campo { display: grid; gap: .4rem; }
+.campo label, .campo legend { font-family: var(--display); font-weight: 700; font-size: 1rem; }
+.campo .ayuda { font-size: .88rem; color: var(--muted); }
+input[type="email"], input[type="text"] { font: 1.05rem var(--body); padding: .8rem .9rem; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--fg); width: 100%; }
+input[type="email"]:focus, input[type="text"]:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+fieldset { border: 0; padding: 0; margin: 0; }
+.opciones { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .4rem; }
+.opciones label { font: 600 .95rem var(--display); display: inline-flex; align-items: center; gap: .45rem; padding: .6rem .9rem; border: 1.5px solid var(--line); border-radius: 99px; cursor: pointer; }
+.opciones input { accent-color: var(--accent); margin: 0; }
+.opciones label:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.consentimiento { display: grid; grid-template-columns: 1.3rem 1fr; gap: .6rem; font-size: .95rem; align-items: start; }
+.consentimiento input { width: 1.15rem; height: 1.15rem; margin-top: .25rem; accent-color: var(--accent); }
+.estado { font-size: .98rem; padding: .8rem 1rem; border-radius: 10px; background: var(--soft); }
+.estado.ok { border-left: 4px solid #3E8E7E; }
+.estado.error { border-left: 4px solid var(--accent); }
+.panel { margin-top: 1.5rem; border: 1px dashed var(--line); border-radius: 14px; padding: 1rem; }
+.panel h3 { font-size: 1.05rem; }
+.tabla-env { overflow-x: auto; margin-top: .75rem; }
+.panel table { border-collapse: collapse; width: 100%; font-size: .85rem; font-family: var(--mono); }
+.panel th, .panel td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+
+/* Privacidad y pie */
+details.privacidad { margin-top: 1rem; font-size: .95rem; }
+details.privacidad summary { cursor: pointer; font-family: var(--display); font-weight: 700; }
+details.privacidad div { display: grid; gap: .6rem; margin-top: .75rem; color: var(--muted); }
+footer { margin-top: clamp(5rem, 14vw, 9rem); border-top: 1px solid var(--line); padding: 2rem 1rem 3rem; }
+.pie { max-width: 52rem; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 1.5rem; font-size: .92rem; color: var(--muted); }
+.pie .logo { color: var(--fg); }
+.pie p { max-width: 70ch; }
+@media (min-width: 720px) { .pie { grid-template-columns: 14rem 1fr; } .juego { padding: 1.5rem; } .informe { padding: 1.75rem; } .alta { padding: 2rem; } }
+@media (max-width: 480px) { .fuentes li { grid-template-columns: 1fr; gap: .3rem; } .escala div { font-size: .62rem; padding: .5rem .3rem; } .escala div b { font-size: .72rem; } }
+
+/* Aparición al bajar: parte siempre de un estado visible */
+.aparece { transition: opacity .8s ease, transform .8s ease; }
+.aparece.espera { opacity: .25; transform: translateY(18px); }
+@media (prefers-reduced-motion: reduce) { .aparece, .aparece.espera { transition: none; opacity: 1; transform: none; } }
+</style>
+
+<header class="portada" id="arriba">
+  <canvas id="ciudad" aria-hidden="true"></canvas>
+  <video id="video" muted loop playsinline preload="none" aria-hidden="true"></video>
+  <div class="marca">
+    <span class="logo"><svg viewBox="0 0 26 16" aria-hidden="true"><path d="M1 8h3l2-6 3 12 3-9 2 5 2-2h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>DecibHello</span>
+    <a class="cta-mini" href="#lista">Lista de espera</a>
+  </div>
+  <div class="portada-texto">
+    <p class="antetitulo">Barcelona · ruido calle a calle</p>
+    <h1>Escucha la calle <em>antes de firmar.</em></h1>
+    <p class="entradilla">Una nota de ruido de 0 a 100 para cada portal de Barcelona. Hora a hora, día a día, con datos públicos.</p>
+  </div>
+  <a class="bajar" href="#problema" aria-label="Bajar al contenido"><span>Bajar</span><span class="linea" aria-hidden="true"></span></a>
+</header>
+
+<main>
+  <section class="capitulo aparece" id="problema">
+    <span class="num">Uno</span>
+    <h2>El ruido se descubre después de mudarse.</h2>
+    <p>Visitas el piso un martes a las once de la mañana. Hay luz, la calle está tranquila, el precio encaja. Firmas.</p>
+    <p>Luego llega el primer viernes. La terraza de abajo cierra tarde. A las dos pasa el camión de la basura. Y ya hay contrato, fianza o hipoteca.</p>
+    <p class="destacado">Una visita dura veinte minutos. <mark>Vivir en un piso dura años.</mark></p>
+  </section>
+
+  <section class="capitulo aparece" id="fotos">
+    <span class="num">Dos</span>
+    <h2>Las fotos no tienen sonido.</h2>
+    <p>Un anuncio enseña metros, precio y fotos. Casi nunca dice nada del ruido.</p>
+    <p>Los datos existen. El Ajuntament publica un mapa de ruido y tiene sensores en la calle. Pero están repartidos en ficheros técnicos, en decibelios y en franjas que nadie consulta antes de alquilar.</p>
+    <p>DecibHello junta esos datos y los convierte en una cifra que se entiende: de 0, muy tranquilo, a 100, muy ruidoso.</p>
+    <div class="escala" role="list" aria-label="Escala de la nota">
+      <div role="listitem"><i style="background:#3E8E7E"></i><b>0–19</b>Muy tranquilo</div>
+      <div role="listitem"><i style="background:#8DB255"></i><b>20–39</b>Tranquilo</div>
+      <div role="listitem"><i style="background:#E3B23C"></i><b>40–59</b>Moderado</div>
+      <div role="listitem"><i style="background:#E07B39"></i><b>60–79</b>Ruidoso</div>
+      <div role="listitem"><i style="background:#C73A1E"></i><b>80–100</b>Muy ruidoso</div>
+    </div>
+    <p class="nota-pie">0 = calle muy tranquila (45 dB de día, 35 dB de noche). 100 = Tuset un viernes de madrugada (75 dB de día, 70 dB de noche).</p>
+  </section>
+
+  <section class="capitulo aparece" id="horas">
+    <span class="num">Tres</span>
+    <h2>Una calle no suena igual un lunes que un viernes.</h2>
+    <p>Carrer de Tuset, 20. Hay un sensor municipal a pocos metros, en Tuset 30, así que aquí la nota sale de lo que midió hora a hora durante 2023.</p>
+    <p>Mueve la hora y cambia el día. Compara con la noche del lunes.</p>
+
+    <figure class="ancha">
+      <div class="juego">
+        <div class="lecturas" aria-live="polite">
+          <div class="lectura">
+            <div class="quien"><span class="punto" style="background:var(--accent)"></span><span id="l-dia">Viernes</span></div>
+            <div class="cifra" id="l-nota">100</div>
+            <div class="etq" id="l-etq">Muy ruidoso</div>
+            <div class="db" id="l-db">≈ 71 dB</div>
+          </div>
+          <div class="lectura ref" id="ref">
+            <div class="quien"><span class="punto" style="background:var(--calm)"></span>Lunes</div>
+            <div class="cifra" id="r-nota">58</div>
+            <div class="etq" id="r-etq">Tranquilo</div>
+            <div class="db" id="r-db">≈ 55 dB</div>
+          </div>
+        </div>
+        <div class="grafico" id="g-curva" style="margin-top:1rem"></div>
+        <div class="mandos">
+          <div class="hora-fila">
+            <output id="hora-out" for="hora">1:00</output>
+            <input type="range" id="hora" min="0" max="23" step="1" value="18" aria-label="Hora del día">
+          </div>
+          <div class="momento" id="momento">Madrugada del sábado</div>
+          <div class="dias" role="group" aria-label="Día de la semana">
+            <button type="button" data-d="0" aria-pressed="false" aria-label="Lunes">L</button>
+            <button type="button" data-d="1" aria-pressed="false" aria-label="Martes">M</button>
+            <button type="button" data-d="2" aria-pressed="false" aria-label="Miércoles">X</button>
+            <button type="button" data-d="3" aria-pressed="false" aria-label="Jueves">J</button>
+            <button type="button" data-d="4" aria-pressed="true" aria-label="Viernes">V</button>
+            <button type="button" data-d="5" aria-pressed="false" aria-label="Sábado">S</button>
+            <button type="button" data-d="6" aria-pressed="false" aria-label="Domingo">D</button>
+          </div>
+        </div>
+      </div>
+      <figcaption>Nota de cada hora en Carrer de Tuset 20, fachada a la calle. El día va de las 7:00 a las 7:00: la madrugada cuenta en la noche en que empieza. Fuente: sensor municipal de ruido de Tuset 30 (Open Data BCN, 2023).</figcaption>
+    </figure>
+
+    <p class="destacado">La noche del lunes, Tuset saca un 60. <mark>La del viernes, un 93.</mark></p>
+    <figure class="ancha">
+      <div class="grafico" id="g-noches" role="img" aria-label="Nota media de la noche en Tuset 20 de lunes a domingo: 60, 64, 80, 87, 93, 93 y 57."></div>
+      <figcaption>Nota media de la noche (23:00–7:00) que empieza cada día, Carrer de Tuset 20. En naranja, 60 o más (ruidoso o muy ruidoso). Piloto DecibHello.</figcaption>
+    </figure>
+  </section>
+
+  <section class="capitulo aparece" id="calles">
+    <span class="num">Cuatro</span>
+    <h2>Tres calles, tres maneras de vivir.</h2>
+    <p>La misma ciudad puede sonar a pueblo o a autopista. Estas son tres direcciones del piloto, con la nota media de todo el día.</p>
+    <figure class="ancha">
+      <div class="grafico" id="g-calles" role="img" aria-label="Nota global: Carrer de Pomaret 20, 19; Carrer de Tuset 20, 75; Gran Via de les Corts Catalanes 600, 98."></div>
+      <figcaption>Nota global del día (30 % día, 20 % tarde, 50 % noche), fachada a la calle. En naranja, 60 o más. Piloto DecibHello con datos de Open Data BCN.</figcaption>
+    </figure>
+    <p>En Pomaret, en Sarrià, el ruido viene sobre todo del tráfico de día y baja mucho de noche. En la Gran Via el tráfico no para: de día llega al tope de la escala. En Tuset manda la noche: bares y locales que abren hasta tarde.</p>
+  </section>
+
+  <section class="capitulo aparece" id="como">
+    <span class="num">Cinco</span>
+    <h2>Cómo lo medimos.</h2>
+    <p>Todo sale de datos públicos del Ajuntament de Barcelona. Cada hora de cada portal tiene un nivel en decibelios, medido o estimado. La nota sale siempre de la misma fórmula.</p>
+    <ul class="fuentes">
+      <li><span class="que">Mapa</span><div><h3>Mapa estratégico de ruido</h3><p>El nivel oficial de cada tramo de calle, de día, de tarde y de noche. Lo asignamos a los 172.000 portales de la ciudad.</p></div></li>
+      <li><span class="que">Sensores</span><div><h3>Sensores municipales</h3><p>Miden el ruido cada hora. Nos dicen cómo cambia según la hora y el día de la semana. Donde hay un sensor en la misma calle, manda su medición.</p></div></li>
+      <li><span class="que">Ocio</span><div><h3>Bares, discotecas y sus horarios</h3><p>Cuántos hay a menos de 100 metros y qué noches abren de madrugada. Suben la nota en proporción, con un peso comprobado con los sensores.</p></div></li>
+      <li><span class="que">Obras</span><div><h3>Obras públicas en curso</h3><p>Si hay una obra a menos de 25 metros, suma ruido de día laborable mientras dura. Se actualiza cada mañana.</p></div></li>
+      <li><span class="que">Picos</span><div><h3>Calles estrechas y quejas</h3><p>El camión de madrugada apenas mueve una media, pero despierta. Por eso avisamos aparte cuando la calle es estrecha o hay quejas por la recogida.</p></div></li>
+    </ul>
+    <p class="nota-pie">Es una estimación con datos públicos, no una medición de tu piso. La estamos comprobando calle a calle.</p>
+  </section>
+
+  <section class="capitulo aparece" id="interior">
+    <span class="num">Seis</span>
+    <h2>Exterior o interior: otro piso.</h2>
+    <p>Dos pisos del mismo portal pueden no parecerse en nada. El que da a la calle recibe el tráfico y la noche. El que da al patio de manzana, mucho menos.</p>
+    <figure class="ancha">
+      <div class="grafico" id="g-lados" role="img" aria-label="Carrer de Tuset 20: nota 75 en la fachada a la calle y 25 en el patio interior."></div>
+      <figcaption>Carrer de Tuset 20, nota global del día. El patio interior sale del mapa oficial de ruido de los patios de manzana.</figcaption>
+    </figure>
+    <p>Por eso el informe separa siempre exterior e interior.</p>
+  </section>
+
+  <section class="capitulo aparece" id="informe">
+    <span class="num">Siete</span>
+    <h2>Así es un informe.</h2>
+    <p>Este es el de Tuset 20, con los datos del piloto.</p>
+    <article class="informe ancha" aria-label="Informe de ejemplo de Carrer de Tuset 20">
+      <header>
+        <span class="dir">Carrer de Tuset 20</span>
+        <span class="chip">Confianza: medida</span>
+      </header>
+      <div class="nota-grande">
+        <span class="cifra">75</span>
+        <div><div class="etq">Ruidoso</div><div class="sub">Más ruidosa que el 76 % de los portales de Barcelona</div></div>
+      </div>
+      <div>
+        <div class="barra" aria-hidden="true"><span class="marca-nota" style="left:75%"></span></div>
+        <div class="barra-ejes" aria-hidden="true"><span>0 muy tranquilo</span><span>100 muy ruidoso</span></div>
+      </div>
+      <dl class="datos">
+        <div><dt>Día</dt><dd>68<small>7–19 h</small></dd></div>
+        <div><dt>Tarde</dt><dd>65<small>19–23 h</small></dd></div>
+        <div><dt>Noche</dt><dd>84<small>23–7 h</small></dd></div>
+      </dl>
+      <ul class="avisos">
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h14M10 3v14" stroke="currentColor" stroke-width="1.8"/></svg><span><b>Exterior 75 · interior 25.</b> Un piso que da al patio de manzana es mucho más tranquilo.</span></li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M14 3a7 7 0 1 0 3 12A6 6 0 0 1 14 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span><b>Noches más ruidosas: viernes y sábado (93).</b> La más tranquila, el domingo (57).</span></li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 14h16M4 14V8h12v6M7 8V5h6v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span><b>Picos nocturnos: bajo.</b> Calle de unos 23 m entre fachadas y sin quejas por la recogida a menos de 100 m.</span></li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 1 18h18L10 2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 8v4M10 14.5v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span><b>Obras públicas: ninguna a menos de 100 m</b> en el cálculo del piloto. El visor las revisa cada mañana.</span></li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 5a7 7 0 0 0 0 10M15 5a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span><b>Medido por el sensor municipal de Tuset 30</b> (2023). Mapa oficial: 60–65 dB de día y 65–70 dB de noche.</span></li>
+      </ul>
+      <a class="boton" href="https://claude.ai/artifact/AoLUjYUaWy6arbZLiL9vje" target="_blank" rel="noopener">Probar el visor con otra calle <span aria-hidden="true">→</span></a>
+    </article>
+    <p class="nota-pie">El visor es un prototipo privado: puede pedir acceso.</p>
+  </section>
+
+  <section class="capitulo aparece" id="lista">
+    <span class="num">Ocho</span>
+    <h2>Apúntate antes de firmar.</h2>
+    <p>Estamos preparando DecibHello para cualquier portal de Barcelona. Déjanos tu correo y te avisamos cuando abra. Quizá te pidamos tu opinión antes.</p>
+    <form class="alta" id="form" novalidate>
+      <div class="campo">
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" name="correo" autocomplete="email" required placeholder="nombre@correo.com">
+      </div>
+      <fieldset class="campo">
+        <legend>¿Qué buscas?</legend>
+        <div class="opciones">
+          <label><input type="radio" id="busca-alquilar" name="busca" value="alquilar" required> Alquilar</label>
+          <label><input type="radio" id="busca-comprar" name="busca" value="comprar"> Comprar</label>
+          <label><input type="radio" id="busca-ambas" name="busca" value="las dos"> Las dos cosas</label>
+          <label><input type="radio" id="busca-otro" name="busca" value="otro"> Otro motivo</label>
+        </div>
+      </fieldset>
+      <div class="campo">
+        <label for="zona">Barrio o ciudad</label>
+        <span class="ayuda" id="zona-ayuda">Dónde buscas piso. Por ejemplo: Gràcia, Sant Antoni o Badalona.</span>
+        <input type="text" id="zona" name="zona" autocomplete="address-level2" aria-describedby="zona-ayuda" maxlength="80">
+      </div>
+      <label class="consentimiento" for="acepto"><input type="checkbox" id="acepto" name="acepto" required><span>Acepto que DecibHello guarde estos datos para avisarme. He leído la <a href="#privacidad">información de privacidad</a>.</span></label>
+      <button class="boton acento" type="submit" id="enviar">Apuntarme a la lista</button>
+      <div class="estado" id="estado" role="status" hidden></div>
+    </form>
+    <details class="privacidad" id="privacidad">
+      <summary>Información de privacidad (provisional)</summary>
+      <div>
+        <p>Guardamos tu correo, lo que buscas, la zona y la fecha de alta. Solo los usamos para avisarte del lanzamiento y, si quieres, pedirte opinión.</p>
+        <p>No los vendemos ni los compartimos. Puedes pedir que los borremos cuando quieras.</p>
+        <p>Texto provisional, pendiente de revisión legal: falta indicar el responsable del tratamiento y una dirección de contacto.</p>
+      </div>
+    </details>
+    <div class="panel" id="panel" hidden>
+      <h3>Inscripciones (solo las ves tú)</h3>
+      <p class="nota-pie" id="panel-total">Cargando…</p>
+      <div class="tabla-env"><table><thead><tr><th>Fecha</th><th>Correo</th><th>Busca</th><th>Zona</th></tr></thead><tbody id="panel-filas"></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="pie">
+    <span class="logo"><svg viewBox="0 0 26 16" aria-hidden="true"><path d="M1 8h3l2-6 3 12 3-9 2 5 2-2h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>DecibHello</span>
+    <div style="display:grid;gap:.8rem">
+      <p>Datos: Ajuntament de Barcelona, <a href="https://opendata-ajuntament.barcelona.cat/" target="_blank" rel="noopener">Open Data BCN</a> (mapa estratégico de ruido 2017, red de sensores de ruido 2023, locales de ocio, obras públicas y quejas IRIS). Elaboración propia. Las notas son estimaciones del piloto, no mediciones de cada vivienda.</p>
+      <p id="credito-video">Fondo de la portada: ilustración propia de la trama del Eixample.</p>
+      <p>© 2026 DecibHello · Barcelona</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ---------- Datos reales del piloto (web/datos/extraccion.json, sacados de piloto/visor.html) ----------
+// Carrer de Tuset 20, fachada a la calle. Índice de día 0 = lunes. Horas 0–6 de cada día = madrugada del día siguiente.
+const TUSET = {"nota":[[61,58,71,61,52,48,59,55,71,70,70,71,72,70,70,68,70,70,71,70,68,59,53,68],[73,65,72,68,50,50,58,52,66,69,70,72,73,72,76,70,68,67,70,69,67,62,57,77],[81,83,87,86,79,79,64,60,73,83,100,77,77,70,72,69,67,66,71,77,72,69,67,80],[90,94,98,90,82,84,68,70,64,68,70,69,68,67,69,69,66,65,67,68,68,70,73,88],[100,100,100,97,89,82,79,55,70,60,61,58,57,57,56,52,51,54,59,64,67,70,69,95],[100,99,100,98,92,83,80,65,69,54,49,45,48,49,50,49,49,48,50,50,50,49,48,93],[58,62,71,47,43,52,60,54,63,65,65,68,71,66,71,65,65,69,66,66,64,55,49,63]],
+  "db":[[56,55,60,56,53,52,56,61,66,66,66,66,67,66,66,66,66,66,66,66,65,63,61,59],[60,58,60,59,52,53,55,60,65,66,66,67,67,67,68,66,65,65,66,66,65,64,62,62],[63,64,66,65,63,63,57,63,67,70,76,68,68,66,67,66,65,65,66,68,66,66,65,63],[66,68,69,66,64,64,59,66,64,66,66,66,65,65,66,66,65,65,65,66,66,66,67,66],[71,70,71,69,66,64,63,62,66,63,63,62,62,62,62,61,60,61,63,64,65,66,66,68],[71,70,70,69,67,64,63,64,66,61,60,58,59,60,60,60,60,60,60,60,60,60,59,68],[55,57,60,52,50,53,56,61,64,64,64,66,66,65,66,64,64,66,65,65,64,62,60,57]]};
+const NOCHES = [60, 64, 80, 87, 93, 93, 57];
+const CALLES = [["Carrer de Pomaret 20", 19], ["Carrer de Tuset 20", 75], ["Gran Via de les Corts Catalanes 600", 98]];
+const LADOS = [["Fachada a la calle", 75], ["Patio interior", 25]];
+const DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+const ORDEN = Array.from({ length: 24 }, (_, i) => (i + 7) % 24); // posición 0 = 7:00
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+const etiqueta = n => n < 20 ? "Muy tranquilo" : n < 40 ? "Tranquilo" : n < 60 ? "Moderado" : n < 80 ? "Ruidoso" : "Muy ruidoso";
+const may = s => s.charAt(0).toUpperCase() + s.slice(1);
+const hh = h => h + ":00";
+
+// ---------- SVG ----------
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, padre) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (padre) padre.append(e); return e; }
+function txt(padre, x, y, s, anchor = "middle", extra = {}) { const t = el("text", { x, y, "text-anchor": anchor, ...extra }, padre); t.textContent = s; return t; }
+function lienzo(cont, h) {
+  const w = Math.max(280, Math.round(cont.clientWidth) || 640);
+  const svg = el("svg", { viewBox: `0 0 ${w} ${h}`, width: w, height: h });
+  cont.replaceChildren(svg);
+  return { svg, w, h };
+}
+
+// Curva de 24 horas con dos días
+const est = { dia: 4, pos: 18 }; // viernes, 1:00
+function pintarCurva() {
+  const cont = $("g-curva");
+  const { svg, w, h } = lienzo(cont, cont.clientWidth < 500 ? 200 : 240);
+  const m = { l: 30, r: 10, t: 22, b: 24 };
+  const x = i => m.l + (i + 0.5) / 24 * (w - m.l - m.r);
+  const y = v => m.t + (1 - v / 100) * (h - m.t - m.b);
+  // franjas
+  const franjas = [[0, 12, "Día"], [12, 16, "Tarde"], [16, 24, "Noche"]];
+  franjas.forEach(([a, b, n], k) => {
+    const x0 = m.l + a / 24 * (w - m.l - m.r), x1 = m.l + b / 24 * (w - m.l - m.r);
+    if (k === 2) el("rect", { x: x0, y: m.t, width: x1 - x0, height: h - m.t - m.b, fill: "var(--soft)" }, svg);
+    txt(svg, (x0 + x1) / 2, 12, n);
+  });
+  [0, 50, 100].forEach(v => { el("line", { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), class: v ? "rejilla" : "eje" }, svg); txt(svg, m.l - 6, y(v) + 4, v, "end"); });
+  const marcas = w < 500 ? [0, 6, 12, 18, 23] : [0, 3, 6, 9, 12, 15, 18, 21, 23];
+  marcas.forEach(i => txt(svg, x(i), h - 6, hh(ORDEN[i])));
+  const linea = (d, color, ancho) => {
+    const pts = ORDEN.map((hr, i) => `${x(i).toFixed(1)},${y(TUSET.nota[d][hr]).toFixed(1)}`).join(" ");
+    el("polyline", { points: pts, fill: "none", stroke: color, "stroke-width": ancho, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+  };
+  if (est.dia !== 0) linea(0, "var(--calm)", 2);
+  linea(est.dia, "var(--accent)", 2.5);
+  // marcador
+  const hr = ORDEN[est.pos];
+  el("line", { x1: x(est.pos), x2: x(est.pos), y1: m.t, y2: h - m.b, stroke: "var(--fg)", "stroke-width": 1 }, svg);
+  if (est.dia !== 0) el("circle", { cx: x(est.pos), cy: y(TUSET.nota[0][hr]), r: 4.5, fill: "var(--calm)", stroke: "var(--card)", "stroke-width": 2 }, svg);
+  el("circle", { cx: x(est.pos), cy: y(TUSET.nota[est.dia][hr]), r: 5.5, fill: "var(--accent)", stroke: "var(--card)", "stroke-width": 2 }, svg);
+  // arrastrar sobre el gráfico mueve la hora
+  const zona = el("rect", { x: m.l, y: 0, width: w - m.l - m.r, height: h, fill: "transparent", style: "cursor:ew-resize;touch-action:pan-y" }, svg);
+  const mover = e => { const r = svg.getBoundingClientRect(); const px = (e.clientX - r.left) * w / r.width; const i = Math.max(0, Math.min(23, Math.floor((px - m.l) / (w - m.l - m.r) * 24))); if (i !== est.pos) { est.pos = i; actualizar(); } };
+  zona.addEventListener("pointermove", e => { if (e.pointerType === "mouse" || e.buttons) mover(e); });
+  zona.addEventListener("pointerdown", mover);
+}
+function actualizar() {
+  const hr = ORDEN[est.pos], d = est.dia;
+  const n = TUSET.nota[d][hr], r = TUSET.nota[0][hr];
+  $("l-dia").textContent = may(DIAS[d]);
+  $("l-nota").textContent = n; $("l-etq").textContent = etiqueta(n); $("l-db").textContent = `≈ ${TUSET.db[d][hr]} dB`;
+  $("r-nota").textContent = r; $("r-etq").textContent = etiqueta(r); $("r-db").textContent = `≈ ${TUSET.db[0][hr]} dB`;
+  $("ref").hidden = d === 0;
+  $("hora").value = est.pos;
+  $("hora-out").textContent = hh(hr);
+  $("momento").textContent = hr < 7 ? `Noche del ${DIAS[d]} · madrugada del ${DIAS[(d + 1) % 7]}` : `${may(DIAS[d])} · ${hr < 19 ? "de día" : hr < 23 ? "por la tarde" : "de noche"}`;
+  $("hora").setAttribute("aria-valuetext", `${hh(hr)}, ${DIAS[d]}: nota ${n}, ${etiqueta(n).toLowerCase()}`);
+  document.querySelectorAll(".dias button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.d === d));
+  pintarCurva();
+}
+$("hora").addEventListener("input", e => { est.pos = +e.target.value; actualizar(); });
+document.querySelectorAll(".dias button").forEach(b => b.addEventListener("click", () => { est.dia = +b.dataset.d; actualizar(); }));
+
+// Barras verticales: noches de la semana
+function pintarNoches() {
+  const cont = $("g-noches");
+  const { svg, w, h } = lienzo(cont, 230);
+  const m = { l: 30, r: 6, t: 24, b: 26 };
+  const bw = (w - m.l - m.r) / 7;
+  const y = v => m.t + (1 - v / 100) * (h - m.t - m.b);
+  [0, 50, 100].forEach(v => { el("line", { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), class: v ? "rejilla" : "eje" }, svg); txt(svg, m.l - 6, y(v) + 4, v, "end"); });
+  NOCHES.forEach((v, i) => {
+    const x0 = m.l + i * bw + bw * 0.18, ancho = bw * 0.64, top = y(v), base = y(0);
+    const r = Math.min(4, ancho / 2);
+    el("path", { d: `M${x0},${base} V${top + r} Q${x0},${top} ${x0 + r},${top} H${x0 + ancho - r} Q${x0 + ancho},${top} ${x0 + ancho},${top + r} V${base} Z`, fill: v >= 60 ? "var(--accent)" : "var(--calm)" }, svg).append(Object.assign(document.createElementNS(NS, "title"), { textContent: `Noche del ${DIAS[i]}: ${v}` }));
+    txt(svg, x0 + ancho / 2, top - 7, v, "middle", { style: "fill:var(--fg);font-weight:500" });
+    txt(svg, x0 + ancho / 2, h - 7, w < 460 ? DIAS[i].slice(0, 2) : may(DIAS[i]).slice(0, 3));
+  });
+}
+
+// Barras horizontales
+function pintarHorizontal(id, datos) {
+  const cont = $(id);
+  const fila = 54;
+  const { svg, w, h } = lienzo(cont, datos.length * fila + 26);
+  const m = { l: 0, r: 36 };
+  const x = v => m.l + v / 100 * (w - m.l - m.r);
+  [0, 20, 40, 60, 80, 100].forEach(v => { el("line", { x1: x(v), x2: x(v), y1: 0, y2: h - 20, class: v ? "rejilla" : "eje" }, svg); txt(svg, x(v), h - 4, v, v === 0 ? "start" : v === 100 ? "end" : "middle"); });
+  datos.forEach(([nombre, v], i) => {
+    const y0 = i * fila;
+    txt(svg, 0, y0 + 16, nombre, "start", { style: "fill:var(--fg);font-family:var(--display);font-weight:700;font-size:13px" });
+    const ancho = Math.max(4, x(v) - m.l), alto = 16, yy = y0 + 24;
+    el("path", { d: `M${m.l},${yy} H${m.l + ancho - 4} Q${m.l + ancho},${yy} ${m.l + ancho},${yy + 4} V${yy + alto - 4} Q${m.l + ancho},${yy + alto} ${m.l + ancho - 4},${yy + alto} H${m.l} Z`, fill: v >= 60 ? "var(--accent)" : "var(--calm)" }, svg);
+    txt(svg, m.l + ancho + 6, yy + 13, v, "start", { style: "fill:var(--fg);font-weight:500;font-size:13px" });
+  });
+}
+function pintarGraficos() { actualizar(); pintarNoches(); pintarHorizontal("g-calles", CALLES); pintarHorizontal("g-lados", LADOS); }
+pintarGraficos();
+let tRes; addEventListener("resize", () => { clearTimeout(tRes); tRes = setTimeout(pintarGraficos, 120); });
+
+// ---------- Aparición al bajar ----------
+if (!reduce && "IntersectionObserver" in window) {
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove("espera"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -10% 0px" });
+  document.querySelectorAll(".aparece").forEach(s => { if (s.getBoundingClientRect().top > innerHeight) { s.classList.add("espera"); io.observe(s); } });
+}
+
+// ---------- Portada: trama del Eixample con tráfico y ondas de sonido ----------
+(function portada() {
+  const cv = $("ciudad"), cx = cv.getContext("2d");
+  const portada = $("arriba");
+  let W, H, dpr, coches = [], gente = [], ondas = [], visible = true, t0 = performance.now();
+  const MANZANA = 92, CALLE = 22, PASO = MANZANA + CALLE, CHAFLAN = 20, ANG = -Math.PI / 4 + 0.05;
+  const azar = (a, b) => a + Math.random() * (b - a);
+  function preparar() {
+    dpr = Math.min(2, devicePixelRatio || 1);
+    W = portada.clientWidth; H = portada.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    const n = Math.round((W * H) / 9000);
+    coches = Array.from({ length: Math.min(140, n) }, () => nuevo(true));
+    gente = Array.from({ length: Math.min(220, n * 1.5) }, () => nuevo(false));
+  }
+  // Recorridos en coordenadas de la trama (antes de rotar)
+  const R = () => Math.hypot(W, H) * 0.75;
+  function nuevo(coche) {
+    const horiz = Math.random() < 0.5, k = Math.round(azar(-R() / PASO, R() / PASO));
+    const sentido = Math.random() < 0.5 ? 1 : -1;
+    const carril = coche ? (sentido > 0 ? -5 : 5) : (Math.random() < 0.5 ? -1 : 1) * (CALLE / 2 + 2);
+    return { horiz, eje: k * PASO - CALLE / 2 + carril, pos: azar(-R(), R()), v: (coche ? azar(38, 70) : azar(5, 10)) * sentido, coche };
+  }
+  function dibujar(t, dt) {
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx.fillStyle = "#0D1117"; cx.fillRect(0, 0, W, H);
+    cx.save();
+    cx.translate(W * 0.55, H * 0.45); cx.rotate(ANG);
+    const r = R(), n = Math.ceil(r / PASO);
+    // manzanas con chaflán
+    cx.fillStyle = "#171E27";
+    for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) {
+      const x = i * PASO, y = j * PASO, c = CHAFLAN, s = MANZANA;
+      cx.beginPath(); cx.moveTo(x + c, y); cx.lineTo(x + s - c, y); cx.lineTo(x + s, y + c); cx.lineTo(x + s, y + s - c); cx.lineTo(x + s - c, y + s); cx.lineTo(x + c, y + s); cx.lineTo(x, y + s - c); cx.lineTo(x, y + c); cx.closePath(); cx.fill();
+    }
+    // patios de manzana
+    cx.fillStyle = "#121820";
+    for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) cx.fillRect(i * PASO + 24, j * PASO + 24, MANZANA - 48, MANZANA - 48);
+    // gente y coches
+    for (const lista of [gente, coches]) for (const a of lista) {
+      a.pos += a.v * dt;
+      if (Math.abs(a.pos) > r) Object.assign(a, nuevo(a.coche), { pos: -Math.sign(a.v) * r });
+      const x = a.horiz ? a.pos : a.eje, y = a.horiz ? a.eje : a.pos;
+      if (a.coche) { cx.fillStyle = a.v > 0 ? "rgba(240,160,75,.85)" : "rgba(242,244,245,.75)"; a.horiz ? cx.fillRect(x - 4, y - 1.6, 8, 3.2) : cx.fillRect(x - 1.6, y - 4, 3.2, 8); }
+      else { cx.fillStyle = "rgba(169,179,189,.55)"; cx.fillRect(x - 0.9, y - 0.9, 1.8, 1.8); }
+    }
+    // ondas de sonido desde los cruces
+    if (!reduce && Math.random() < dt * 1.4) ondas.push({ x: Math.round(azar(-4, 4)) * PASO - CALLE / 2, y: Math.round(azar(-3, 3)) * PASO - CALLE / 2, t: 0, fuerte: Math.random() < 0.35 });
+    ondas = ondas.filter(o => (o.t += dt) < 3.2);
+    for (const o of ondas) for (let k = 0; k < 3; k++) {
+      const tt = o.t - k * 0.35; if (tt <= 0) continue;
+      const rad = tt * (o.fuerte ? 70 : 45), alfa = Math.max(0, 0.5 * (1 - tt / 2.8));
+      cx.strokeStyle = o.fuerte ? `rgba(240,160,75,${alfa})` : `rgba(169,179,189,${alfa * 0.7})`; cx.lineWidth = 1.2;
+      cx.beginPath(); cx.arc(o.x, o.y, rad, 0, Math.PI * 2); cx.stroke();
+    }
+    cx.restore();
+    // onda sonora en la base
+    cx.strokeStyle = "rgba(240,160,75,.55)"; cx.lineWidth = 1.5; cx.beginPath();
+    for (let x = 0; x <= W; x += 4) {
+      const env = Math.sin(x / W * Math.PI);
+      const yv = H - 70 + env * (Math.sin(x * 0.045 + t * 2.1) * 9 + Math.sin(x * 0.013 - t * 1.3) * 7) * (0.6 + 0.4 * Math.sin(t * 0.7));
+      x ? cx.lineTo(x, yv) : cx.moveTo(x, yv);
+    }
+    cx.stroke();
+  }
+  let ultimo = performance.now();
+  function bucle(ahora) {
+    const dt = Math.min(0.05, (ahora - ultimo) / 1000); ultimo = ahora;
+    if (visible) dibujar((ahora - t0) / 1000, dt);
+    requestAnimationFrame(bucle);
+  }
+  preparar();
+  if (reduce) { dibujar(0, 0); addEventListener("resize", () => { preparar(); dibujar(0, 0); }); }
+  else {
+    new IntersectionObserver(e => (visible = e[0].isIntersecting)).observe(portada);
+    addEventListener("resize", preparar);
+    requestAnimationFrame(bucle);
+  }
+  // Vídeo de portada (si está publicado junto a la página). Sin vídeo con "reducir movimiento".
+  const v = $("video");
+  if (!reduce) {
+    const fuentes = [["media/portada.webm", "video/webm"], ["media/portada.mp4", "video/mp4"]];
+    for (const [src, type] of fuentes) { const s = document.createElement("source"); s.src = src; s.type = type; v.append(s); }
+    v.poster = "media/portada.jpg";
+    v.addEventListener("playing", () => { v.classList.add("lista"); visible = false; $("credito-video").textContent = "Vídeo de la portada: ver créditos en web/CREDITOS.md."; }, { once: true });
+    v.load(); v.play().catch(() => {});
+  }
+})();
+
+// ---------- Lista de espera ----------
+(async function lista() {
+  const form = $("form"), estado = $("estado"), boton = $("enviar");
+  const mostrar = (msg, tipo) => { estado.hidden = false; estado.className = "estado " + tipo; estado.textContent = msg; };
+  let db = null, user = null;
+  const listo = (async () => {
+    if (!window.claude?.use) return;
+    [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (db && user && (await user.isOwner())) panel();
+  })();
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const correo = form.correo.value.trim(), busca = form.busca.value, zona = form.zona.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)) { mostrar("Revisa el correo: falta la arroba o el dominio.", "error"); form.correo.focus(); return; }
+    if (!busca) { mostrar("Elige si buscas alquilar, comprar o las dos cosas.", "error"); return; }
+    if (!form.acepto.checked) { mostrar("Para apuntarte, marca la casilla de privacidad.", "error"); form.acepto.focus(); return; }
+    boton.disabled = true; boton.textContent = "Guardando…";
+    try {
+      await listo;
+      const id = db && user ? await user.id() : null;
+      if (!id) throw { code: "sin_db" };
+      await db.doc("lista/" + id).set({ correo, busca, zona, consentimiento: true, fecha: new Date().toISOString(), origen: "web" });
+      form.reset();
+      mostrar("¡Hecho! Estás en la lista. Te escribiremos cuando DecibHello abra.", "ok");
+    } catch (err) {
+      mostrar(err && err.code === "quota_exceeded" ? "La lista está llena por ahora. Vuelve a intentarlo en unos días."
+        : "No hemos podido guardar tu inscripción desde aquí. Esta versión de prueba solo admite personas invitadas a la página. Inténtalo más tarde.", "error");
+    } finally { boton.disabled = false; boton.textContent = "Apuntarme a la lista"; }
+  });
+  // Panel para el dueño: ve todas las inscripciones.
+  function panel() {
+    $("panel").hidden = false;
+    db.collection("lista").orderBy("fecha", "desc").onSnapshot(snap => {
+      $("panel-total").textContent = snap.size ? `${snap.size} inscripcion${snap.size === 1 ? "" : "es"}` : "Todavía no hay inscripciones. Aparecerán aquí en cuanto alguien se apunte.";
+      const filas = snap.docs.map(d => { const x = d.data() || {}; const tr = document.createElement("tr");
+        [String(x.fecha || "").slice(0, 10), x.correo, x.busca, x.zona].forEach(v => { const td = document.createElement("td"); td.textContent = v || "—"; tr.append(td); }); return tr; });
+      $("panel-filas").replaceChildren(...filas);
+    }, () => { $("panel-total").textContent = "No se han podido cargar las inscripciones."; });
+  }
+})();
+</script>
