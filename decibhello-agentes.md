@@ -4,11 +4,11 @@ El director del proyecto es la sesión principal de Claude (la que habla con Pab
 
 | # | Agente | Sesión | Rama | Carpeta | Estado |
 |---|---|---|---|---|---|
-| 1 | Web y lista de espera | `session_01AKVCMzunJ9suXjcJRcHFEd` | `agente/web-lista-espera` | `web/` | hecho (6 oct): landing publicada por el agente en https://claude.ai/artifact/KrBrXRxafoU2cScYv55FjD, con vídeo de la plaça de Catalunya (Coverr). Pendiente: vídeo con más gente y coches; formulario público con dominio propio |
+| 1 | Web y lista de espera | `session_01AKVCMzunJ9suXjcJRcHFEd` | `agente/web-lista-espera` | `web/` | hecho (6 oct): landing en https://claude.ai/artifact/KrBrXRxafoU2cScYv55FjD con vídeo, buscador de calles (usa `piloto/paquete/decibhello.js`), voto de ciudades y lista de espera. Pendiente de Pablo: guiones de los vídeos de plastilina, su vídeo con sonido y una foto del área metropolitana |
 | 2 | Extensión de Chrome | `session_01VAn9UEcGXw6tfhhJ4Vu2Eg` | `agente/extension-chrome` | `extension/` | dormido |
 | 3 | Sonómetro web | `session_01TP2VCShQMuQCnyVzeHegj7` | `agente/sonometro` | `sonometro/` | dormido |
 | 4 | Entrevistas de validación | `session_015Fobjtmy4viNvwbz6ecU7i` | `agente/entrevistas` | `negocio/` | dormido |
-| 5 | Siguiente ciudad | `session_01FjeojmRJDgrrT1p1TLiUH7` | `agente/siguiente-ciudad` | `investigacion/` | dormido |
+| 5 | Siguiente ciudad | `session_01FjeojmRJDgrrT1p1TLiUH7` | `agente/siguiente-ciudad` | `investigacion/` | trabajando (6 oct): Madrid frente a Valencia, fuente a fuente, con nota de 0 a 10 → `investigacion/siguiente-ciudad-madrid-valencia.md` |
 | 6 | Textos legales | `session_0145ccAQynYUi5LEEFvuqGkW` | `agente/legal` | `legal/` | dormido |
 
 Cómo funciona:
