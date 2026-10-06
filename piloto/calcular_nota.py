@@ -297,8 +297,16 @@ def construir_visor(indice, perfiles):
     datos = json.dumps({"indice": indice, "piloto": piloto, "perfiles": modelo.PERFILES, "sensores": sensores,
                         "coef_locales": modelo.COEF_LOCALES, "percentiles_ciudad": distribucion_ciudad(indice, perfiles)},
                        ensure_ascii=False, separators=(",", ":"))
-    html = (AQUI / "visor_plantilla.html").read_text(encoding="utf-8").replace("/*DATOS*/null", datos)
+    motor = (AQUI / "motor.js").read_text(encoding="utf-8")
+    html = (AQUI / "visor_plantilla.html").read_text(encoding="utf-8").replace("/*DATOS*/null", datos).replace("/*MOTOR*/", motor)
     (AQUI / "visor.html").write_text(html, encoding="utf-8")
+    # Paquete para otras páginas (la web): el mismo motor y los mismos datos, en un solo fichero.
+    # Uso: <script src="decibhello.js"></script> y después window.DecibHello.buscar("Tuset 20").
+    (AQUI / "paquete").mkdir(exist_ok=True)
+    (AQUI / "paquete" / "decibhello.js").write_text(
+        "// Generado por piloto/calcular_nota.py a partir de piloto/motor.js. No lo edites a mano.\n"
+        "(function () {\n\"use strict\";\nconst DATOS = " + datos + ";\n" + motor + "\nwindow.DecibHello = DecibHello;\n})();\n",
+        encoding="utf-8")
 
 
 def escribir_tabla_md(filas):

@@ -33,6 +33,25 @@ for (const x of js) {
   if (r.picos_nocturnos !== x.picos) { dif++; console.log("picos", x.d, r.picos_nocturnos, x.picos); }
 }
 console.log(`paridad Python/JS: ${dif} diferencias en ${js.length * 9} valores`);
+
+// El paquete para otras páginas (piloto/paquete/decibhello.js) debe dar lo mismo que el visor.
+const q = await navegador.newPage();
+q.on("pageerror", e => errores.push("paquete: " + e.message));
+await q.addScriptTag({ path: path.join(piloto, "paquete", "decibhello.js") });
+await q.waitForFunction(() => window.DecibHello);
+const paquete = await q.evaluate(dirs => dirs.map(d => {
+  const r = DecibHello.buscar(d);
+  return r.tipo === "ok" ? [d, Math.round(r.informe.nota), r.informe.noches.map(Math.round)] : [d, r.tipo];
+}), js.map(x => x.d));
+let difPaquete = 0;
+for (const [d, nota, noches] of paquete) {
+  const x = js.find(y => y.d === d);
+  if (nota !== x.g || JSON.stringify(noches) !== JSON.stringify(x.n)) { difPaquete++; console.log("paquete", d, nota, x.g); }
+}
+const extra = await q.evaluate(() => [DecibHello.buscar("https://www.google.com/maps/@41.3953,2.1500,17z").tipo, DecibHello.buscar("https://www.idealista.com/inmueble/123/").tipo, DecibHello.buscar("Carrer Xqzwkt 5").tipo, DecibHello.buscar("40.4168,-3.7038").tipo]);
+if (extra.join() !== "ok,aviso,sin_resultado,fuera") { difPaquete++; console.log("paquete, casos especiales:", extra); }
+console.log(`paquete decibhello.js: ${difPaquete} diferencias`);
+dif += difPaquete;
 if (errores.length) console.log("errores de la página:", errores);
 await navegador.close();
 process.exit(dif || errores.length ? 1 : 0);

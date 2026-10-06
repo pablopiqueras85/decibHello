@@ -7,6 +7,7 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 - `decibhello-concepto.md`: idea, escala, competencia y modelo de negocio.
 - `decibhello-fuentes-datos-barcelona.md`: fuentes de datos, cómo se accede y borradores de solicitudes de transparencia (2.13 recogida de basuras, 2.15 obras privadas).
 - `decibhello-pendientes.md`: pendientes y hoja de ruta. **Léelo antes de empezar** y márcalo al terminar algo.
+- `decibhello-agentes.md`: equipo de agentes (sesiones, ramas, carpetas) y cómo se les despierta.
 - `decibhello-actualizacion.md`: registro de cambios para el usuario, por fechas. Añade una sección cuando cambies algo que él note.
 - `piloto/`: el prototipo de Barcelona (ver `piloto/README.md`). `servicios-ia-y-skool.md` es de otro proyecto: no lo toques.
 
@@ -26,16 +27,16 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 
 ## Cómo trabajar
 
-- El modelo existe dos veces: `piloto/modelo.py` (Python) y su copia en JavaScript dentro de `piloto/visor_plantilla.html`. **Cualquier cambio en uno va en el otro.** Después ejecuta:
+- El modelo existe dos veces: `piloto/modelo.py` (Python) y su copia en JavaScript `piloto/motor.js` (modelo, índice y buscador). **Cualquier cambio en uno va en el otro.** `calcular_nota.py` mete `motor.js` en el visor y genera `piloto/paquete/decibhello.js` (motor + datos en un solo fichero) para otras páginas, como la web: `window.DecibHello.buscar("Tuset 20")`. Nadie copia la fórmula a mano. Después ejecuta:
   ```bash
   python3 piloto/indice.py        # solo si cambian los datos del índice (≈1 min, descarga Open Data BCN)
   python3 piloto/calcular_nota.py # notas del piloto + visor.html
-  cd piloto/pruebas && npm install && node paridad.mjs   # debe dar 0 diferencias
+  cd piloto/pruebas && npm install && node paridad.mjs   # visor y paquete: deben dar 0 diferencias
   ```
   Chromium está en `/opt/pw-browsers/chromium`; no ejecutes `playwright install`.
 - Mira el visor en el móvil (390 px de ancho) y en escritorio antes de publicar.
 - Datos: API del datastore de Open Data BCN (`datastore_search`, `datastore_search_sql`). Las descargas directas de ficheros piden verificación anti-robots: **nunca la saltes**; pide al usuario que los descargue.
 - Los CSV de sensores de 2023 (`piloto/sensores/`, ~50 MB) no están en el repositorio. Solo hacen falta para `sensores.py`, `ocio_oculto.py` y `obras.py`; si los necesitas, pídeselos al usuario.
 - Sensores: de 7:00 a 23:59 la fecha registrada es la del día siguiente (`sensores.py` lo corrige).
-- Rama de trabajo actual: `claude/keen-bohr-5oenpq`. Si trabajas en paralelo con otro agente, usa una rama propia y no toquéis los mismos ficheros a la vez (sobre todo `modelo.py`, `visor_plantilla.html` y `calcular_nota.py`).
+- Rama de trabajo actual: `claude/keen-bohr-5oenpq`. Si trabajas en paralelo con otro agente, usa una rama propia y no toquéis los mismos ficheros a la vez (sobre todo `modelo.py`, `motor.js`, `visor_plantilla.html` y `calcular_nota.py`).
 - No abras pull requests salvo que el usuario lo pida.
