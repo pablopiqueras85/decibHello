@@ -34,16 +34,17 @@ Convención: **0 = muy tranquilo, 100 = muy ruidoso**. La nota funciona como un 
 
 | Rango | Etiqueta | Lectura para el usuario |
 |---|---|---|
-| 0–15 | Muy tranquilo | Se duerme con la ventana abierta |
-| 16–30 | Tranquilo | Ruido puntual, poco molesto |
-| 31–50 | Moderado | Tráfico o actividad notable en algunas franjas |
-| 51–70 | Ruidoso | Molesto a menudo; conviene buen aislamiento |
-| 71–100 | Muy ruidoso | Ruido intenso y frecuente, también de noche |
+| 0–19 | Muy tranquilo | Se duerme con la ventana abierta |
+| 20–39 | Tranquilo | Ruido puntual, poco molesto |
+| 40–59 | Moderado | Tráfico o actividad notable en algunas franjas |
+| 60–79 | Ruidoso | Molesto a menudo; conviene buen aislamiento |
+| 80–100 | Muy ruidoso | Ruido intenso y frecuente, también de noche |
 
 Cómo se calcula (propuesta a validar):
 - Se calcula una nota por franja (día 7–19 h, tarde 19–23 h, noche 23–7 h) y una nota global ponderada.
 - La noche pesa más que el día, porque es la franja que más afecta al descanso.
-- Referencia para calibrar: las guías de ruido ambiental de la OMS (2018) recomiendan para tráfico rodado menos de 53 dB Lden y menos de 45 dB Lnight. Por encima de esos niveles la nota debería superar 50.
+- La escala va de los extremos reales de Barcelona: 0 = calle muy tranquila (45 dB de día y de tarde, 35 dB de noche) y 100 = como Tuset un viernes de madrugada (75 dB de día y de tarde, 70 dB de noche), lineal entre ambos. Con la referencia de la OMS (53 dB Lden, 45 dB Lnight) el 84 % de los portales salía "ruidoso" y la escala no distinguía entre calles (cambio de octubre de 2026).
+- Cada informe dice además en qué posición está la calle en la ciudad: "más ruidosa que el X % de los portales de Barcelona".
 - Además de los dB, la nota sube por los focos intermitentes (bares, terrazas, obras), que molestan más de lo que indica una media anual.
 - Cada informe muestra el nivel de confianza de la nota (alto, medio o bajo) según los datos disponibles en esa calle.
 

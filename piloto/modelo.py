@@ -11,10 +11,10 @@ FRANJA = ["N"] * 7 + ["D"] * 12 + ["E"] * 4 + ["N"]
 HORAS = {f: [h for h in range(24) if FRANJA[h] == f] for f in "DEN"}
 # Pesos de cada franja en la nota global: la noche pesa más.
 PESOS = {"D": 0.3, "E": 0.2, "N": 0.5}
-# Nivel (dB) que da 50 puntos en cada franja. Es la misma penalización que el indicador europeo Lden
-# (+5 dB tarde, +10 dB noche); de noche, 45 dB es la recomendación OMS para tráfico.
-ANCLA_50 = {"D": 55, "E": 50, "N": 45}
-PUNTOS_POR_DB = 50 / 30
+# Escala de cada franja: nivel (dB) que da 0 puntos y nivel que da 100. Son los extremos reales de Barcelona:
+# 0 = calle muy tranquila; 100 = como Tuset un viernes de madrugada (~70 dB de noche). Lineal entre ambos.
+# La noche tiene los dos extremos más bajos: el mismo ruido puntúa más de noche.
+ESCALA = {"D": (45, 75), "E": (45, 75), "N": (35, 70)}
 
 # Formas horarias y pesos por día de la semana MEDIDOS con la red municipal de sensores (2023, datos por hora):
 # ver sensores.py -> perfiles_sensores.json. Si ese fichero no existe, se usan los supuestos iniciales (v0).
@@ -132,18 +132,15 @@ def perfil_horario(total, trafico=None, ocio_noche=None, dia=None):
     return db
 
 
-def suavizar_extremos(v):
-    """Comprime suavemente por encima de 70 y por debajo de 30 para no saturar en 0 o 100 y mantener el orden."""
-    if v > 70:
-        return 70 + 30 * (1 - math.exp(-(v - 70) / 30))
-    if v < 30:
-        return 30 - 30 * (1 - math.exp(-(30 - v) / 30))
-    return v
+def nota_db(db, franja):
+    """Nota 0-100 de un nivel en dB dentro de su franja (lineal entre los extremos de ESCALA)."""
+    cero, cien = ESCALA[franja]
+    return min(100.0, max(0.0, (db - cero) / (cien - cero) * 100))
 
 
 def notas_horarias(db, dia=None):
     """Nota 0-100 de cada hora a partir de su nivel en dB: la MISMA fórmula para todo (medido o estimado)."""
-    return [suavizar_extremos(50 + (db[h] - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB) for h in range(24)]
+    return [nota_db(db[h], FRANJA[h]) for h in range(24)]
 
 
 def resumen(notas):

@@ -9,6 +9,7 @@ Uso: python3 piloto/indice.py  (una vez, descarga datos)  y después  python3 pi
 
 import csv
 import json
+import math
 import re
 import unicodedata
 from pathlib import Path
@@ -139,6 +140,11 @@ def ajustar_noches(indice):
     return sum(1 for _, lst in nuevos.items() for _, i in lst if i >= 0)
 
 
+def redondear(x):
+    """Redondeo como el visor (Math.round): las mitades hacia arriba."""
+    return math.floor(x + 0.5)
+
+
 def mapa_tramo(indice, i):
     t = indice["tramos"][i]
     return {campo: indice["bandas"][int(t[k])] for k, campo in enumerate(indice["campos_tramo"])}
@@ -167,7 +173,7 @@ def main():
             mp = mapa_tramo(indice, v["patio"])
             interior = modelo.calcular({f"TOTAL_{f}": mp[f"TOTAL_{f}"] for f in "DEN"})
         focos = {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]}
-        noches = {modelo.DIAS[d]: round(modelo.calcular(mapa, focos, d, medido, locales, aj)["franjas"]["N"]) for d in range(7)}
+        noches = {modelo.DIAS[d]: redondear(modelo.calcular(mapa, focos, d, medido, locales, aj)["franjas"]["N"]) for d in range(7)}
         confianza = "alta" if v["sensor_dam"] <= RADIO_SENSOR_DAM else "media"
         if not exacto:
             confianza = "baja"
@@ -175,9 +181,9 @@ def main():
             confianza = "medida"
         filas.append({
             "direccion": info["direccion"], "grupo": info["grupo"],
-            "nota_global": round(res["global"]), "nota_dia": round(res["franjas"]["D"]),
-            "nota_tarde": round(res["franjas"]["E"]), "nota_noche": round(res["franjas"]["N"]),
-            "nota_global_interior": round(interior["global"]) if interior else "",
+            "nota_global": redondear(res["global"]), "nota_dia": redondear(res["franjas"]["D"]),
+            "nota_tarde": redondear(res["franjas"]["E"]), "nota_noche": redondear(res["franjas"]["N"]),
+            "nota_global_interior": redondear(interior["global"]) if interior else "",
             "mes_dia": mapa["TOTAL_D"], "mes_tarde": mapa["TOTAL_E"], "mes_noche": mapa["TOTAL_N"],
             "mes_trafico_noche": mapa["TRANSIT_N"], "mes_ocio_noche": mapa["OCI_N"],
             "ocio_nocturno_100m": v["ocio"], "bares_rest_100m": v["bares"], "quejas_ruido_100m": v["quejas"],
@@ -202,11 +208,36 @@ def main():
               f'{r["grupo"]:<11} {r["direccion"]:<46} {r["confianza"]}')
 
 
+def distribucion_ciudad(indice, perfiles):
+    """Percentiles 0-100 de la nota global exterior (media de todos los días) de todos los portales de la ciudad.
+    Cada rango pesa por su número de portales. Sirve para "más ruidosa que el X % de los portales de Barcelona"."""
+    campos, n = indice["campos_rango"], len(indice["campos_rango"])
+    notas, pesos, cache = [], [], {}
+    for _, planos in indice["calles"]:
+        for r in rangos(planos, n):
+            v = dict(zip(campos, r))
+            medido = perfiles[v["sensor"]]["db"] if v["sensor"] >= 0 else None
+            locales = (v["solo_bares"], v["musicales"]) if medido is None else None
+            clave = (v["tramo"], v["sensor"], locales)
+            if clave not in cache:
+                cache[clave] = modelo.calcular(mapa_tramo(indice, v["tramo"]), medido=medido, locales=locales)["global"]
+            notas.append(cache[clave])
+            pesos.append(max(1, (v["fin"] - v["ini"]) // 2 + 1))
+    orden = sorted(range(len(notas)), key=notas.__getitem__)
+    total, acum, k, cortes = sum(pesos), 0, 0, []
+    for p in range(101):
+        while k < len(orden) - 1 and acum + pesos[orden[k]] < p / 100 * total:
+            acum += pesos[orden[k]]
+            k += 1
+        cortes.append(round(notas[orden[k]], 2))
+    return cortes
+
+
 def construir_visor(indice, perfiles):
     piloto = [{"direccion": d["direccion"], "grupo": d["grupo"], "aviso": d["aviso"]} for d in leer_direcciones()]
     sensores = [{"calle": p["calle"], "tipo": p["tipo"], "dias": p["dias"], "db": p["db"]} for p in perfiles]
     datos = json.dumps({"indice": indice, "piloto": piloto, "perfiles": modelo.PERFILES, "sensores": sensores,
-                        "coef_locales": modelo.COEF_LOCALES},
+                        "coef_locales": modelo.COEF_LOCALES, "percentiles_ciudad": distribucion_ciudad(indice, perfiles)},
                        ensure_ascii=False, separators=(",", ":"))
     html = (AQUI / "visor_plantilla.html").read_text(encoding="utf-8").replace("/*DATOS*/null", datos)
     (AQUI / "visor.html").write_text(html, encoding="utf-8")

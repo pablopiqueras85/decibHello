@@ -58,3 +58,12 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - Error medio con validación por distritos: día 4,47 → 4,43 dB, tarde 5,91 → 4,99 dB, noche 4,33 → 4,16 dB.
 - **Pisos turísticos**: los sensores no muestran que suban el nivel medio de la hora (coeficiente 0). Cuentan en el **aviso de picos nocturnos**: 20 o más a menos de 100 m suben el aviso (llegadas y salidas a deshoras).
 - En el visor, "Por qué suena así" muestra los bares musicales y discotecas y cuántos dB suma cada franja.
+
+## Actualización del 6 de octubre (noche): escala nueva
+
+- **Problema**: con la escala anclada en la OMS (45 dB de noche = 50), el 84 % de los portales de Barcelona salía "ruidoso" o "muy ruidoso" y ninguno bajaba de 33.
+- **Cambio**: la nota va ahora de los extremos reales de Barcelona. Día y tarde: 45 dB = 0, 75 dB = 100. Noche: 35 dB = 0, 70 dB = 100. Lineal, sin compresión. Etiquetas cada 20 puntos.
+- **Resultado en toda la ciudad**: 35 % tranquilo o muy tranquilo, 23 % moderado, 42 % ruidoso o muy ruidoso.
+- **Ejemplos**: Tuset viernes 1:00 = 100 (antes 86); Tuset lunes noche = 58; Pomaret = 19 (antes 45); Campoamor = 50 (antes 62).
+- **Nuevo en el visor**: "más ruidosa (o más tranquila) que el X % de los portales de Barcelona", con la nota media del día de la fachada.
+- **Pendiente**: las grandes avenidas quedan todas cerca de 100; afinar con tus notas a ciegas.

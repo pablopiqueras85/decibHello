@@ -143,6 +143,7 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 .pie p { margin: 0; max-width: 90ch; }
 
 @media (prefers-reduced-motion: reduce) { .marca-barra { transition: none; } }
+@media (max-width: 560px) { .lectura { grid-template-columns: minmax(0, 1fr); } .picos { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
 <div class="wrap">
@@ -213,12 +214,13 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
           <span class="nivel" id="nivel"></span>
           <span class="db" id="db"></span>
           <span class="cuando" id="cuando"></span>
+          <span class="cuando" id="percentil"></span>
         </div>
       </div>
 
       <div class="escala" aria-hidden="true">
         <div class="barra"><span class="marca-barra" id="marca-barra"></span></div>
-        <div class="ticks"><span style="left:0">0 tranquilo</span><span style="left:50%">50 · límite OMS</span><span style="left:100%">100 ruidoso</span></div>
+        <div class="ticks"><span style="left:0">0 muy tranquilo</span><span style="left:50%">50</span><span style="left:100%">100 muy ruidoso</span></div>
       </div>
 
       <div class="picos" id="picos" aria-live="polite">
@@ -275,8 +277,8 @@ const FRANJA = Array.from({ length: 24 }, (_, h) => (h >= 7 && h < 19 ? "D" : h 
 const HORAS = { D: [], E: [], N: [] };
 FRANJA.forEach((f, h) => HORAS[f].push(h));
 const PESOS = { D: 0.3, E: 0.2, N: 0.5 };
-const ANCLA_50 = { D: 55, E: 50, N: 45 };
-const PUNTOS_POR_DB = 50 / 30;
+// Escala de cada franja: dB que dan 0 y 100 puntos (extremos reales de Barcelona). Lineal entre ambos.
+const ESCALA = { D: [45, 75], E: [45, 75], N: [35, 70] };
 const DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
 const normalizarPesos = p => { const m = p.reduce((a, b) => a + b, 0) / p.length; return p.map(x => x / m); };
 // Formas horarias y pesos por día medidos con los sensores municipales (sensores.py -> perfiles_sensores.json).
@@ -338,14 +340,13 @@ function perfilHorario(total, trafico, ocioNoche, dia) {
   }
   return db;
 }
-function suavizarExtremos(v) {
-  if (v > 70) return 70 + 30 * (1 - Math.exp(-(v - 70) / 30));
-  if (v < 30) return 30 - 30 * (1 - Math.exp(-(30 - v) / 30));
-  return v;
+function notaDb(db, f) {
+  const [cero, cien] = ESCALA[f];
+  return Math.min(100, Math.max(0, (db - cero) / (cien - cero) * 100));
 }
 // Misma fórmula para todo: la nota de cada hora sale solo de su nivel en dB (medido o estimado).
 function notasHorarias(db) {
-  return db.map((v, h) => suavizarExtremos(50 + (v - ANCLA_50[FRANJA[h]]) * PUNTOS_POR_DB));
+  return db.map((v, h) => notaDb(v, FRANJA[h]));
 }
 function resumen(notas) {
   const franjas = {};
@@ -566,11 +567,18 @@ const NOMBRE_FRANJA = { D: "Día (7–19 h)", E: "Tarde (19–23 h)", N: "Noche 
 const GRUPOS = [["control", "Calles de control"], ["ruidosa", "Ruidosas"], ["intermedia", "Intermedias"], ["tranquila", "Tranquilas"]];
 const NOMBRE_GRUPO = { control: "piloto · control", ruidosa: "piloto · hipótesis ruidosa", intermedia: "piloto · hipótesis intermedia", tranquila: "piloto · hipótesis tranquila" };
 
+// Posición en la ciudad: % de portales de Barcelona con una nota global exterior menor.
+function percentilCiudad(g) {
+  const pc = DATOS.percentiles_ciudad;
+  let k = 0;
+  while (k < 100 && pc[k + 1] <= g) k++;
+  return Math.max(1, Math.min(99, k));
+}
 function nivelTexto(s) {
-  if (s <= 15) return "Muy tranquilo";
-  if (s <= 30) return "Tranquilo";
-  if (s <= 50) return "Moderado";
-  if (s <= 70) return "Ruidoso";
+  if (s < 20) return "Muy tranquilo";
+  if (s < 40) return "Tranquilo";
+  if (s < 60) return "Moderado";
+  if (s < 80) return "Ruidoso";
   return "Muy ruidoso";
 }
 function colorNota(s) {
@@ -638,6 +646,9 @@ function pintarDetalle() {
     : `${momento(estado.hora)} · ${estado.dia == null ? "media de todos los días · " : ""}mapa oficial (media anual) ${s.mapa[fr]}`;
   if (res.sensor && estado.lado === "exterior") $("cuando").textContent += ` · medido por el sensor municipal de ${res.sensor.calle} (2023)`;
   $("marca-barra").style.left = nota + "%";
+  const pc = percentilCiudad(res.exterior.global);
+  $("percentil").textContent = pc >= 50 ? `Más ruidosa que el ${pc} % de los portales de Barcelona (media del día, fachada a la calle)`
+    : `Más tranquila que el ${100 - pc} % de los portales de Barcelona (media del día, fachada a la calle)`;
   $("hora").value = posicion(estado.hora);
   $("hora-out").textContent = estado.modo === "franja" ? NOMBRE_FRANJA[estado.franja].split(" ")[0] : hh(estado.hora);
 
