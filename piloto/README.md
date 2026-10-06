@@ -34,7 +34,7 @@ Los CSV de sensores (`2023_1S_…_1Hora.csv`, `2023_2S_…_1Hora.csv`) se descar
 
 ## Actualización diaria
 
-Una tarea programada ("DecibHello: actualizar obras del visor", cada día a las 6:47, hora de Madrid) regenera el índice y el visor con las obras públicas del día (Open Data BCN las actualiza a diario) y republica el visor en el mismo enlace. Si algo falla, no publica. Las obras que empiezan o terminan entre dos actualizaciones ya se tienen en cuenta en el visor, porque compara sus fechas con el día en que se mira. Las quejas IRIS se publican cada trimestre, así que no sirven para avisos del día.
+Una tarea programada ("DecibHello: actualizar obras del visor", de lunes a viernes a las 6:47, hora de Madrid) regenera el índice y el visor con las obras públicas del día (Open Data BCN las actualiza a diario) y republica el visor en el mismo enlace. Si algo falla, no publica. Las obras que empiezan o terminan entre dos actualizaciones ya se tienen en cuenta en el visor, porque compara sus fechas con el día en que se mira. Las quejas IRIS se publican cada trimestre, así que no sirven para avisos del día.
 
 ## Comprobaciones
 
