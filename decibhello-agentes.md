@@ -4,7 +4,7 @@ El director del proyecto es la sesión principal de Claude (la que habla con Pab
 
 | # | Agente | Sesión | Rama | Carpeta | Estado |
 |---|---|---|---|---|---|
-| 1 | Web y lista de espera | `session_01AKVCMzunJ9suXjcJRcHFEd` | `agente/web-lista-espera` | `web/` | hecho (6 oct): landing publicada por el agente en https://claude.ai/artifact/KrBrXRxafoU2cScYv55FjD, con vídeo de la plaça de Catalunya (Coverr). Copia previa sin vídeo: https://claude.ai/artifact/7Kj6yE7p3jSS9TGgp1oA6B. Pendiente: vídeo con más gente y coches; formulario público con dominio propio |
+| 1 | Web y lista de espera | `session_01AKVCMzunJ9suXjcJRcHFEd` | `agente/web-lista-espera` | `web/` | hecho (6 oct): landing publicada por el agente en https://claude.ai/artifact/KrBrXRxafoU2cScYv55FjD, con vídeo de la plaça de Catalunya (Coverr). Pendiente: vídeo con más gente y coches; formulario público con dominio propio |
 | 2 | Extensión de Chrome | `session_01VAn9UEcGXw6tfhhJ4Vu2Eg` | `agente/extension-chrome` | `extension/` | dormido |
 | 3 | Sonómetro web | `session_01TP2VCShQMuQCnyVzeHegj7` | `agente/sonometro` | `sonometro/` | dormido |
 | 4 | Entrevistas de validación | `session_015Fobjtmy4viNvwbz6ecU7i` | `agente/entrevistas` | `negocio/` | dormido |
