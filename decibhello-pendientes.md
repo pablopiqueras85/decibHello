@@ -10,6 +10,7 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Tramo silencioso de Travessera de Gràcia**: número o cruce.
 - [ ] **Anchura de Travessera de Gràcia 150**: confirmar si ≈ 8 m es razonable.
 - [ ] **Solicitud de información pública** al Ajuntament (contenedores, rutas y horarios de recogida, calendario de muebles, limpieza nocturna). Borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.13.
+- [ ] **Solicitudes de transparencia al Ayuntamiento de Madrid** (dos: datos por hora de las 31 estaciones de ruido, y horarios de recogida y limpieza). Borrador del agente 5 en `investigacion/solicitud-transparencia-madrid.md` (rama `agente/siguiente-ciudad`).
 - [ ] **Solicitud de información pública sobre obras privadas** (licencias de obras mayores y permisos de andamios, grúas y contenedores desde 2024). Borrador en el apartado 2.15.
 - [ ] **Decidir cómo tratar los anuncios** (Idealista, Fotocasa…): pedir la calle (ahora), extensión de navegador o acuerdos con portales.
 - [ ] **Decisiones abiertas**: idiomas (castellano, catalán, inglés), nombre y dominio.
@@ -57,7 +58,8 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Validar que la gente lo quiere**: 10–15 entrevistas y una página con lista de espera.
 - [ ] **Modelo de ingresos**: informe gratuito básico y completo de pago; licencia para inmobiliarias y portales.
 - [ ] **Mantenimiento de datos**: actualizar quejas, locales, pisos turísticos y sensores cada mes o trimestre de forma automática.
-- [ ] **Siguiente ciudad**: área metropolitana de Barcelona; después Madrid o Valencia.
+- [x] **Siguiente ciudad: Madrid** (confirmado el 6 de octubre de 2026). Datos de 0 a 10: Barcelona 9,5 · Madrid 8 · Valencia 5 · L'Hospitalet + Badalona 3,5 · Sant Cugat 1. Informes en `investigacion/` (rama `agente/siguiente-ciudad`). El área metropolitana, como ampliación de Barcelona más adelante.
+- [ ] **Piloto de Madrid**: unas 3–4 semanas. Mapa 2021 en dB exactos cada 5 m, censo de locales con horarios, portales con coordenadas. Falta: sensores por hora (transparencia), ocio en el mapa (recalibrar con pocas estaciones) y situar en el mapa las quejas y los pisos turísticos.
 
 ### 6. Venta a portales y empresas (cuando haya portal público y validación)
 - [ ] **Estrategia extensión vs. portales**: la extensión sirve para medir interés, no para presionar. En la web de un portal que integre la nota, la extensión deja de mostrarse. El portal propio sigue siendo el centro.

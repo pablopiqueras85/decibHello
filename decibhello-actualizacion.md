@@ -81,3 +81,10 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - Las **obras públicas** se actualizan a diario en Open Data BCN. Una tarea programada las descarga de lunes a viernes a las 6:47, regenera el visor y lo republica en el mismo enlace.
 - Las **quejas vecinales (IRIS)** se publican cada trimestre (las de 2026 llegan a marzo): no sirven para un aviso del día, así que no se usan para obras.
 - Las **obras privadas** siguen pendientes de la solicitud de transparencia (borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.15).
+
+## Actualización del 6 de octubre (tarde): equipo de agentes, web y Madrid
+
+- **Equipo de agentes**: seis agentes con su encargo, su rama y su carpeta (`decibhello-agentes.md`). Se despiertan a petición de Pablo.
+- **Web** (agente 1): landing con vídeo, historia con datos reales del piloto, buscador de calles, votación de la próxima ciudad y lista de espera. https://claude.ai/artifact/KrBrXRxafoU2cScYv55FjD
+- **Motor común**: el modelo y el buscador en JavaScript están en `piloto/motor.js`. El visor y la web usan la misma pieza (`piloto/paquete/decibhello.js`), así que dan la misma nota.
+- **Siguiente ciudad: Madrid** (agente 5, confirmado por Pablo). Tiene mejor mapa (2021, dB exactos cada 5 m) y mejor censo de locales que Barcelona. Le faltan sensores por hora: hay que pedirlos por transparencia (borrador listo).

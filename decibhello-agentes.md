@@ -8,7 +8,7 @@ El director del proyecto es la sesión principal de Claude (la que habla con Pab
 | 2 | Extensión de Chrome | `session_01VAn9UEcGXw6tfhhJ4Vu2Eg` | `agente/extension-chrome` | `extension/` | dormido |
 | 3 | Sonómetro web | `session_01TP2VCShQMuQCnyVzeHegj7` | `agente/sonometro` | `sonometro/` | dormido |
 | 4 | Entrevistas de validación | `session_015Fobjtmy4viNvwbz6ecU7i` | `agente/entrevistas` | `negocio/` | dormido |
-| 5 | Siguiente ciudad | `session_01FjeojmRJDgrrT1p1TLiUH7` | `agente/siguiente-ciudad` | `investigacion/` | hecho (6 oct): recomienda Madrid (datos: Barcelona 9,5 · Madrid 8 · Valencia 5 · L'Hospitalet + Badalona 3,5 · Sant Cugat 1). Informes en `investigacion/` de su rama. Pendiente de Pablo: confirmar Madrid y la solicitud de transparencia de los datos por hora de los sensores de Madrid |
+| 5 | Siguiente ciudad | `session_01FjeojmRJDgrrT1p1TLiUH7` | `agente/siguiente-ciudad` | `investigacion/` | hecho (6 oct): recomienda Madrid (datos: Barcelona 9,5 · Madrid 8 · Valencia 5 · L'Hospitalet + Badalona 3,5 · Sant Cugat 1). Informes en `investigacion/` de su rama. Madrid confirmado por Pablo. Borrador de las dos solicitudes de transparencia a Madrid en `investigacion/solicitud-transparencia-madrid.md` |
 | 6 | Textos legales | `session_0145ccAQynYUi5LEEFvuqGkW` | `agente/legal` | `legal/` | dormido |
 
 Cómo funciona:
