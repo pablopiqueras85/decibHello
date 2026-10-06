@@ -67,3 +67,11 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - **Ejemplos**: Tuset viernes 1:00 = 100 (antes 86); Tuset lunes noche = 58; Pomaret = 19 (antes 45); Campoamor = 50 (antes 62).
 - **Nuevo en el visor**: "más ruidosa (o más tranquila) que el X % de los portales de Barcelona", con la nota media del día de la fachada.
 - **Pendiente**: las grandes avenidas quedan todas cerca de 100; afinar con tus notas a ciegas.
+
+## Actualización del 6 de octubre: obras públicas
+
+- **Datos**: Open Data BCN publica las obras en el espacio público (1.919 desde 2022, ~300 en curso) con polígono, tipo, estado y fechas.
+- **Validación con sensores (2023)**: una obra a menos de 25 m sube el ruido de día laborable una mediana de +2 dB mientras dura (Enric Granados, reurbanización: +8 dB; Escudellers, pavimentación: +5 a +6 dB). A 25–75 m, +0,4 dB; a 300–600 m (control), nada.
+- **En la nota**: obra en curso a menos de 25 m → +2 dB de 8 a 18 h, de lunes a viernes, hasta la fecha de fin. Desaparece sola cuando termina. No suman las previstas, las paradas ni los grandes proyectos (túnel de la L9, Camp Nou…), que se muestran como aviso.
+- **En el visor**: bloque "Obras" con las obras a menos de 100 m (distancia, tipo, fechas y ficha) y cuánto cambia la nota.
+- **Pendiente**: obras privadas de edificios; actualización diaria en el portal.

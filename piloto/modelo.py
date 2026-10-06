@@ -61,6 +61,20 @@ K_HORARIOS = 2.79
 COEF_LOCALES = {"D": {"bares": 1.32, "musicales": 1.68}, "E": {"bares": 2.90, "musicales": 0.72}, "N": {"bares": 1.93, "musicales": 0.0}}
 
 
+# Obra pública activa a menos de 25 m del portal: +2 dB de 8 a 18 h, de lunes a viernes, mientras dure
+# (validado con sensores, ver obras_validacion.md). Es temporal: desaparece cuando la obra termina.
+OBRA_DB = 2.0
+HORAS_OBRA = range(8, 18)
+
+
+def suma_obra(db, dia):
+    """Suma el ruido de una obra activa al perfil horario (en el sitio). Sin día: media de la semana (5 de 7 días)."""
+    extra = OBRA_DB if dia is not None else 10 * math.log10((5 * 10 ** (OBRA_DB / 10) + 2) / 7)
+    if dia is None or dia < 5:
+        for h in HORAS_OBRA:
+            db[h] += extra
+
+
 def correccion_locales(bares, musicales):
     """dB a sumar por franja según bares y bares musicales/discotecas a menos de 100 m."""
     return {f: c["bares"] * math.log1p(bares) + c["musicales"] * math.log1p(musicales) for f, c in COEF_LOCALES.items()}
@@ -164,13 +178,15 @@ def ajuste_noches(carga):
     return [round(10 * math.log10(x / mg), 1) for x in g]
 
 
-def calcular(mapa, focos=None, dia=None, medido=None, locales=None, ajuste_noche=None):
+def calcular(mapa, focos=None, dia=None, medido=None, locales=None, ajuste_noche=None, obra=False):
     # focos: se mantiene por compatibilidad; ya no suma puntos. Todo pasa por los dB (validado con sensores).
     """mapa: {'TOTAL_D':banda,...,'TRANSIT_N':banda,'OCI_N':banda} (texto de banda o dB); dia: 0-6 o None (media anual).
     medido: perfil de un sensor municipal cercano (7 x 24 dB). Si se da, sustituye al mapa y no se suman focos,
     porque la medición ya los incluye."""
     if medido is not None:
         db = perfil_medido(medido, dia)
+        if obra:
+            suma_obra(db, dia)
         notas = notas_horarias(db, dia)
         franjas, global_ = resumen(notas)
         return {"db": db, "notas": notas, "franjas": franjas, "global": global_}
@@ -183,6 +199,8 @@ def calcular(mapa, focos=None, dia=None, medido=None, locales=None, ajuste_noche
     if ajuste_noche is not None and dia is not None:
         for h in HORAS["N"]:
             db[h] += ajuste_noche[dia]
+    if obra:
+        suma_obra(db, dia)
     notas = notas_horarias(db, dia)
     franjas, global_ = resumen(notas)
     return {"db": db, "notas": notas, "franjas": franjas, "global": global_}

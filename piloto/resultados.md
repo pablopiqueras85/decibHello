@@ -21,7 +21,8 @@ Es una **primera versión para aprender**, no una nota definitiva: los pesos y u
 7. **Donde hay sensor, manda la medición**: los portales del mismo tramo que un sensor municipal a menos de 60 m, o de la misma calle a menos de 120 m (933 tramos), usan su nivel medido en 2023, día por día y hora por hora, en lugar del mapa y el modelo (352 tramos de la ciudad). Ahí no se suman focos, porque la medición ya los incluye.
 8. **Horarios de los locales de noche**: discotecas, bares musicales y coctelerías a menos de 150 m, con los días que abren de madrugada (Open Data BCN, espacios de música y copas). Las noches con más locales abiertos suben y las demás bajan, sin cambiar la media de la semana: unos 2,8 dB por cada vez que se duplica la carga de esa noche, ajustado con los sensores (ver `ocio_oculto.md`).
 9. **Bares y discotecas suman en proporción**: en tramos sin sensor, cada franja suma a · log(1 + bares) + b · log(1 + bares musicales y discotecas), todo a menos de 100 m y sin contar restaurantes. Coeficientes ajustados con los sensores y validados dejando fuera cada distrito: día 1,32 y 1,68; tarde 2,90 y 0,72; noche 1,93 y 0. Por ejemplo, 10 bares suman ≈ +3,2 dB de día, +7,0 por la tarde y +4,6 de noche; con 5 musicales más, ≈ +6,2 / +8,2 / +4,6. Sin locales no se suma nada. Los pisos turísticos salen con coeficiente 0 y cuentan en el aviso de picos (20 o más a menos de 100 m). Ver `ocio_oculto.md`.
-10. **Notas por franja** = media de sus horas. **Nota global** = 30 % día + 20 % tarde + 50 % noche.
+10. **Obras públicas**: si hay una obra en curso a menos de 25 m del portal, se suman +2 dB de 8 a 18 h, de lunes a viernes, hasta que termina. Es lo que miden de media los sensores municipales con una obra así de cerca (ver `obras_validacion.md`). No suman las obras previstas o paradas, ni los grandes proyectos (más de 2 ha, como el túnel de la L9), que se muestran como aviso. El visor lista las obras a menos de 100 m con sus fechas.
+11. **Notas por franja** = media de sus horas. **Nota global** = 30 % día + 20 % tarde + 50 % noche.
 11. **Confianza**:
    - medida: el dato sale de un sensor del mismo tramo;
    - alta: hay sensor a menos de 150 m;
@@ -49,9 +50,9 @@ El visor interactivo (`visor.html`) tiene un buscador para cualquier portal de B
 | 76 | 75 | 88 | 71 | 3 | Carrer de Blai 20 | ruidosa | 60–65 | 0 / 31 / 4 / 51 | medida |
 | 75 | 68 | 65 | 84 | 25 | Carrer de Tuset 20 | control | 65–70 | 7 / 26 / 3 / 4 | medida |
 | 73 | 71 | 82 | 70 | 3 | Rambla del Poblenou 60 | intermedia | 55–60 | 0 / 12 / 6 / 5 | medida |
+| 70 | 70 | 75 | 68 | 25 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | medida |
 | 69 | 67 | 66 | 72 | 14 | Carrer del Consell de Cent 250 | intermedia | 65–70 | 0 / 14 / 0 / 18 | medida |
 | 68 | 58 | 87 | 66 | 20 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 29 / 2 / 16 | medida |
-| 68 | 65 | 75 | 68 | 25 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | medida |
 | 67 | 63 | 66 | 70 | 14 | Carrer d'Enric Granados 50 | intermedia | 60–65 | 0 / 13 / 1 / 53 | medida |
 | 66 | 75 | 60 | 63 | 41 | Carrer Gran de Sant Andreu 200 | intermedia | 55–60 | 0 / 2 / 5 / 0 | media |
 | 61 | 58 | 58 | 63 | 19 | Carrer de la Mare de Déu del Coll 50 | tranquila | 55–60 | 0 / 0 / 2 / 3 | media |

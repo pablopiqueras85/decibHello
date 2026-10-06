@@ -143,6 +143,8 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 .pie p { margin: 0; max-width: 90ch; }
 
 @media (prefers-reduced-motion: reduce) { .marca-barra { transition: none; } }
+.obras-lista { grid-column: 1 / -1; margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.88rem; color: var(--ink-2); }
+.obras-lista a { color: inherit; }
 @media (max-width: 560px) { .lectura { grid-template-columns: minmax(0, 1fr); } .picos { grid-template-columns: minmax(0, 1fr); } }
 </style>
 
@@ -227,6 +229,13 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
         <span class="nivel-picos"><i id="picos-punto"></i><span id="picos-nivel"></span></span>
         <p id="picos-motivo"></p>
         <small>Camiones de basura y limpieza de madrugada: picos cortos que no recoge la media del mapa oficial. No entra en la nota. Faltan datos públicos de contenedores y de rutas y horarios de recogida.</small>
+      </div>
+
+      <div class="picos" id="obras" aria-live="polite" hidden>
+        <span class="nivel-picos"><i id="obras-punto"></i><span id="obras-nivel"></span></span>
+        <p id="obras-efecto"></p>
+        <ul class="obras-lista" id="obras-lista"></ul>
+        <small id="obras-nota"></small>
       </div>
 
       <div class="hora">
@@ -357,6 +366,12 @@ function perfilMedido(dbDias, dia) {
   if (dia != null) return dbDias[dia].slice();
   return Array.from({ length: 24 }, (_, h) => 10 * Math.log10(dbDias.reduce((a, d) => a + energia(d[h]), 0) / 7));
 }
+// Obra pública activa a menos de 25 m: +2 dB de 8 a 18 h, de lunes a viernes (validado con sensores, obras_validacion.md).
+const OBRA_DB = 2.0;
+function sumaObra(db, dia) {
+  const extra = dia != null ? OBRA_DB : 10 * Math.log10((5 * Math.pow(10, OBRA_DB / 10) + 2) / 7);
+  if (dia == null || dia < 5) for (let h = 8; h < 18; h++) db[h] += extra;
+}
 function avisoPicos(anchoM, quejas, turisticos = 0) {
   const estrecha = anchoM >= 0 && anchoM < 12;
   // Pisos turísticos: llegadas y salidas a deshoras; 20 o más a menos de 100 m cuentan como foco.
@@ -400,8 +415,12 @@ function correccionLocales(r) {
   return c;
 }
 const fmtDb = x => x.toFixed(1).replace(".", ",");
+const HOY = new Date().toLocaleDateString("sv-SE");  // AAAA-MM-DD en la hora local de quien mira
+const obrasCerca = r => (r.obras >= 0 ? IX.grupos_obras[r.obras] : []).map(([o, d]) => ({ ...IX.obras[o], d }));
+const obraEnCurso = o => o.estado !== "Aturada" && o.inicio <= HOY && HOY <= o.fin;
+const obraSuma = r => obrasCerca(r).some(o => o.d <= IX.obras_radio_efecto && o.suma && obraEnCurso(o));
 function calcular(r, dia = estado.dia) {
-  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.musicales + "|" + r.noches + "|" + dia;
+  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.musicales + "|" + r.obras + "|" + r.noches + "|" + dia;
   if (cacheCalc.has(clave)) return cacheCalc.get(clave);
   const t = IX.tramos[r.tramo];
   const b = k => bandaDb(+t[IX.campos_tramo.indexOf(k)]);
@@ -410,6 +429,10 @@ function calcular(r, dia = estado.dia) {
   const dbExt = sensor ? perfilMedido(sensor.db, dia) : perfilHorario({ D: b("TOTAL_D") + zb.D, E: b("TOTAL_E") + zb.E, N: b("TOTAL_N") + zb.N }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"), dia);
   // Horarios de los locales de noche cercanos: más ruido las noches en que abren de madrugada (no si hay sensor).
   if (!sensor && r.noches >= 0 && dia != null) HORAS.N.forEach(h => (dbExt[h] += IX.ajustes_noche[r.noches][dia]));
+  // Obra pública en curso a menos de 25 m: ruido extra temporal de día laborable (también si hay sensor: la medición es de 2023).
+  const obra = obraSuma(r);
+  const globalSinObra = obra ? resumen(notasHorarias(dbExt)).global : null;
+  if (obra) sumaObra(dbExt, dia);
   const notasExt = notasHorarias(dbExt);
   const ext = { db: dbExt, nota: notasExt, ...resumen(notasExt), mapa: { D: IX.bandas[+t[0]], E: IX.bandas[+t[1]], N: IX.bandas[+t[2]] } };
   let int = null;
@@ -419,7 +442,7 @@ function calcular(r, dia = estado.dia) {
     const notasInt = notasHorarias(dbInt);
     int = { db: dbInt, nota: notasInt, ...resumen(notasInt), mapa: { D: IX.bandas[+p[0]], E: IX.bandas[+p[1]], N: IX.bandas[+p[2]] } };
   }
-  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor, locales: zb,
+  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor, locales: zb, obra, globalSinObra,
     ajusteNoches: !sensor && r.noches >= 0 ? IX.ajustes_noche[r.noches] : null };
   cacheCalc.set(clave, res);
   return res;
@@ -567,6 +590,30 @@ const NOMBRE_FRANJA = { D: "Día (7–19 h)", E: "Tarde (19–23 h)", N: "Noche 
 const GRUPOS = [["control", "Calles de control"], ["ruidosa", "Ruidosas"], ["intermedia", "Intermedias"], ["tranquila", "Tranquilas"]];
 const NOMBRE_GRUPO = { control: "piloto · control", ruidosa: "piloto · hipótesis ruidosa", intermedia: "piloto · hipótesis intermedia", tranquila: "piloto · hipótesis tranquila" };
 
+const fechaTxt = iso => iso.split("-").reverse().join("/");
+function pintarObras(r, res) {
+  const lista = obrasCerca(r);
+  $("obras").hidden = !lista.length;
+  if (!lista.length) return;
+  const enCurso = lista.filter(obraEnCurso);
+  $("obras-nivel").textContent = res.obra ? "Obra en curso junto al portal" : enCurso.length ? "Obras en curso cerca" : "Obras previstas cerca";
+  $("obras-punto").style.background = `var(--st-${res.obra ? "alto" : enCurso.length ? "medio" : "bajo"})`;
+  const cerca = lista.find(o => o.d <= IX.obras_radio_efecto && o.suma && obraEnCurso(o));
+  $("obras-efecto").textContent = res.obra
+    ? `Ruido temporal: la nota incluye +${fmtDb(OBRA_DB)} dB de 8 a 18 h, de lunes a viernes, hasta el ${fechaTxt(cerca.fin)}. ${Math.round(res.globalSinObra) === Math.round(res.exterior.global) ? "En la nota del día apenas se nota." : `Sin la obra, la nota del día sería ${Math.round(res.globalSinObra)} (ahora ${Math.round(res.exterior.global)}).`}`
+    : "No suman a la nota: están a más de 25 m, todavía no han empezado, están paradas o son grandes proyectos con el ruido concentrado en pocos puntos.";
+  const ul = $("obras-lista");
+  ul.replaceChildren();
+  for (const o of lista.slice(0, 5)) {
+    const li = document.createElement("li");
+    const estado = o.estado === "Aturada" ? "parada" : o.inicio > HOY ? `prevista del ${fechaTxt(o.inicio)} al ${fechaTxt(o.fin)}` : `en curso hasta el ${fechaTxt(o.fin)}`;
+    li.append(`${o.d <= 1 ? "En la misma calle" : `A ${o.d} m`} · ${o.tipo} · ${estado}${o.titulo ? " · " + o.titulo : ""} `);
+    if (/^https?:\/\//.test(o.url)) { const a = document.createElement("a"); a.href = o.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "ficha"; li.append("(", a, ")"); }
+    ul.append(li);
+  }
+  if (lista.length > 5) { const li = document.createElement("li"); li.textContent = `y ${lista.length - 5} más`; ul.append(li); }
+  $("obras-nota").textContent = `Obras públicas del Ajuntament a menos de 100 m (datos a ${fechaTxt(IX.obras_fecha)}). Comparado con sensores municipales: una obra a menos de 25 m suma de media unos 2 dB de día laborable mientras dura, y bastante más en sus fases más duras. No incluye obras privadas de edificios.`;
+}
 // Posición en la ciudad: % de portales de Barcelona con una nota global exterior menor.
 function percentilCiudad(g) {
   const pc = DATOS.percentiles_ciudad;
@@ -659,6 +706,7 @@ function pintarDetalle() {
   const quejasTxt = r.quejas_recogida ? `${r.quejas_recogida} queja${r.quejas_recogida > 1 ? "s" : ""} por ruido de limpieza y recogida a menos de 100 m (2023–2026)` : "sin quejas por ruido de limpieza y recogida a menos de 100 m (2023–2026)";
   const turTxt = r.turisticos >= 20 ? ` · ${r.turisticos} pisos turísticos a menos de 100 m (llegadas y salidas a deshoras)` : "";
   $("picos-motivo").textContent = `${anchoTxt} · ${quejasTxt}${turTxt}.`;
+  pintarObras(r, res);
   const lado = r.ini % 2 ? "impar" : "par";
   const filas = [
     ["Tráfico de noche (mapa)", res.trafico],
@@ -672,6 +720,7 @@ function pintarDetalle() {
     ["Bares musicales y discotecas · 100 m", r.musicales],
     ["Suma por bares cercanos", res.sensor ? "incluida en la medición" : `+${fmtDb(res.locales.D)} dB de día · +${fmtDb(res.locales.E)} tarde · +${fmtDb(res.locales.N)} noche`],
     ["Locales de noche a 150 m (horarios)", res.ajusteNoches ? "noches más ruidosas: " + DIAS.filter((_, d) => res.ajusteNoches[d] >= 1).join(", ") || "sin noches destacadas" : res.sensor ? "incluido en la medición" : "ninguno"],
+    ["Obras públicas · 100 m", r.obras >= 0 ? IX.grupos_obras[r.obras].length : 0],
     ["Sensor municipal más cercano", r.sensor_dam >= 100 ? (r.sensor_dam / 100).toFixed(1).replace(".", ",") + " km" : r.sensor_dam * 10 + " m"],
     ["Mismo tramo", `portales ${r.ini}–${r.fin} (lado ${lado})`],
     ["Nota global del día", `${Math.round(res.exterior.global)} exterior` + (res.interior ? ` · ${Math.round(res.interior.global)} interior` : "")],

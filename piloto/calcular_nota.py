@@ -140,6 +140,60 @@ def ajustar_noches(indice):
     return sum(1 for _, lst in nuevos.items() for _, i in lst if i >= 0)
 
 
+def asignar_obras(indice, hoy=None):
+    """Obras públicas no terminadas a menos de 100 m de cada rango (obras.py). Añade 'obras' (índice en
+    indice['grupos_obras'], lista de [obra, distancia en m], o -1) e indice['obras'] con los datos de cada obra."""
+    import datetime as dt
+    import obras as mod_obras
+    from pyproj import Transformer
+    hoy = hoy or dt.date.today()
+    vig = mod_obras.vigentes(mod_obras.cargar(hoy), hoy)
+    campos = indice["campos_rango"]
+    n = len(campos)
+    ilat, ilon = campos.index("lat_e5"), campos.index("lon_e5")
+    t = Transformer.from_crs("EPSG:4326", "EPSG:25831", always_xy=True)
+    puntos = [(c, k) for c, (_, pl) in enumerate(indice["calles"]) for k in range(0, len(pl), n)]
+    x, y = t.transform([2.0 + indice["calles"][c][1][k + ilon] / 1e5 for c, k in puntos],
+                       [41.3 + indice["calles"][c][1][k + ilat] / 1e5 for c, k in puntos])
+    cerca = mod_obras.cerca_de(vig, np.c_[x, y])
+    usadas, grupos, idx, nuevos = {}, [], {}, {}
+    for (c, k), lst in zip(puntos, cerca):
+        i = -1
+        if lst:
+            g = tuple((usadas.setdefault(o, len(usadas)), d) for o, d in lst)
+            i = idx.setdefault(g, len(grupos))
+            if i == len(grupos):
+                grupos.append([list(p) for p in g])
+        nuevos.setdefault(c, []).append((k, i))
+    for c, lst in nuevos.items():
+        pl = indice["calles"][c][1]
+        out = []
+        for k, i in lst:
+            out += pl[k:k + n] + [i]
+        indice["calles"][c][1] = out
+    indice["campos_rango"] = campos + ["obras"]
+    indice["grupos_obras"] = grupos
+    indice["obras"] = [None] * len(usadas)
+    for o, j in usadas.items():
+        rec, geom, ini, fin = vig[o]
+        indice["obras"][j] = {"suma": geom.area <= mod_obras.AREA_MAX_EFECTO, "titulo": rec["titol"], "tipo": rec["tipusobra"], "inicio": ini.isoformat(), "fin": fin.isoformat(),
+                              "estado": rec["estat"], "lugar": (rec.get("ubicacio") or "").strip(), "url": rec.get("url_web_obres") or ""}
+    indice["obras_fecha"] = hoy.isoformat()
+    indice["obras_radio_efecto"] = mod_obras.RADIO_EFECTO
+    return len(usadas), sum(1 for lst in nuevos.values() for _, i in lst if i >= 0)
+
+
+def obra_activa(indice, grupo, hoy=None):
+    """True si una obra en curso (no parada, no un gran proyecto) está a menos de obras.RADIO_EFECTO m en la fecha `hoy`."""
+    import datetime as dt
+    import obras as mod_obras
+    if grupo < 0:
+        return False
+    hoy = (hoy or dt.date.today()).isoformat()
+    return any(d <= mod_obras.RADIO_EFECTO and indice["obras"][o]["suma"] and indice["obras"][o]["estado"] != "Aturada"
+               and indice["obras"][o]["inicio"] <= hoy <= indice["obras"][o]["fin"] for o, d in indice["grupos_obras"][grupo])
+
+
 def redondear(x):
     """Redondeo como el visor (Math.round): las mitades hacia arriba."""
     return math.floor(x + 0.5)
@@ -156,6 +210,7 @@ def main():
     perfiles = json.loads(f_sens.read_text(encoding="utf-8")) if f_sens.exists() else []
     print(f"rangos con medición de sensor: {anclar_sensores(indice, perfiles)}")
     print(f"rangos con ajuste por horarios de locales: {ajustar_noches(indice)}")
+    print("obras vigentes cerca de algún portal: {} · rangos con obras a menos de 100 m: {}".format(*asignar_obras(indice)))
     campos = indice["campos_rango"]
     filas = []
     for info in leer_direcciones():
@@ -166,14 +221,15 @@ def main():
         medido = perfiles[v["sensor"]]["db"] if v["sensor"] >= 0 else None
         locales = (v["solo_bares"], v["musicales"]) if medido is None else None
         aj = indice["ajustes_noche"][v["noches"]] if v["noches"] >= 0 and medido is None else None
+        obra = obra_activa(indice, v["obras"])
         res = modelo.calcular(mapa, {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]},
-                              medido=medido, locales=locales, ajuste_noche=aj)
+                              medido=medido, locales=locales, ajuste_noche=aj, obra=obra)
         interior = None
         if v["patio"] >= 0:
             mp = mapa_tramo(indice, v["patio"])
             interior = modelo.calcular({f"TOTAL_{f}": mp[f"TOTAL_{f}"] for f in "DEN"})
         focos = {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]}
-        noches = {modelo.DIAS[d]: redondear(modelo.calcular(mapa, focos, d, medido, locales, aj)["franjas"]["N"]) for d in range(7)}
+        noches = {modelo.DIAS[d]: redondear(modelo.calcular(mapa, focos, d, medido, locales, aj, obra)["franjas"]["N"]) for d in range(7)}
         confianza = "alta" if v["sensor_dam"] <= RADIO_SENSOR_DAM else "media"
         if not exacto:
             confianza = "baja"
@@ -193,6 +249,8 @@ def main():
             "solo_bares_100m": v["solo_bares"], "musicales_100m": v["musicales"],
             "ancho_m": v["ancho_m"], "quejas_recogida_100m": v["quejas_recogida"],
             "picos_nocturnos": modelo.aviso_picos(v["ancho_m"], v["quejas_recogida"], v["turisticos"]),
+            "obra_activa_25m": "sí" if obra else "",
+            "obras_100m": len(indice["grupos_obras"][v["obras"]]) if v["obras"] >= 0 else 0,
             **{f"noche_{d}": n for d, n in noches.items()},
         })
 

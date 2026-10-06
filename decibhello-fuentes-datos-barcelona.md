@@ -163,6 +163,13 @@ El paso de camiones de basura y de limpieza de madrugada da picos cortos e inten
 >
 > La finalidad es elaborar un servicio informativo sobre el ruido urbano para la ciudadanía. Solicito además, si es posible, que esta información se publique en Open Data BCN.
 
+### 2.14 Obras en el espacio público
+
+- **Dataset**: "Obres a l'espai públic" (`obres`), recurso `4e6b3bfe-2f47-4d35-aa7d-3e4bcc930cea`, accesible por la API del datastore. Se actualiza a menudo (última: 1 de octubre de 2026).
+- **Contenido**: 1.919 obras desde 2022 (unas 300 en curso), con polígono, tipo (urbanización, servicios, alcantarillado, transporte, edificación, pavimentación…), estado, fechas de inicio y fin, promotor, constructora y enlace a la ficha.
+- **Validación**: con los sensores de 2023, una obra a menos de 25 m sube el ruido de día laborable unos 2 dB de media mientras dura, y hasta 8 dB en una reurbanización. Más lejos, casi nada (`piloto/obras_validacion.md`).
+- **Límites**: solo obras públicas. Las fechas son las previstas y el polígono marca todo el ámbito, no la fase del día. Las obras privadas de edificios no están.
+
 ## 3. Cómo se accede a los datos
 
 - **Ficheros tabulares (CSV)**: se leen sin problema por la API del portal (`datastore_search` y `datastore_search_sql`), con consultas y filtros. Así funcionan el MES por tramo, el censo de locales, los pisos turísticos, IRIS y la lista de sensores.
