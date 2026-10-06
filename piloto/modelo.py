@@ -50,15 +50,20 @@ else:  # supuestos v0
     PESO_DIA_OCIO_NOCHE = _normalizar([0.2, 0.25, 0.35, 0.7, 1.0, 1.0, 0.3])
     PESO_DIA_OCIO_TARDE = _normalizar([0.6, 0.6, 0.7, 0.85, 1.0, 1.0, 0.7])
     PESO_DIA_HORA_TRAFICO = PESO_DIA_HORA_OCIO = None
-# Zona de bares (validado con sensores, ver ocio_oculto.md): con 10 o más bares a menos de 100 m, el mapa 2017 se
-# queda corto de día y por la tarde (el mapa no modela ocio fuera de la noche). Corrección prudente: el percentil 25
-# de lo que midieron los sensores en esas zonas. De noche las pistas no predicen el error, así que no se corrige.
 # Horarios de los locales de noche (discotecas, bares musicales, coctelerías): las noches en que hay más locales
 # abiertos de madrugada a menos de 150 m son más ruidosas. Coeficiente ajustado con los sensores (horarios_ocio.py):
 # dB extra por unidad de log(1 + carga de esa noche), respecto a la media de la semana del propio tramo.
 K_HORARIOS = 2.79
-ZONA_BARES_MIN = 10
-CORRECCION_ZONA_BARES = {"D": 6.0, "E": 8.8, "N": 0.0}
+# Bares y discotecas suman ruido de forma proporcional (validado con sensores por distritos, ver ocio_oculto.md):
+# dB por unidad de log(1 + número a menos de 100 m), por franja. Sin locales, cero. Ajuste no negativo y sin término
+# fijo, para no subir calles sin locales. Los pisos turísticos no suben la media horaria (coeficiente 0 en los
+# sensores): cuentan en el aviso de picos nocturnos.
+COEF_LOCALES = {"D": {"bares": 1.32, "musicales": 1.68}, "E": {"bares": 2.90, "musicales": 0.72}, "N": {"bares": 1.93, "musicales": 0.0}}
+
+
+def correccion_locales(bares, musicales):
+    """dB a sumar por franja según bares y bares musicales/discotecas a menos de 100 m."""
+    return {f: c["bares"] * math.log1p(bares) + c["musicales"] * math.log1p(musicales) for f, c in COEF_LOCALES.items()}
 # Un "día" va de las 7:00 a las 7:00 del día siguiente: la noche del viernes (23-7 h) es la que empieza el viernes.
 
 
@@ -162,7 +167,7 @@ def ajuste_noches(carga):
     return [round(10 * math.log10(x / mg), 1) for x in g]
 
 
-def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False, ajuste_noche=None):
+def calcular(mapa, focos=None, dia=None, medido=None, locales=None, ajuste_noche=None):
     # focos: se mantiene por compatibilidad; ya no suma puntos. Todo pasa por los dB (validado con sensores).
     """mapa: {'TOTAL_D':banda,...,'TRANSIT_N':banda,'OCI_N':banda} (texto de banda o dB); dia: 0-6 o None (media anual).
     medido: perfil de un sensor municipal cercano (7 x 24 dB). Si se da, sustituye al mapa y no se suman focos,
@@ -173,7 +178,8 @@ def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False, ajuste_n
         franjas, global_ = resumen(notas)
         return {"db": db, "notas": notas, "franjas": franjas, "global": global_}
     db_de = lambda v: v if isinstance(v, (int, float)) else banda_a_db(v)
-    total = {f: db_de(mapa[f"TOTAL_{f}"]) + (CORRECCION_ZONA_BARES[f] if zona_bares else 0) for f in "DEN"}
+    corr = correccion_locales(*locales) if locales else {f: 0.0 for f in "DEN"}
+    total = {f: db_de(mapa[f"TOTAL_{f}"]) + corr[f] for f in "DEN"}
     trafico = {f: db_de(mapa[f"TRANSIT_{f}"]) for f in "DEN"} if "TRANSIT_D" in mapa else None
     ocio = db_de(mapa["OCI_N"]) if "OCI_N" in mapa else None
     db = perfil_horario(total, trafico, ocio, dia)
@@ -185,16 +191,18 @@ def calcular(mapa, focos=None, dia=None, medido=None, zona_bares=False, ajuste_n
     return {"db": db, "notas": notas, "franjas": franjas, "global": global_}
 
 
-def aviso_picos(ancho_m, quejas_recogida):
+def aviso_picos(ancho_m, quejas_recogida, turisticos=0):
     """Aviso de picos nocturnos (camiones de recogida y limpieza). No entra en la nota 0-100.
 
     ancho_m: anchura de la calle entre portales de lados opuestos (-1 si no se sabe).
     quejas_recogida: quejas por ruido de limpieza y recogida (IRIS 2023-2026) a menos de 100 m.
     """
     estrecha = 0 <= ancho_m < 12
-    if (estrecha and quejas_recogida >= 1) or quejas_recogida >= 5:
+    # Pisos turísticos: llegadas y salidas a deshoras (maletas, grupos); 20 o más a menos de 100 m cuentan como foco.
+    turistico = turisticos >= 20
+    if (estrecha and (quejas_recogida >= 1 or turistico)) or quejas_recogida >= 5 or (turistico and quejas_recogida >= 1):
         nivel = "alto"
-    elif estrecha or quejas_recogida >= 1:
+    elif estrecha or quejas_recogida >= 1 or turistico:
         nivel = "medio"
     else:
         nivel = "bajo"

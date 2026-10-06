@@ -50,3 +50,11 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - **De noche, ninguna pista pública predice dónde se equivoca el mapa.** Retirado el aviso nocturno que puse anoche.
 - **De día y por la tarde, sí**: con 10 o más bares a menos de 100 m, el mapa se queda corto (mediana +7 dB de día y +12 dB por la tarde). El mapa no modela el ocio fuera de la noche. Se corrige con una estimación prudente: **+6 dB de día y +8,8 dB por la tarde**, en ~1.000 tramos (2,6 % de la ciudad). En esos sensores, el error de tarde baja de 11 a 4 dB.
 - **Para la noche hace falta medir**: mediciones con el móvil, opiniones de vecinos o más sensores.
+
+## Actualización del 6 de octubre (tarde): bares y discotecas suman en proporción
+
+- La regla de "zona de bares" (todo o nada a partir de 10 bares) se sustituye por una **suma proporcional**: cuantos más bares y bares musicales o discotecas haya a menos de 100 m, más dB se suman, en las tres franjas. Sin locales no se suma nada.
+- Coeficientes (dB por log(1 + número)), ajustados con los sensores y validados dejando fuera cada distrito: día 1,32 (bares) y 1,68 (musicales); tarde 2,90 y 0,72; noche 1,93 y 0. Ejemplo: 10 bares ≈ +3,2 / +7,0 / +4,6 dB; con 5 musicales más ≈ +6,2 / +8,2 / +4,6 dB.
+- Error medio con validación por distritos: día 4,47 → 4,43 dB, tarde 5,91 → 4,99 dB, noche 4,33 → 4,16 dB.
+- **Pisos turísticos**: los sensores no muestran que suban el nivel medio de la hora (coeficiente 0). Cuentan en el **aviso de picos nocturnos**: 20 o más a menos de 100 m suben el aviso (llegadas y salidas a deshoras).
+- En el visor, "Por qué suena así" muestra los bares musicales y discotecas y cuántos dB suma cada franja.

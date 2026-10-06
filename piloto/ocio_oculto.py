@@ -191,19 +191,26 @@ def analisis_trampa(X, val, grupos):
     for c in ["bares_100", "bares_50", "quejas_gente_100", "mesas_50", "musicales_100", "plaza_30"]:
         out.append(f"| {c} | {roc_auc_score(val.dif_E > 5, X[c]):.2f} | {roc_auc_score(val.dif_N > 5, X[c]):.2f} |")
     out += ["", "De noche ninguna pista supera claramente el azar. Por la tarde, el número de bares sí.", "",
-            f"## Regla adoptada: zona de bares (≥ {10} bares a menos de 100 m, sin contar restaurantes)", "",
-            "| Franja | Sensores en zona de bares | Diferencia mediana | Percentil 25 (corrección usada) | Error en esos sensores, sin → con corrección (validado por distritos) |",
+            "## Corrección adoptada: proporcional al número de bares y discotecas", "",
+            "Suma en dB = a · log(1 + bares) + b · log(1 + bares musicales y discotecas) + c · log(1 + pisos turísticos), "
+            "con a, b, c ≥ 0 y sin término fijo (una calle sin locales no suma nada). Bares sin contar restaurantes; todo a menos de 100 m. "
+            "Ajustado por mínimos cuadrados no negativos y validado dejando fuera cada distrito.", "",
+            "| Franja | Bares (a) | Musicales y discotecas (b) | Pisos turísticos (c) | Error medio, solo mapa → con corrección (validado por distritos) |",
             "|---|---|---|---|---|"]
-    a = bares >= 10
+    from scipy.optimize import nnls
+    A = X[["bares_100", "musicales_100", "turisticos_100"]].values
     for f in "DEN":
         y = val[f"dif_{f}"].values
         p = np.zeros(len(y))
-        for tr, te in LeaveOneGroupOut().split(y, y, grupos):
-            p[te] = np.where(a[te], np.percentile(y[tr][a[tr]], 25) if a[tr].any() else 0, 0)
-        out.append(f"| {f} | {a.sum()} | {np.median(y[a]):+.1f} dB | {np.percentile(y[a], 25):+.1f} dB | "
-                   f"{np.abs(y[a]).mean():.1f} → {np.abs(y[a] - p[a]).mean():.1f} dB |")
-    out += ["", "Se aplica de día y por la tarde (donde mejora y el mapa no modela el ocio). De noche no, porque no mejora.",
-            "Afecta a unos 1.000 tramos de la ciudad (2,6 %), y nunca a calles sin bares.", ""]
+        for tr, te in LeaveOneGroupOut().split(A, y, grupos):
+            p[te] = A[te] @ nnls(A[tr], y[tr])[0]
+        coef = nnls(A, y)[0]
+        out.append(f"| {f} | {coef[0]:.2f} | {coef[1]:.2f} | {coef[2]:.2f} | {np.abs(y).mean():.2f} → {np.abs(y - p).mean():.2f} dB |")
+    out += ["", "Los coeficientes se usan tal cual en `modelo.py` (`COEF_LOCALES`). Ejemplos de día / tarde / noche: "
+            "10 bares ≈ +3,2 / +7,0 / +4,6 dB; 10 bares y 5 musicales ≈ +6,2 / +8,2 / +4,6 dB.",
+            "Los pisos turísticos salen con coeficiente 0 en todas las franjas: no suben el nivel medio de la hora que miden los sensores. "
+            "Sí cuentan en el aviso de picos nocturnos (20 o más a menos de 100 m: llegadas y salidas a deshoras).",
+            "Donde hay sensor no se aplica: la medición ya lo recoge.", ""]
     return out
 
 

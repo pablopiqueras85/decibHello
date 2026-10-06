@@ -356,10 +356,12 @@ function perfilMedido(dbDias, dia) {
   if (dia != null) return dbDias[dia].slice();
   return Array.from({ length: 24 }, (_, h) => 10 * Math.log10(dbDias.reduce((a, d) => a + energia(d[h]), 0) / 7));
 }
-function avisoPicos(anchoM, quejas) {
+function avisoPicos(anchoM, quejas, turisticos = 0) {
   const estrecha = anchoM >= 0 && anchoM < 12;
-  if ((estrecha && quejas >= 1) || quejas >= 5) return "alto";
-  if (estrecha || quejas >= 1) return "medio";
+  // Pisos turísticos: llegadas y salidas a deshoras; 20 o más a menos de 100 m cuentan como foco.
+  const turistico = turisticos >= 20;
+  if ((estrecha && (quejas >= 1 || turistico)) || quejas >= 5 || (turistico && quejas >= 1)) return "alto";
+  if (estrecha || quejas >= 1 || turistico) return "medio";
   return "bajo";
 }
 // MODELO:fin
@@ -389,15 +391,21 @@ const CALLES = IX.calles.map(([nombre, planos]) => {
   return { nombre, rangos, ...tokensCalle(nombre) };
 });
 const cacheCalc = new Map();
-const ZB = DATOS.zona_bares;
-const esZonaBares = r => r.sensor < 0 && r.solo_bares >= ZB.minimo;
+// Corrección proporcional por bares y bares musicales/discotecas (dB por log(1+n)), validada con sensores por distritos.
+const CL = DATOS.coef_locales;
+function correccionLocales(r) {
+  const c = {};
+  for (const f of ["D", "E", "N"]) c[f] = r.sensor >= 0 ? 0 : CL[f].bares * Math.log1p(r.solo_bares) + CL[f].musicales * Math.log1p(r.musicales);
+  return c;
+}
+const fmtDb = x => x.toFixed(1).replace(".", ",");
 function calcular(r, dia = estado.dia) {
-  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.noches + "|" + dia;
+  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.musicales + "|" + r.noches + "|" + dia;
   if (cacheCalc.has(clave)) return cacheCalc.get(clave);
   const t = IX.tramos[r.tramo];
   const b = k => bandaDb(+t[IX.campos_tramo.indexOf(k)]);
   const sensor = r.sensor >= 0 ? DATOS.sensores[r.sensor] : null;
-  const zb = esZonaBares(r) ? ZB.correccion : { D: 0, E: 0, N: 0 };
+  const zb = correccionLocales(r);
   const dbExt = sensor ? perfilMedido(sensor.db, dia) : perfilHorario({ D: b("TOTAL_D") + zb.D, E: b("TOTAL_E") + zb.E, N: b("TOTAL_N") + zb.N }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"), dia);
   // Horarios de los locales de noche cercanos: más ruido las noches en que abren de madrugada (no si hay sensor).
   if (!sensor && r.noches >= 0 && dia != null) HORAS.N.forEach(h => (dbExt[h] += IX.ajustes_noche[r.noches][dia]));
@@ -410,7 +418,7 @@ function calcular(r, dia = estado.dia) {
     const notasInt = notasHorarias(dbInt);
     int = { db: dbInt, nota: notasInt, ...resumen(notasInt), mapa: { D: IX.bandas[+p[0]], E: IX.bandas[+p[1]], N: IX.bandas[+p[2]] } };
   }
-  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor,
+  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor, locales: zb,
     ajusteNoches: !sensor && r.noches >= 0 ? IX.ajustes_noche[r.noches] : null };
   cacheCalc.set(clave, res);
   return res;
@@ -604,10 +612,7 @@ function pintarDetalle() {
   $("confianza").textContent = "confianza " + estado.confianza;
   $("grupo").hidden = !estado.grupo;
   $("grupo").textContent = estado.grupo ? NOMBRE_GRUPO[estado.grupo] : "";
-  // Zona de bares (validado con sensores): el mapa oficial se queda corto de día y por la tarde; ya se corrige.
-  const zonaBares = esZonaBares(r)
-    ? `Zona de bares (${r.solo_bares} bares a menos de 100 m): el mapa oficial no cuenta el ocio de día ni de tarde, y los sensores municipales en zonas así miden bastante más. Se han sumado +${ZB.correccion.D} dB de día y +${ZB.correccion.E} dB por la tarde (estimación prudente).` : "";
-  const avisos = [estado.origen, estado.aviso, zonaBares].filter(Boolean).join(" ");
+  const avisos = [estado.origen, estado.aviso].filter(Boolean).join(" ");
   $("aviso").hidden = !avisos;
   $("aviso").textContent = avisos;
 
@@ -636,12 +641,13 @@ function pintarDetalle() {
   $("hora").value = posicion(estado.hora);
   $("hora-out").textContent = estado.modo === "franja" ? NOMBRE_FRANJA[estado.franja].split(" ")[0] : hh(estado.hora);
 
-  const nivelPicos = avisoPicos(r.ancho_m, r.quejas_recogida);
+  const nivelPicos = avisoPicos(r.ancho_m, r.quejas_recogida, r.turisticos);
   $("picos-nivel").textContent = "Picos nocturnos: " + nivelPicos;
   $("picos-punto").style.background = `var(--st-${nivelPicos})`;
   const anchoTxt = r.ancho_m < 0 ? "anchura desconocida" : r.ancho_m < 12 ? `calle estrecha (≈ ${r.ancho_m} m entre fachadas): el ruido rebota` : `calle de ≈ ${r.ancho_m} m entre fachadas`;
   const quejasTxt = r.quejas_recogida ? `${r.quejas_recogida} queja${r.quejas_recogida > 1 ? "s" : ""} por ruido de limpieza y recogida a menos de 100 m (2023–2026)` : "sin quejas por ruido de limpieza y recogida a menos de 100 m (2023–2026)";
-  $("picos-motivo").textContent = `${anchoTxt} · ${quejasTxt}.`;
+  const turTxt = r.turisticos >= 20 ? ` · ${r.turisticos} pisos turísticos a menos de 100 m (llegadas y salidas a deshoras)` : "";
+  $("picos-motivo").textContent = `${anchoTxt} · ${quejasTxt}${turTxt}.`;
   const lado = r.ini % 2 ? "impar" : "par";
   const filas = [
     ["Tráfico de noche (mapa)", res.trafico],
@@ -650,8 +656,10 @@ function pintarDetalle() {
     ["Bares y restaurantes · 100 m", r.bares],
     ["Quejas por ruido 2025 · 100 m", r.quejas],
     ["Pisos turísticos · 100 m", r.turisticos],
-    ["Origen del dato", res.sensor ? `medición del sensor de ${res.sensor.calle} (${res.sensor.dias} días de 2023)` : esZonaBares(r) ? "mapa oficial 2017 + modelo + corrección por zona de bares" : "mapa oficial 2017 + modelo"],
+    ["Origen del dato", res.sensor ? `medición del sensor de ${res.sensor.calle} (${res.sensor.dias} días de 2023)` : r.solo_bares + r.musicales > 0 ? "mapa oficial 2017 + modelo + suma por bares cercanos" : "mapa oficial 2017 + modelo"],
     ["Bares (sin restaurantes) · 100 m", r.solo_bares],
+    ["Bares musicales y discotecas · 100 m", r.musicales],
+    ["Suma por bares cercanos", res.sensor ? "incluida en la medición" : `+${fmtDb(res.locales.D)} dB de día · +${fmtDb(res.locales.E)} tarde · +${fmtDb(res.locales.N)} noche`],
     ["Locales de noche a 150 m (horarios)", res.ajusteNoches ? "noches más ruidosas: " + DIAS.filter((_, d) => res.ajusteNoches[d] >= 1).join(", ") || "sin noches destacadas" : res.sensor ? "incluido en la medición" : "ninguno"],
     ["Sensor municipal más cercano", r.sensor_dam >= 100 ? (r.sensor_dam / 100).toFixed(1).replace(".", ",") + " km" : r.sensor_dam * 10 + " m"],
     ["Mismo tramo", `portales ${r.ini}–${r.fin} (lado ${lado})`],

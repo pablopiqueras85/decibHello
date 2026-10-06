@@ -158,16 +158,16 @@ def main():
         v = dict(zip(campos, r))
         mapa = mapa_tramo(indice, v["tramo"])
         medido = perfiles[v["sensor"]]["db"] if v["sensor"] >= 0 else None
-        zona_bares = medido is None and v["solo_bares"] >= modelo.ZONA_BARES_MIN
+        locales = (v["solo_bares"], v["musicales"]) if medido is None else None
         aj = indice["ajustes_noche"][v["noches"]] if v["noches"] >= 0 and medido is None else None
         res = modelo.calcular(mapa, {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]},
-                              medido=medido, zona_bares=zona_bares, ajuste_noche=aj)
+                              medido=medido, locales=locales, ajuste_noche=aj)
         interior = None
         if v["patio"] >= 0:
             mp = mapa_tramo(indice, v["patio"])
             interior = modelo.calcular({f"TOTAL_{f}": mp[f"TOTAL_{f}"] for f in "DEN"})
         focos = {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]}
-        noches = {modelo.DIAS[d]: round(modelo.calcular(mapa, focos, d, medido, zona_bares, aj)["franjas"]["N"]) for d in range(7)}
+        noches = {modelo.DIAS[d]: round(modelo.calcular(mapa, focos, d, medido, locales, aj)["franjas"]["N"]) for d in range(7)}
         confianza = "alta" if v["sensor_dam"] <= RADIO_SENSOR_DAM else "media"
         if not exacto:
             confianza = "baja"
@@ -184,9 +184,9 @@ def main():
             "pisos_turisticos_100m": v["turisticos"], "sensor_mas_cercano_m": v["sensor_dam"] * 10,
             "rango_portales": f'{v["ini"]}-{v["fin"]}', "confianza": confianza,
             "sensor": perfiles[v["sensor"]]["calle"] if medido is not None else "",
-            "solo_bares_100m": v["solo_bares"], "zona_bares": "sí" if zona_bares else "",
+            "solo_bares_100m": v["solo_bares"], "musicales_100m": v["musicales"],
             "ancho_m": v["ancho_m"], "quejas_recogida_100m": v["quejas_recogida"],
-            "picos_nocturnos": modelo.aviso_picos(v["ancho_m"], v["quejas_recogida"]),
+            "picos_nocturnos": modelo.aviso_picos(v["ancho_m"], v["quejas_recogida"], v["turisticos"]),
             **{f"noche_{d}": n for d, n in noches.items()},
         })
 
@@ -206,7 +206,7 @@ def construir_visor(indice, perfiles):
     piloto = [{"direccion": d["direccion"], "grupo": d["grupo"], "aviso": d["aviso"]} for d in leer_direcciones()]
     sensores = [{"calle": p["calle"], "tipo": p["tipo"], "dias": p["dias"], "db": p["db"]} for p in perfiles]
     datos = json.dumps({"indice": indice, "piloto": piloto, "perfiles": modelo.PERFILES, "sensores": sensores,
-                        "zona_bares": {"minimo": modelo.ZONA_BARES_MIN, "correccion": modelo.CORRECCION_ZONA_BARES}},
+                        "coef_locales": modelo.COEF_LOCALES},
                        ensure_ascii=False, separators=(",", ":"))
     html = (AQUI / "visor_plantilla.html").read_text(encoding="utf-8").replace("/*DATOS*/null", datos)
     (AQUI / "visor.html").write_text(html, encoding="utf-8")

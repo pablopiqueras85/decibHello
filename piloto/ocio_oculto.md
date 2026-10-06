@@ -71,23 +71,17 @@ AUC: 0,5 = azar, 1 = perfecto. Objetivo: el mapa se queda corto más de 5 dB.
 
 De noche ninguna pista supera claramente el azar. Por la tarde, el número de bares sí.
 
-## Regla adoptada: zona de bares (≥ 10 bares a menos de 100 m, sin contar restaurantes)
+## Corrección adoptada: proporcional al número de bares y discotecas
 
-| Franja | Sensores en zona de bares | Diferencia mediana | Percentil 25 (corrección usada) | Error en esos sensores, sin → con corrección (validado por distritos) |
+Suma en dB = a · log(1 + bares) + b · log(1 + bares musicales y discotecas) + c · log(1 + pisos turísticos), con a, b, c ≥ 0 y sin término fijo (una calle sin locales no suma nada). Bares sin contar restaurantes; todo a menos de 100 m. Ajustado por mínimos cuadrados no negativos y validado dejando fuera cada distrito.
+
+| Franja | Bares (a) | Musicales y discotecas (b) | Pisos turísticos (c) | Error medio, solo mapa → con corrección (validado por distritos) |
 |---|---|---|---|---|
-| D | 17 | +7.3 dB | +6.0 dB | 7.4 → 2.8 dB |
-| E | 17 | +11.8 dB | +8.8 dB | 11.1 → 4.0 dB |
-| N | 17 | +3.0 dB | +1.3 dB | 6.9 → 6.4 dB |
+| D | 1.32 | 1.68 | 0.00 | 4.47 → 4.43 dB |
+| E | 2.90 | 0.72 | 0.00 | 5.91 → 4.99 dB |
+| N | 1.93 | 0.00 | 0.00 | 4.33 → 4.16 dB |
 
-Se aplica de día y por la tarde (donde mejora y el mapa no modela el ocio). De noche no, porque no mejora.
-Afecta a unos 1.000 tramos de la ciudad (2,6 %), y nunca a calles sin bares.
+Los coeficientes se usan tal cual en `modelo.py` (`COEF_LOCALES`). Ejemplos de día / tarde / noche: 10 bares ≈ +3,2 / +7,0 / +4,6 dB; 10 bares y 5 musicales ≈ +6,2 / +8,2 / +4,6 dB.
+Los pisos turísticos salen con coeficiente 0 en todas las franjas: no suben el nivel medio de la hora que miden los sensores. Sí cuentan en el aviso de picos nocturnos (20 o más a menos de 100 m: llegadas y salidas a deshoras).
+Donde hay sensor no se aplica: la medición ya lo recoge.
 
-
-## Horarios de los locales de noche (añadido el 6 de octubre)
-
-Pista nueva propuesta tras ver Tuset: los días que abren de madrugada las discotecas, bares musicales y coctelerías cercanos (Open Data BCN, "espais de música i copes", 342 locales, 150 con horario publicado; `horarios_ocio.py`).
-
-- Los locales de noche **no predicen el nivel medio** de la noche, pero sí **cómo se reparte en la semana**. Con 6 o más bares musicales o discotecas a menos de 300 m, el salto entre viernes/sábado y lunes/martes es de +4,4 dB de mediana; sin ninguno, +0,8 dB.
-- Con los horarios de los locales a menos de 150 m, el error del reparto por día (validado por distritos) baja de 1,49 a 1,41 dB en los sensores con locales cerca. En Tuset, donde las discotecas abren de miércoles a sábado, el lunes pasa de −1,3 dB (media de la ciudad) a −5,7 dB (medido: −9,7 dB).
-- Se aplica a unos 7.900 tramos sin sensor. Donde hay sensor no hace falta: la medición ya lo recoge.
-- Además, los sensores se usan ahora también para los portales de la misma calle a menos de 120 m (Tuset 20 usa el sensor de Tuset 30).

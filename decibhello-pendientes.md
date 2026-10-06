@@ -17,7 +17,7 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 
 ### 1. Que la nota sea fiable (lo más importante)
 - [x] **Calibrar con mediciones reales**: perfiles por hora y día de la semana medidos con los sensores, y nivel medido en 352 tramos con sensor.
-- [x] **Ocio infravalorado de día y de tarde**: corregido en las zonas de bares (≥ 10 bares a 100 m), validado con sensores por distritos (`piloto/ocio_oculto.md`).
+- [x] **Ocio infravalorado de día y de tarde**: los bares y discotecas suman dB en proporción a cuántos hay a menos de 100 m (también de noche), validado con sensores por distritos (`piloto/ocio_oculto.md`). Los pisos turísticos cuentan en el aviso de picos nocturnos.
 - [x] **Reparto semanal del ocio nocturno**: horarios de discotecas y bares musicales cercanos (Open Data BCN) y sensores de la misma calle. Tuset ya usa su sensor.
 - [ ] **Medir los picos, no solo la media**: un domingo a las 15:00 se percibe tranquilo y la hora punta muy ruidosa, pero los sensores solo marcan 2–4 dB de diferencia en la media horaria. Lo que cambia son los picos (motos, bocinas, camiones, autobuses). Con los datos minuto a minuto se puede calcular un indicador de picos (por ejemplo, el nivel superado el 10 % del tiempo) y sumarlo a la nota.
 - [ ] **Escala en lo más alto**: Tuset un viernes a la 1:00 mide ~70 dB y sale con nota 86; para ti es un 100. Recalibrar la parte alta de la escala cuando tengamos tus notas a ciegas de todas las calles de control.

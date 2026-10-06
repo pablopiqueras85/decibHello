@@ -131,6 +131,7 @@ def main():
     adreces = todo("adreces_edificis", RES_ADRECES, ["codi_carrer", "numpost_i", "numpost_f", "nom_barri", "x_etrs89", "y_etrs89"])
     carrerer = todo("carrerer", RES_CARRERER, ["codi_via", "nom_oficial"])
     oci = puntos(sql("cens_oci", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "SN_Oci_Nocturn"=\'Si\''), "Latitud", "Longitud")
+    musicales = puntos(sql("cens_musicales", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "Nom_Activitat" ILIKE \'Bars especials%\''), "Latitud", "Longitud")
     solo_bares = puntos(sql("cens_solo_bares", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "Nom_Activitat"=\'Bars   / CIBERCAFÈ\''), "Latitud", "Longitud")
     bars = puntos(sql("cens_bars", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "Nom_Grup_Activitat" ILIKE \'Restaurants, bars%\''), "Latitud", "Longitud")
     queixes = puntos(sql("iris2025_soroll", f'SELECT "LATITUD","LONGITUD" FROM "{RES_IRIS_2025}" WHERE "ELEMENT"=\'Molèsties soroll a la via pública\''), "LATITUD", "LONGITUD")
@@ -267,7 +268,8 @@ def main():
 
     n_oci, n_bar, n_quej, n_hut = contar(oci), contar(bars), contar(queixes), contar(hut)
     n_recog = contar(recogida)
-    n_solo_bares = contar(solo_bares)  # solo bares (sin restaurantes): la pista validada para la "zona de bares"
+    n_solo_bares = contar(solo_bares)
+    n_musicales = contar(musicales)  # bares musicales, pubs y discotecas  # solo bares (sin restaurantes): la pista validada para la "zona de bares"
     d_sens = np.min(np.hypot(centros[:, None, 0] - sensors[None, :, 0], centros[:, None, 1] - sensors[None, :, 1]), axis=1)
     lon, lat = a_wgs.transform(centros[:, 0], centros[:, 1])
 
@@ -280,7 +282,7 @@ def main():
                        int(n_oci[k]), int(n_bar[k]), int(n_quej[k]), int(n_hut[k]), int(round(d_sens[k] / 10)),
                        int(round((lat[k] - 41.3) * 1e5)), int(round((lon[k] - 2.0) * 1e5)),
                        int(round(float(np.median([a for a in r["ancho"] if a >= 0])))) if any(a >= 0 for a in r["ancho"]) else -1,
-                       int(n_recog[k]), int(n_solo_bares[k])]
+                       int(n_recog[k]), int(n_solo_bares[k]), int(n_musicales[k])]
             k += 1
         salida_calles.append([nombres[codi], planos])
 
@@ -289,7 +291,7 @@ def main():
         tramos[j] = "".join(str(BANDAS.index(tramer[i][c])) for c in CAMPOS_TRAMO)
 
     indice = {"bandas": BANDAS, "campos_tramo": CAMPOS_TRAMO, "tramos": tramos, "barrios": barrios,
-              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida", "solo_bares"],
+              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida", "solo_bares", "musicales"],
               "origen": {"lat": 41.3, "lon": 2.0}, "calles": salida_calles}
     (CACHE / "indice.json").write_text(json.dumps(indice, ensure_ascii=False, separators=(",", ":")))
     print(f"calles {len(salida_calles)} · rangos {len(todos_r)} · tramos usados {len(tramos)} · "
