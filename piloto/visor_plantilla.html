@@ -86,6 +86,34 @@ button, input { font: inherit; color: inherit; }
 .seg button[aria-pressed="true"] small { color: inherit; opacity: 0.75; }
 .seg button:disabled { opacity: 0.45; cursor: not-allowed; }
 [hidden] { display: none !important; }
+.chk { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--ink-2); margin-top: 4px; cursor: pointer; }
+.chk input { accent-color: var(--ink); margin: 0; }
+.chk.off { opacity: 0.5; cursor: not-allowed; }
+.acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.btn { font: inherit; font-size: 0.88rem; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); cursor: pointer; }
+.btn:hover { background: var(--band); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.prim { background: var(--sel-bg); color: var(--sel-fg); border-color: var(--sel-bg); }
+.estado-accion { font-size: 0.82rem; color: var(--muted); margin: 6px 0 0; }
+.mapa-caja svg { display: block; width: 100%; height: auto; }
+.mapa-ley { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--ink-2); margin-top: 8px; }
+.mapa-ley span { display: inline-flex; align-items: center; gap: 6px; }
+.mapa-ley svg { width: 14px; height: 14px; }
+.comparar { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-top: 10px; }
+.tarjeta { border: 1px solid var(--line-2); border-radius: 10px; padding: 12px; display: grid; gap: 6px; background: var(--surface); min-width: 0; }
+.tarjeta h3 { margin: 0; font-size: 0.95rem; line-height: 1.25; }
+.tarjeta .sub { margin: 0; }
+.tarjeta .cifra-t { font-family: var(--f-display); font-weight: 700; font-size: 2rem; line-height: 1; display: flex; align-items: center; gap: 8px; }
+.tarjeta .cifra-t i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.tarjeta dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0; font-size: 0.82rem; }
+.tarjeta dt { color: var(--muted); }
+.tarjeta dd { margin: 0; font-variant-numeric: tabular-nums; }
+.tarjeta button { justify-self: start; }
+@media print {
+  .top, .lista, .controles, .hora, .acciones, #comparar-sec, .pie button { display: none !important; }
+  .app { display: block !important; }
+  .panel { border: 0 !important; box-shadow: none !important; }
+}
 .sel-planta { font: inherit; font-size: 0.9rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line-2); border-radius: 8px; padding: 7px 10px; min-width: 9.5rem; }
 .sel-planta:disabled { opacity: 0.45; }
 .nota-planta { font-size: 0.78rem; color: var(--muted); max-width: 22rem; }
@@ -190,6 +218,7 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
             <button type="button" id="lado-exterior" aria-pressed="true">Exterior</button>
             <button type="button" id="lado-interior" aria-pressed="false">Interior (patio)</button>
           </div>
+          <label class="chk" id="esq-caja"><input type="checkbox" id="esquina"> <span id="esq-txt">También da a otra calle</span></label>
         </div>
         <div class="grupo-ctl">
           <label class="etq" for="planta">Planta</label>
@@ -226,8 +255,16 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
           <span class="db" id="db"></span>
           <span class="cuando" id="cuando"></span>
           <span class="cuando" id="percentil"></span>
+          <span class="cuando" id="barrio-media"></span>
+          <span class="cuando" id="margen"></span>
         </div>
       </div>
+      <div class="acciones">
+        <button type="button" class="btn prim" id="btn-comparar">Añadir a la comparación</button>
+        <button type="button" class="btn" id="btn-informe">Descargar informe</button>
+        <button type="button" class="btn" id="btn-imprimir">Imprimir o guardar en PDF</button>
+      </div>
+      <p class="estado-accion" id="estado-accion" hidden></p>
 
       <div class="escala" aria-hidden="true">
         <div class="barra"><span class="marca-barra" id="marca-barra"></span></div>
@@ -268,9 +305,22 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
         </div>
       </div>
 
+      <div class="seccion">
+        <h2>Alrededor (200 m)</h2>
+        <p class="sub" id="mapa-sub"></p>
+        <div class="mapa-caja" id="mapa-caja"><svg id="mapa" role="img"></svg></div>
+        <div class="mapa-ley" id="mapa-ley"></div>
+      </div>
+
       <div class="seccion porque">
         <h2>Por qué suena así</h2>
         <dl id="porque"></dl>
+      </div>
+
+      <div class="seccion" id="comparar-sec" hidden>
+        <h2>Comparación</h2>
+        <p class="sub">Nota global del día (media de todos los días) de cada piso, con su planta y su lado. Hasta 3 pisos.</p>
+        <div class="comparar" id="comparar"></div>
       </div>
     </section>
 
@@ -292,7 +342,7 @@ const DATOS = /*DATOS*/null;
 
 /*MOTOR*/
 // ---------- Estado y pintado ----------
-const estado = { ci: 0, r: null, numero: null, origen: "", lado: "exterior", planta: 1, modo: "hora", hora: 1, franja: "N", dia: null, grupo: null, aviso: "" };
+const estado = { ci: 0, r: null, numero: null, origen: "", lado: "exterior", planta: 1, esquina: false, modo: "hora", hora: 1, franja: "N", dia: null, grupo: null, aviso: "" };
 // El eje del día va de las 7:00 a las 7:00 del día siguiente: la noche pertenece al día en que empieza.
 const ORDEN = Array.from({ length: 24 }, (_, i) => (i + 7) % 24);
 const posicion = h => (h + 17) % 24;
@@ -373,7 +423,8 @@ const PILOTO = DATOS.piloto.map(p => {
 }).filter(Boolean);
 
 function seleccionar(ci, r, numero, origen, extra = {}) {
-  Object.assign(estado, { ci, r, numero, origen, grupo: null, aviso: "" }, extra);
+  Object.assign(estado, { ci, r, numero, origen, grupo: null, aviso: "", esquina: false }, extra);
+  avisoAccion("");
   pintarTodo();
 }
 function confianza(r, exacto, distancia) {
@@ -385,7 +436,9 @@ function confianza(r, exacto, distancia) {
 function pintarDetalle() {
   const c = CALLES[estado.ci], r = estado.r;
   ajustarPlanta(r);
-  const res = calcular(r, estado.dia, estado.planta);
+  const r2 = rangoEsquina(r);
+  if (!r2) estado.esquina = false;
+  const res = calcular(r, estado.dia, estado.planta, estado.esquina && estado.lado === "exterior");
   const s = ladoDe(res);
   $("calle-titulo").textContent = c.nombre + (estado.numero != null ? " " + estado.numero : "");
   $("barrio").textContent = IX.barrios[r.barrio] || "";
@@ -401,6 +454,10 @@ function pintarDetalle() {
   $("lado-interior").disabled = sinPatio;
   $("lado-interior").title = sinPatio ? "No hay datos de patio interior para este portal" : "";
   pintarPlanta(r, res);
+  $("esquina").checked = estado.esquina;
+  $("esquina").disabled = !r2 || estado.lado === "interior";
+  $("esq-caja").classList.toggle("off", $("esquina").disabled);
+  $("esq-txt").textContent = r2 ? `Esquina: también da a ${CALLES[r.esq_calle].nombre}` : "Esquina: ningún portal de otra calle a menos de 20 m";
   $("lado-exterior").setAttribute("aria-pressed", estado.lado === "exterior");
   $("lado-interior").setAttribute("aria-pressed", estado.lado === "interior");
   document.querySelectorAll("[data-franja]").forEach(b => b.setAttribute("aria-pressed", estado.modo === "franja" && b.dataset.franja === estado.franja));
@@ -422,6 +479,12 @@ function pintarDetalle() {
   const pc = percentilCiudad(res.exterior.global);
   $("percentil").textContent = pc >= 50 ? `Más ruidosa que el ${pc} % de los portales de Barcelona (media del día, fachada a la calle)`
     : `Más tranquila que el ${100 - pc} % de los portales de Barcelona (media del día, fachada a la calle)`;
+  const media = DATOS.medias_barrio[String(r.barrio)];
+  $("barrio-media").textContent = media != null ? `Media de su barrio (${IX.barrios[r.barrio]}): ${Math.round(media)} · media de Barcelona: ${Math.round(DATOS.media_ciudad)} (nota del día, fachada a la calle)` : "";
+  // Margen de error: 2 de cada 3 calles comprobadas con sensores caen dentro (interior: margen de calle sin sensor).
+  const mDb = estado.lado === "interior" ? DATOS.incertidumbre.estimado_db : res.margenDb;
+  const [m1, m2] = entre(l.nota, margenPuntos(mDb, fr));
+  $("margen").textContent = `Margen habitual: entre ${Math.round(m1)} y ${Math.round(m2)} (${res.sensor && estado.lado === "exterior" ? "medido por un sensor de la calle" : "estimado: 2 de cada 3 calles comprobadas con sensores caen dentro"})`;
   $("hora").value = posicion(estado.hora);
   $("hora-out").textContent = estado.modo === "franja" ? NOMBRE_FRANJA[estado.franja].split(" ")[0] : hh(estado.hora);
 
@@ -445,11 +508,13 @@ function pintarDetalle() {
     ["Bares (sin restaurantes) · 100 m", r.solo_bares],
     ["Bares musicales y discotecas · 100 m", r.musicales],
     ["Suma por bares cercanos", res.sensor ? "incluida en la medición" : `+${fmtDb(res.locales.D)} dB de día · +${fmtDb(res.locales.E)} tarde · +${fmtDb(res.locales.N)} noche`],
-    ["Locales de noche a 150 m (horarios)", res.ajusteNoches ? "noches más ruidosas: " + DIAS.filter((_, d) => res.ajusteNoches[d] >= 1).join(", ") || "sin noches destacadas" : res.sensor ? "incluido en la medición" : "ninguno"],
+    ["Locales de noche a 150 m (horarios)", res.ajusteNoches ? (DIAS.filter((_, d) => res.ajusteNoches[d] >= 1).length ? "noches más ruidosas: " + DIAS.filter((_, d) => res.ajusteNoches[d] >= 1).join(", ") : "hay locales cerca, sin noches destacadas") : res.sensor ? "incluido en la medición" : "ninguno"],
     ["Obras públicas · 100 m", r.obras >= 0 ? IX.grupos_obras[r.obras].length : 0],
     ["Sensor municipal más cercano", r.sensor_dam >= 100 ? (r.sensor_dam / 100).toFixed(1).replace(".", ",") + " km" : r.sensor_dam * 10 + " m"],
     ["Mismo tramo", `portales ${r.ini}–${r.fin} (lado ${lado})`],
-    ["Nota global del día", `${Math.round(res.exterior.global)} exterior` + (res.interior ? ` · ${Math.round(res.interior.global)} interior` : "")],
+    ["Nota global del día", `${Math.round(res.exterior.global)} exterior (entre ${entre(res.exterior.global, margenPuntos(res.margenDb)).map(Math.round).join(" y ")})` + (res.interior ? ` · ${Math.round(res.interior.global)} interior` : "")],
+    ["Planta", `${nombrePlanta(estado.planta)}${res.dPlanta ? ` (${res.dPlanta > 0 ? "+" : "−"}${fmtDb(Math.abs(res.dPlanta))} dB, estimación)` : ""} · edificio de ${r.plantas > 0 ? r.plantas + " plantas" : "altura desconocida"} (Catastro)`],
+    ["Esquina", res.esquina ? `también da a ${res.esquina.calle}: cada hora cuenta la fachada más ruidosa` : r2 ? `puede dar también a ${CALLES[r.esq_calle].nombre} (márcalo arriba si es tu caso)` : "no"],
   ];
   const dl = $("porque");
   dl.replaceChildren();
@@ -461,7 +526,145 @@ function pintarDetalle() {
   }
   pintarGrafico(res);
   pintarTira();
+  pintarMapa(r);
+  pintarComparar();
 }
+
+// ---------- Mapa de la zona: tramos con su nota, bares, discotecas, quejas, sensores y obras a menos de 200 m ----------
+const RADIO_MAPA = 200;
+function pintarMapa(r) {
+  const svg = $("mapa");
+  const w = Math.round($("mapa-caja").clientWidth) || 640, h = Math.min(w, 420);
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.replaceChildren();
+  const kx = Math.cos(r.lat * Math.PI / 180) * 111320, ky = 110540;
+  const esc = (Math.min(w, h) / 2 - 12) / RADIO_MAPA;
+  const pos = (lat, lon) => [w / 2 + (lon - r.lon) * kx * esc, h / 2 - (lat - r.lat) * ky * esc];
+  const dentro = (lat, lon) => Math.hypot((lon - r.lon) * kx, (lat - r.lat) * ky) <= RADIO_MAPA;
+  el("circle", { cx: w / 2, cy: h / 2, r: RADIO_MAPA * esc, fill: "var(--band)", stroke: "var(--line)" }, svg);
+  const cuenta = { tramos: 0, bares: 0, musicales: 0, quejas: 0, sensores: 0, obras: 0 };
+  // Tramos de calle con su nota del día (exterior, 1.º): dibujan las calles.
+  CALLES.forEach(c => c.rangos.forEach(x => {
+    if (!dentro(x.lat, x.lon)) return;
+    const [px, py] = pos(x.lat, x.lon);
+    const n = calcular(x, null).exterior.global;
+    const t = el("circle", { cx: px, cy: py, r: 4.5, fill: colorNota(n), stroke: "var(--surface)", "stroke-width": 1 }, svg);
+    const tt = document.createElementNS(NS, "title"); tt.textContent = `${c.nombre} ${x.ini}–${x.fin}: ${Math.round(n)}`; t.append(tt);
+    cuenta.tramos++;
+  }));
+  const capa = (lista, nombre, pinta) => { for (let i = 0; i < lista.length; i += 2) { const lat = IX.origen.lat + lista[i] / 1e5, lon = IX.origen.lon + lista[i + 1] / 1e5; if (dentro(lat, lon)) { pinta(...pos(lat, lon)); cuenta[nombre]++; } } };
+  capa(DATOS.capas.bares, "bares", (x, y) => el("circle", { cx: x, cy: y, r: 2, fill: "var(--ink-2)" }, svg));
+  capa(DATOS.capas.quejas, "quejas", (x, y) => el("path", { d: `M${x - 3} ${y - 3}L${x + 3} ${y + 3}M${x + 3} ${y - 3}L${x - 3} ${y + 3}`, stroke: "var(--loud)", "stroke-width": 1.6 }, svg));
+  capa(DATOS.capas.musicales, "musicales", (x, y) => el("circle", { cx: x, cy: y, r: 4, fill: "var(--st-medio)", stroke: "var(--ink)", "stroke-width": 1 }, svg));
+  DATOS.sensores.forEach(z => { if (z.lat && dentro(z.lat, z.lon)) { const [x, y] = pos(z.lat, z.lon); el("rect", { x: x - 5, y: y - 5, width: 10, height: 10, fill: "var(--quiet)", stroke: "var(--surface)", "stroke-width": 1.5 }, svg); cuenta.sensores++; } });
+  IX.obras.forEach(o => { if (o.lat && dentro(o.lat, o.lon) && o.fin >= HOY) { const [x, y] = pos(o.lat, o.lon); el("path", { d: `M${x} ${y - 7}L${x + 6} ${y + 5}L${x - 6} ${y + 5}Z`, fill: obraEnCurso(o) ? "var(--st-alto)" : "none", stroke: "var(--st-alto)", "stroke-width": 1.5 }, svg); cuenta.obras++; } });
+  el("circle", { cx: w / 2, cy: h / 2, r: 9, fill: "none", stroke: "var(--ink)", "stroke-width": 2.5 }, svg);
+  el("circle", { cx: w / 2, cy: h / 2, r: 3, fill: "var(--ink)" }, svg);
+  const eb = el("text", { x: 14, y: h - 10, "text-anchor": "start", fill: "var(--ink-2)", "font-size": 11 }, svg); eb.textContent = "100 m";
+  el("line", { x1: 14, x2: 14 + 100 * esc, y1: h - 24, y2: h - 24, stroke: "var(--ink-2)", "stroke-width": 2 }, svg);
+  svg.setAttribute("aria-label", `Mapa de 200 m alrededor: ${cuenta.tramos} tramos de calle, ${cuenta.bares} bares, ${cuenta.musicales} bares musicales o discotecas, ${cuenta.quejas} quejas por ruido, ${cuenta.sensores} sensores y ${cuenta.obras} obras.`);
+  $("mapa-sub").textContent = `En el centro, el portal. Cada punto de color es un tramo de calle con su nota del día. ${cuenta.bares} bares, ${cuenta.musicales} bares musicales o discotecas, ${cuenta.quejas} quejas por ruido en la calle (2025), ${cuenta.sensores} sensores municipales y ${cuenta.obras} obras públicas.`;
+  const ley = $("mapa-ley");
+  if (!ley.childElementCount) {
+    const item = (dibujo, txt) => { const s = document.createElement("span"); s.innerHTML = `<svg viewBox="0 0 14 14" aria-hidden="true">${dibujo}</svg>`; s.append(txt); ley.append(s); };
+    item('<circle cx="7" cy="7" r="5" fill="var(--loud)"/>', "Tramo de calle (color = nota)");
+    item('<circle cx="7" cy="7" r="2.5" fill="var(--ink-2)"/>', "Bar");
+    item('<circle cx="7" cy="7" r="4.5" fill="var(--st-medio)" stroke="var(--ink)"/>', "Bar musical o discoteca");
+    item('<path d="M3 3L11 11M11 3L3 11" stroke="var(--loud)" stroke-width="2"/>', "Queja por ruido (2025)");
+    item('<rect x="2" y="2" width="10" height="10" fill="var(--quiet)"/>', "Sensor municipal");
+    item('<path d="M7 1L13 12H1Z" fill="var(--st-alto)"/>', "Obra en curso (hueco: prevista)");
+  }
+}
+
+// ---------- Comparación de pisos (se recuerda en este navegador) ----------
+const CLAVE_COMP = "decibhello-comparar";
+let comparacion = [];
+try { comparacion = JSON.parse(localStorage.getItem(CLAVE_COMP) || "[]"); } catch { comparacion = []; }
+const guardarComp = () => { try { localStorage.setItem(CLAVE_COMP, JSON.stringify(comparacion)); } catch {} };
+const rangoDeComp = x => CALLES[x.ci] && CALLES[x.ci].rangos.find(y => y.ini === x.ini);
+function pintarComparar() {
+  comparacion = comparacion.filter(rangoDeComp);
+  $("comparar-sec").hidden = !comparacion.length;
+  $("btn-comparar").textContent = comparacion.length >= 3 ? "Comparación llena (3)" : "Añadir a la comparación";
+  $("btn-comparar").disabled = comparacion.length >= 3;
+  const cont = $("comparar");
+  cont.replaceChildren(...comparacion.map((x, i) => {
+    const rr = rangoDeComp(x);
+    const res = calcular(rr, null, x.planta, x.esquina);
+    const s = x.lado === "interior" && res.interior ? res.interior : res.exterior;
+    const mDb = x.lado === "interior" ? DATOS.incertidumbre.estimado_db : res.margenDb;
+    const [a, b] = entre(s.global, margenPuntos(mDb));
+    const noches = DIAS.map((_, d) => (x.lado === "interior" && res.interior ? calcular(rr, d, x.planta).interior : calcular(rr, d, x.planta, x.esquina).exterior).franjas.N);
+    const peor = noches.indexOf(Math.max(...noches));
+    const t = document.createElement("article"); t.className = "tarjeta";
+    const h = document.createElement("h3"); h.textContent = CALLES[x.ci].nombre + (x.numero != null ? " " + x.numero : "");
+    const sub = document.createElement("p"); sub.className = "sub"; sub.textContent = `${x.lado === "interior" ? "Interior (patio)" : "Exterior"} · ${nombrePlanta(x.planta)}${x.esquina ? " · esquina" : ""}`;
+    const c = document.createElement("div"); c.className = "cifra-t"; const i0 = document.createElement("i"); i0.style.background = colorNota(s.global); c.append(String(Math.round(s.global)), i0);
+    const dl = document.createElement("dl");
+    for (const [k, v] of [["Nivel", nivelTexto(s.global)], ["Margen", `entre ${Math.round(a)} y ${Math.round(b)}`], ["Día · tarde · noche", `${Math.round(s.franjas.D)} · ${Math.round(s.franjas.E)} · ${Math.round(s.franjas.N)}`],
+      ["Peor noche", `${DIAS[peor]} (${Math.round(noches[peor])})`], ["Picos nocturnos", avisoPicos(rr.ancho_m, rr.quejas_recogida, rr.turisticos)], ["Obras en curso", obrasCerca(rr).filter(obraEnCurso).length ? "sí, a menos de 100 m" : "no"]]) {
+      const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd);
+    }
+    const q = document.createElement("button"); q.type = "button"; q.className = "btn"; q.textContent = "Quitar";
+    q.addEventListener("click", () => { comparacion.splice(i, 1); guardarComp(); pintarComparar(); });
+    t.append(h, sub, c, dl, q);
+    return t;
+  }));
+}
+
+// ---------- Informe para guardar o enviar ----------
+function avisoAccion(txt) { const e = $("estado-accion"); e.hidden = !txt; e.textContent = txt || ""; }
+function informeHtml() {
+  const c = CALLES[estado.ci], r = estado.r;
+  const res = calcular(r, null, estado.planta, estado.esquina && estado.lado === "exterior");
+  const s = ladoDe(res);
+  const mDb = estado.lado === "interior" ? DATOS.incertidumbre.estimado_db : res.margenDb;
+  const [a, b] = entre(s.global, margenPuntos(mDb));
+  const noches = DIAS.map((_, d) => ladoDe(calcular(r, d, estado.planta, estado.esquina && estado.lado === "exterior")).franjas.N);
+  const vars = ["--bg", "--surface", "--ink", "--ink-2", "--muted", "--line", "--line-2", "--band", "--quiet", "--mid", "--loud", "--st-alto", "--st-medio", "--st-bajo", "--sel-bg", "--sel-fg"];
+  const cs = getComputedStyle(document.documentElement);
+  const tokens = vars.map(v => `${v}:${cs.getPropertyValue(v).trim()}`).join(";");
+  const esc = t => String(t).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  const filas = [...$("porque").children].map(d => `<tr><th>${esc(d.firstChild.textContent)}</th><td>${esc(d.lastChild.textContent)}</td></tr>`).join("");
+  const hoy = new Date().toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+  const titulo = `${c.nombre}${estado.numero != null ? " " + estado.numero : ""}`;
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DecibHello · ${esc(titulo)}</title>
+<style>:root{${tokens}}body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:24px;line-height:1.45}main{max-width:760px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px}
+h1{margin:.2rem 0 0;font-size:1.6rem}.sub{color:var(--muted);margin:.2rem 0 1rem}.nota{font-size:3.4rem;font-weight:800;line-height:1}.fila{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+table{border-collapse:collapse;width:100%;font-size:.9rem;margin-top:8px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--ink-2);font-weight:600;width:42%}
+h2{font-size:1.05rem;margin:1.4rem 0 .3rem}svg{width:100%;max-width:520px;height:auto;display:block;margin:0 auto}.pie{color:var(--muted);font-size:.8rem;margin-top:1.4rem}</style></head><body><main>
+<div class="sub">DecibHello · informe de ruido · ${esc(hoy)}</div><h1>${esc(titulo)}</h1><div class="sub">${esc(IX.barrios[r.barrio] || "")} · ${estado.lado === "interior" ? "interior (patio)" : "exterior"} · ${esc(nombrePlanta(estado.planta))}${res.esquina ? " · esquina con " + esc(res.esquina.calle) : ""}</div>
+<div class="fila"><div class="nota">${Math.round(s.global)}</div><div><b>${nivelTexto(s.global)}</b><br>Margen habitual: entre ${Math.round(a)} y ${Math.round(b)}<br>${esc($("percentil").textContent)}<br>${esc($("barrio-media").textContent)}</div></div>
+<h2>Por franjas (media de todos los días)</h2><table><tr><th>Día (7–19)</th><td>${Math.round(s.franjas.D)}</td></tr><tr><th>Tarde (19–23)</th><td>${Math.round(s.franjas.E)}</td></tr><tr><th>Noche (23–7)</th><td>${Math.round(s.franjas.N)}</td></tr></table>
+<h2>Cada noche de la semana</h2><table>${DIAS.map((d, i) => `<tr><th>${d}</th><td>${Math.round(noches[i])}</td></tr>`).join("")}</table>
+<h2>Picos nocturnos y obras</h2><p>${esc($("picos-nivel").textContent)}. ${esc($("picos-motivo").textContent)}</p>${$("obras").hidden ? "<p>Sin obras públicas a menos de 100 m.</p>" : `<p>${esc($("obras-nivel").textContent)}. ${esc($("obras-efecto").textContent)}</p>`}
+<h2>Alrededor (200 m)</h2>${$("mapa").outerHTML}<p class="sub">${esc($("mapa-sub").textContent)}</p>
+<h2>Por qué suena así</h2><table>${filas}</table>
+<p class="pie">Nota de 0 (muy tranquilo) a 100 (muy ruidoso). Es una estimación con datos públicos del Ajuntament de Barcelona (Open Data BCN, CC BY 4.0) y del Catastro, no una medición del piso. La planta del piso es una estimación según estudios de calles, aún sin medir en Barcelona.</p></main></body></html>`;
+}
+let descargas;
+(async () => { try { descargas = window.claude && claude.use ? await claude.use("downloads") : null; } catch { descargas = null; } })();
+$("btn-informe").addEventListener("click", async () => {
+  const nombre = `DecibHello ${CALLES[estado.ci].nombre}${estado.numero != null ? " " + estado.numero : ""}.html`;
+  const html = informeHtml();
+  if (descargas) {
+    try { await descargas.save({ filename: nombre, data: html }); avisoAccion("Informe guardado. Puedes abrirlo en el navegador y enviarlo."); }
+    catch (e) { avisoAccion(e && e.code === "declined" ? "" : "No se ha podido guardar aquí. Prueba con «Imprimir o guardar en PDF»."); }
+    return;
+  }
+  try {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], { type: "text/html" })); a.download = nombre; document.body.append(a); a.click(); a.remove();
+    avisoAccion("Informe descargado.");
+  } catch { avisoAccion("No se ha podido descargar aquí. Prueba con «Imprimir o guardar en PDF»."); }
+});
+$("btn-imprimir").addEventListener("click", () => { try { window.print(); } catch { avisoAccion("Tu navegador no deja imprimir desde aquí."); } });
+$("btn-comparar").addEventListener("click", () => {
+  const x = { ci: estado.ci, ini: estado.r.ini, numero: estado.numero, planta: estado.planta, lado: estado.lado, esquina: estado.esquina && estado.lado === "exterior" };
+  comparacion = comparacion.filter(y => !(y.ci === x.ci && y.ini === x.ini && y.planta === x.planta && y.lado === x.lado && y.esquina === x.esquina));
+  comparacion.push(x); if (comparacion.length > 3) comparacion.shift();
+  guardarComp(); pintarComparar();
+  avisoAccion("Añadido a la comparación (abajo).");
+});
 
 const NS = "http://www.w3.org/2000/svg";
 function el(tag, attrs, padre) {
@@ -700,6 +903,7 @@ $("hora").addEventListener("input", e => { estado.modo = "hora"; estado.hora = O
 document.querySelectorAll("[data-dia]").forEach(b => b.addEventListener("click", () => { estado.dia = b.dataset.dia === "" ? null : +b.dataset.dia; pintarTodo(); }));
 $("lado-exterior").addEventListener("click", () => { estado.lado = "exterior"; pintarTodo(); });
 $("lado-interior").addEventListener("click", () => { estado.lado = "interior"; pintarTodo(); });
+$("esquina").addEventListener("change", e => { estado.esquina = e.target.checked; pintarTodo(); });
 $("planta").addEventListener("change", e => { const v = e.target.value; estado.planta = v === "atico" ? "atico" : +v; pintarTodo(); });
 document.querySelectorAll("[data-franja]").forEach(b => b.addEventListener("click", () => {
   estado.modo = "franja"; estado.franja = b.dataset.franja; estado.hora = { D: 13, E: 21, N: 1 }[estado.franja];

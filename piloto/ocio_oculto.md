@@ -81,6 +81,8 @@ Suma en dB = a · log(1 + bares) + b · log(1 + bares musicales y discotecas) + 
 | E | 2.90 | 0.72 | 0.00 | 5.91 → 4.99 dB |
 | N | 1.93 | 0.00 | 0.00 | 4.33 → 4.16 dB |
 
+**Margen de error de una calle sin sensor** (error que no se supera en 2 de cada 3 sensores): D ±4.9 dB, E ±6.1 dB, N ±4.6 dB. Se guarda en `incertidumbre.json` y el visor lo muestra como "entre X y Y".
+
 Los coeficientes se usan tal cual en `modelo.py` (`COEF_LOCALES`). Ejemplos de día / tarde / noche: 10 bares ≈ +3,2 / +7,0 / +4,6 dB; 10 bares y 5 musicales ≈ +6,2 / +8,2 / +4,6 dB.
 Los pisos turísticos salen con coeficiente 0 en todas las franjas: no suben el nivel medio de la hora que miden los sensores. Sí cuentan en el aviso de picos nocturnos (20 o más a menos de 100 m: llegadas y salidas a deshoras).
 Donde hay sensor no se aplica: la medición ya lo recoge.

@@ -106,6 +106,32 @@ def correccion_planta(planta, plantas_edificio=-1, ancho_m=-1):
     return -min(PLANTA_MAX_DB, pendiente * max(0.0, altura - 4)) + extra
 
 
+# Margen de error, en dB por franja (incertidumbre.json, de ocio_oculto.py): el error que no se supera en 2 de cada 3
+# sensores en calles sin sensor. Donde manda un sensor, calcular_nota.py pasa uno menor (dos sensores de la misma calle).
+try:
+    INCERTIDUMBRE = _json.loads(_Path(__file__).with_name("incertidumbre.json").read_text())["estimado_db"]
+except FileNotFoundError:
+    INCERTIDUMBRE = {"D": 5.0, "E": 6.0, "N": 4.5}
+PUNTOS_POR_DB = {f: 100 / (ESCALA[f][1] - ESCALA[f][0]) for f in "DEN"}
+
+
+def margen_puntos(margen_db, franja=None):
+    """Margen en puntos de nota: de una franja ('D', 'E', 'N') o de la nota global (franja=None)."""
+    if franja:
+        return margen_db[franja] * PUNTOS_POR_DB[franja]
+    return sum(PESOS[f] * margen_db[f] * PUNTOS_POR_DB[f] for f in "DEN")
+
+
+def entre(nota, margen):
+    """Rango "entre X y Y" de una nota, sin salir de 0-100."""
+    return max(0.0, nota - margen), min(100.0, nota + margen)
+
+
+def combinar_esquina(db1, db2):
+    """Piso en esquina: da a dos calles; cada hora manda la fachada más ruidosa."""
+    return [max(a, b) for a, b in zip(db1, db2)]
+
+
 def correccion_locales(bares, musicales):
     """dB a sumar por franja según bares y bares musicales/discotecas a menos de 100 m."""
     return {f: c["bares"] * math.log1p(bares) + c["musicales"] * math.log1p(musicales) for f, c in COEF_LOCALES.items()}

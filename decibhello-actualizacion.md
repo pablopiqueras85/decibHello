@@ -96,3 +96,13 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - **Datos**: las plantas de cada edificio salen del Catastro y la anchura de la calle, del índice.
 - **Ejemplos**: Diagonal 500, 6.º: −3,9 dB (nota 71). Tuset 20, 8.º: igual que un 1.º (calle de 23 m con edificios de 10 plantas). Tuset 20, ático: −3 dB. Verdi 20, bajo: +1 dB.
 - **También**: arreglado un recuadro de obras vacío que salía en calles sin obras.
+
+## Actualización del 7 de octubre (tarde): margen, esquina, comparación, mapa e informe
+
+- **Margen de error**: la nota viene con "entre X y Y". Sin sensor cerca el margen es amplio (unos ±15 puntos en la nota del día): es lo que se equivoca el modelo en 1 de cada 3 calles comprobadas con sensores. Con sensor en la calle baja a unos ±7.
+- **Esquina**: si tu piso da a dos calles, marca "También da a Carrer X" y cada hora cuenta la fachada más ruidosa.
+- **Media del barrio y de la ciudad**: debajo de la nota, la media de su barrio y la de Barcelona.
+- **Comparar**: botón "Añadir a la comparación"; hasta 3 pisos lado a lado, cada uno con su planta, lado y esquina. Se recuerda en tu navegador.
+- **Mapa de la zona (200 m)**: cada tramo de calle con su nota, bares, bares musicales y discotecas, quejas por ruido de 2025, sensores y obras.
+- **Informe**: "Descargar informe" guarda un fichero para abrir en cualquier navegador y enviar; "Imprimir o guardar en PDF" para tenerlo en PDF.
+- **Arreglado**: "Locales de noche" salía con "noches más ruidosas:" vacío cuando no había noches destacadas.

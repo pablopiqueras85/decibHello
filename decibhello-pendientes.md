@@ -28,24 +28,24 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Ocio infravalorado de noche**: ninguna pista pública lo predice (probado con bares, terrazas, quejas por motivo, pisos turísticos, plazas). Solo se resuelve midiendo: mediciones con el móvil, opiniones de vecinos, más sensores.
 - [ ] **Validación sobre el terreno**: medir con sonómetro o móvil en 20–30 portales, de día y de noche, entre semana y en fin de semana, y comparar con la nota. Sin esto no podemos decir cuánto acierta.
 - [ ] **Mapa de ruido 2022**: pasar del de 2017 (por tramo) al ráster de 2022, para recoger cambios como los ejes verdes (Consell de Cent).
-- [ ] **Explicar la incertidumbre**: mostrar un margen ("entre 70 y 80") además de la cifra.
+- [x] **Margen de error** (7 oct): el visor dice "entre X y Y". Sin sensor: ±4,9 dB de día, ±6,1 de tarde y ±4,6 de noche (el error que no se supera en 2 de cada 3 sensores, validado por distritos; ≈ ±15 puntos en la nota del día). Con sensor en la calle: ±2–3 dB (≈ ±7 puntos).
 
 ### 2. Lo que más le importa a quien alquila o compra
 - [x] **Planta del piso** (estimación, 7 oct): selector en el visor, de bajo a ático. Usa las plantas del edificio (Catastro) y la anchura de la calle: en calles estrechas y altas casi no cambia; en calles anchas baja con la altura (Diagonal 500, 6.º: −3,9 dB); ático −3 dB; bajo +1 dB.
 - [ ] **Medir la planta**: con el sonómetro, medir a la vez en varias plantas del mismo edificio, en una calle estrecha y en una ancha, y ajustar las cifras.
-- [ ] **Orientación del piso**: exterior, interior o esquina (que da a dos calles).
+- [x] **Orientación del piso** (7 oct): exterior, interior (patio) y esquina. La esquina se marca a mano ("también da a Carrer X") y cada hora cuenta la fachada más ruidosa.
 - [ ] **Ruido del propio edificio**: bar o local en los bajos, ascensor, aire acondicionado de vecinos. Hoy no lo cubrimos y es de lo que más molesta.
 - [ ] **Estacionalidad**: verano (ventanas abiertas, terrazas) frente a invierno.
 - [x] **Obras públicas**: las obras en curso a menos de 25 m suman +2 dB de día laborable mientras duran (validado con sensores); el visor lista las obras a menos de 100 m con sus fechas (`piloto/obras_validacion.md`).
 - [ ] **Obras privadas** (rehabilitación de edificios, derribos, obra nueva): no hay datos públicos de licencias. Las grandes con andamio o grúa en la calle ya están en las obras públicas. Pedir licencias y permisos de andamios y grúas por transparencia (borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.15).
 - [x] **Obras al día**: una tarea programada regenera y republica el visor de lunes a viernes (6:47) con las obras del día.
 - [ ] **Otros avisos temporales**: fiestas mayores, conciertos.
-- [ ] **Comparar**: dos o tres pisos lado a lado, y la calle frente a la media del barrio y de la ciudad.
+- [x] **Comparar** (7 oct): hasta 3 pisos lado a lado (con su planta, lado y esquina), y la calle frente a la media de su barrio y de Barcelona.
 
 ### 3. Producto usable por cualquiera
 - [ ] **Portal independiente propio**: DecibHello como web con marca, dominio y alojamiento propios, que funcione por sí sola (buscador, informe, mapa) sin depender de los portales inmobiliarios. La extensión de Chrome y los acuerdos con portales son vías de entrada a este portal, no lo sustituyen. Hoy es un prototipo privado: falta dominio, alojamiento, que cargue rápido en el móvil y que los datos se actualicen solos.
-- [ ] **Mapa** con la calle y los focos (bares, sensores, quejas) alrededor.
-- [ ] **Informe para guardar o enviar** (PDF o enlace) por dirección.
+- [x] **Mapa de la zona** (7 oct): 200 m alrededor, con la nota de cada tramo, bares, bares musicales y discotecas, quejas por ruido, sensores y obras. Dibujado por nosotros (sin mapa base de calles).
+- [x] **Informe para guardar o enviar** (7 oct): botón "Descargar informe" (un fichero que se abre en cualquier navegador) e "Imprimir o guardar en PDF".
 - [ ] **Extensión de Chrome**: al abrir un anuncio (Idealista, Fotocasa, Habitaclia…), lee la zona o calle que la página ya muestra al usuario y enseña la nota de DecibHello en el propio anuncio, con enlace al informe completo. Revisar antes las condiciones de uso de cada portal y las normas de la Chrome Web Store (permisos mínimos, privacidad).
 - [ ] **Acuerdos con portales inmobiliarios** para mostrar la nota en sus anuncios.
 - [ ] **Textos claros y aviso legal**: dejar claro que es una estimación, no una medición del piso.

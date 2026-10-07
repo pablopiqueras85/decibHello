@@ -54,7 +54,11 @@ if (extra.join() !== "ok,aviso,sin_resultado,fuera") { difPaquete++; console.log
 const tabla = JSON.parse(fs.readFileSync(path.join(piloto, "pruebas", "planta_python.json"), "utf8"));
 const js_planta = await q.evaluate(t => t.map(([p, pe, an]) => DecibHello.correccionPlanta(p, pe, an)), tabla.casos);
 tabla.casos.forEach((c, i) => { if (Math.abs(js_planta[i] - tabla.db[i]) > 1e-9) { difPaquete++; console.log("planta", c, tabla.db[i], js_planta[i]); } });
-console.log(`paquete decibhello.js: ${difPaquete} diferencias (incluye ${tabla.casos.length} casos de planta)`);
+const js_margen = await q.evaluate(t => t.map(([m, f]) => DecibHello.margenPuntos(m, f)), tabla.casos_margen);
+tabla.casos_margen.forEach((c, i) => { if (Math.abs(js_margen[i] - tabla.margen[i]) > 1e-9) { difPaquete++; console.log("margen", c, tabla.margen[i], js_margen[i]); } });
+const js_esq = await q.evaluate(([a, b]) => DecibHello.combinarEsquina(a, b), tabla.esquina);
+if (JSON.stringify(js_esq) !== JSON.stringify(tabla.esquina[2])) { difPaquete++; console.log("esquina", js_esq, tabla.esquina[2]); }
+console.log(`paquete decibhello.js: ${difPaquete} diferencias (incluye ${tabla.casos.length} casos de planta, ${tabla.casos_margen.length} de margen y la esquina)`);
 dif += difPaquete;
 if (errores.length) console.log("errores de la página:", errores);
 await navegador.close();
