@@ -1,0 +1,9 @@
+{
+ "estimado_db": {
+  "D": 4.9,
+  "E": 6.1,
+  "N": 4.6
+ },
+ "sensores": 140,
+ "nota": "Error (dB) que no se supera en 2 de cada 3 sensores, con validación dejando fuera cada distrito. Ver ocio_oculto.md."
+}

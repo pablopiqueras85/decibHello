@@ -199,6 +199,7 @@ def analisis_trampa(X, val, grupos):
             "|---|---|---|---|---|"]
     from scipy.optimize import nnls
     A = X[["bares_100", "musicales_100", "turisticos_100"]].values
+    margen = {}
     for f in "DEN":
         y = val[f"dif_{f}"].values
         p = np.zeros(len(y))
@@ -206,6 +207,12 @@ def analisis_trampa(X, val, grupos):
             p[te] = A[te] @ nnls(A[tr], y[tr])[0]
         coef = nnls(A, y)[0]
         out.append(f"| {f} | {coef[0]:.2f} | {coef[1]:.2f} | {coef[2]:.2f} | {np.abs(y).mean():.2f} → {np.abs(y - p).mean():.2f} dB |")
+        # Margen de error de una calle sin sensor: error que no se supera en 2 de cada 3 sensores (validado por distritos).
+        margen[f] = round(float(np.percentile(np.abs(y - p), 68)), 1)
+    (AQUI / "incertidumbre.json").write_text(json.dumps({"estimado_db": margen, "sensores": int(len(val)),
+        "nota": "Error (dB) que no se supera en 2 de cada 3 sensores, con validación dejando fuera cada distrito. Ver ocio_oculto.md."}, ensure_ascii=False, indent=1))
+    out += ["", "**Margen de error de una calle sin sensor** (error que no se supera en 2 de cada 3 sensores): "
+            + ", ".join(f"{f} ±{margen[f]} dB" for f in "DEN") + ". Se guarda en `incertidumbre.json` y el visor lo muestra como \"entre X y Y\"."]
     out += ["", "Los coeficientes se usan tal cual en `modelo.py` (`COEF_LOCALES`). Ejemplos de día / tarde / noche: "
             "10 bares ≈ +3,2 / +7,0 / +4,6 dB; 10 bares y 5 musicales ≈ +6,2 / +8,2 / +4,6 dB.",
             "Los pisos turísticos salen con coeficiente 0 en todas las franjas: no suben el nivel medio de la hora que miden los sensores. "

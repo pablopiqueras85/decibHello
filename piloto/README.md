@@ -10,6 +10,8 @@ Prototipo que calcula una nota de ruido de 0 a 100 (100 = muy ruidoso) para cual
 | `indice.py` | Construye el índice de toda la ciudad: cada portal oficial con su tramo del mapa de ruido, su patio, focos cercanos, anchura de calle y quejas. |
 | `ocio_oculto.py` | Prueba si las pistas públicas (bares, terrazas, quejas…) predicen dónde el mapa se queda corto; de ahí sale la suma proporcional por bares y discotecas (`ocio_oculto.md`). |
 | `horarios_ocio.py` | Lee los horarios de discotecas, bares musicales y coctelerías y calcula qué noches abren de madrugada cerca de cada portal. |
+| `incertidumbre.json` | Margen de error de las calles sin sensor (lo escribe `ocio_oculto.py`). |
+| `alturas.py` | Plantas de cada edificio (Catastro, INSPIRE) → `datos/edificios_catastro.json.gz`, para la corrección por planta. |
 | `obras.py` | Obras públicas de Open Data BCN: validación con sensores (`obras_validacion.md`) y obras cerca de cada portal. |
 | `sensores.py` | Analiza los datos por hora de los sensores municipales: perfiles por hora y día, nivel medido por sensor y comparación con el mapa oficial. |
 | `calcular_nota.py` | Calcula el piloto (`direcciones.txt`) y construye el visor. |

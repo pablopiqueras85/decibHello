@@ -81,3 +81,28 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - Las **obras públicas** se actualizan a diario en Open Data BCN. Una tarea programada las descarga de lunes a viernes a las 6:47, regenera el visor y lo republica en el mismo enlace.
 - Las **quejas vecinales (IRIS)** se publican cada trimestre (las de 2026 llegan a marzo): no sirven para un aviso del día, así que no se usan para obras.
 - Las **obras privadas** siguen pendientes de la solicitud de transparencia (borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.15).
+
+## Actualización del 6 de octubre (tarde): equipo de agentes, web y Madrid
+
+- **Equipo de agentes**: seis agentes con su encargo, su rama y su carpeta (`decibhello-agentes.md`). Se despiertan a petición de Pablo.
+- **Web** (agente 1): landing con vídeo, historia con datos reales del piloto, buscador de calles, votación de la próxima ciudad y lista de espera. https://claude.ai/artifact/KrBrXRxafoU2cScYv55FjD
+- **Motor común**: el modelo y el buscador en JavaScript están en `piloto/motor.js`. El visor y la web usan la misma pieza (`piloto/paquete/decibhello.js`), así que dan la misma nota.
+- **Siguiente ciudad: Madrid** (agente 5, confirmado por Pablo). Tiene mejor mapa (2021, dB exactos cada 5 m) y mejor censo de locales que Barcelona. Le faltan sensores por hora: hay que pedirlos por transparencia (borrador listo).
+
+## Actualización del 7 de octubre: planta del piso
+
+- **Nuevo selector "Planta"** en el visor: bajo, 1.º, 2.º… hasta la última planta del edificio, y ático.
+- **Cómo se calcula** (estimación a partir de estudios de calles, aún sin medir en Barcelona): el mapa oficial calcula a la altura de un 1.º. En una calle estrecha entre edificios altos el sonido rebota y casi no cambia con la altura. En una calle ancha baja poco a poco. El ático retirado gana unos 3 dB por la pantalla del pretil, y el bajo suma 1 dB.
+- **Datos**: las plantas de cada edificio salen del Catastro y la anchura de la calle, del índice.
+- **Ejemplos**: Diagonal 500, 6.º: −3,9 dB (nota 71). Tuset 20, 8.º: igual que un 1.º (calle de 23 m con edificios de 10 plantas). Tuset 20, ático: −3 dB. Verdi 20, bajo: +1 dB.
+- **También**: arreglado un recuadro de obras vacío que salía en calles sin obras.
+
+## Actualización del 7 de octubre (tarde): margen, esquina, comparación, mapa e informe
+
+- **Margen de error**: la nota viene con "entre X y Y". Sin sensor cerca el margen es amplio (unos ±15 puntos en la nota del día): es lo que se equivoca el modelo en 1 de cada 3 calles comprobadas con sensores. Con sensor en la calle baja a unos ±7.
+- **Esquina**: si tu piso da a dos calles, marca "También da a Carrer X" y cada hora cuenta la fachada más ruidosa.
+- **Media del barrio y de la ciudad**: debajo de la nota, la media de su barrio y la de Barcelona.
+- **Comparar**: botón "Añadir a la comparación"; hasta 3 pisos lado a lado, cada uno con su planta, lado y esquina. Se recuerda en tu navegador.
+- **Mapa de la zona (200 m)**: cada tramo de calle con su nota, bares, bares musicales y discotecas, quejas por ruido de 2025, sensores y obras.
+- **Informe**: "Descargar informe" guarda un fichero para abrir en cualquier navegador y enviar; "Imprimir o guardar en PDF" para tenerlo en PDF.
+- **Arreglado**: "Locales de noche" salía con "noches más ruidosas:" vacío cuando no había noches destacadas.

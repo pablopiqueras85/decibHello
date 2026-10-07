@@ -252,6 +252,28 @@ def main():
         if rangos:
             rangos_calle[codi] = rangos
 
+    # Esquinas: un rango es de esquina si alguno de sus portales tiene a menos de 20 m un portal de OTRA calle.
+    # Se guarda esa otra calle (índice en la salida) y el primer número de su rango: un piso así da a las dos.
+    from scipy.spatial import cKDTree
+    codis = list(rangos_calle)
+    pts, duenyo = [], []
+    for c, codi in enumerate(codis):
+        for k, r in enumerate(rangos_calle[codi]):
+            for punto in r["xy"]:
+                pts.append(punto)
+                duenyo.append((c, k))
+    pts = np.array(pts)
+    arbol_portales = cKDTree(pts)
+    esquina = {}
+    for i, cerca in enumerate(arbol_portales.query_ball_point(pts, 20)):
+        c, k = duenyo[i]
+        for j in cerca:
+            cj, kj = duenyo[j]
+            if cj != c:
+                d = float(np.hypot(*(pts[j] - pts[i])))
+                if (c, k) not in esquina or d < esquina[(c, k)][0]:
+                    esquina[(c, k)] = (d, cj, rangos_calle[codis[cj]][kj]["ini"])
+
     # Focos y sensor por rango (en su punto central).
     todos_r = [r for rs in rangos_calle.values() for r in rs]
     centros = np.array([np.mean(r["xy"], axis=0) for r in todos_r])
@@ -275,14 +297,15 @@ def main():
 
     k = 0
     salida_calles = []
-    for codi, rs in rangos_calle.items():
+    for c_sal, (codi, rs) in enumerate(rangos_calle.items()):
         planos = []
-        for r in rs:
+        for k_r, r in enumerate(rs):
             planos += [r["ini"], r["fin"], idx_tramo(r["t"]), idx_tramo(r["p"]), idx_barrio(r["barrio"]),
                        int(n_oci[k]), int(n_bar[k]), int(n_quej[k]), int(n_hut[k]), int(round(d_sens[k] / 10)),
                        int(round((lat[k] - 41.3) * 1e5)), int(round((lon[k] - 2.0) * 1e5)),
                        int(round(float(np.median([a for a in r["ancho"] if a >= 0])))) if any(a >= 0 for a in r["ancho"]) else -1,
-                       int(n_recog[k]), int(n_solo_bares[k]), int(n_musicales[k])]
+                       int(n_recog[k]), int(n_solo_bares[k]), int(n_musicales[k]),
+                       *(esquina[(c_sal, k_r)][1:] if (c_sal, k_r) in esquina else (-1, -1))]
             k += 1
         salida_calles.append([nombres[codi], planos])
 
@@ -291,7 +314,7 @@ def main():
         tramos[j] = "".join(str(BANDAS.index(tramer[i][c])) for c in CAMPOS_TRAMO)
 
     indice = {"bandas": BANDAS, "campos_tramo": CAMPOS_TRAMO, "tramos": tramos, "barrios": barrios,
-              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida", "solo_bares", "musicales"],
+              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida", "solo_bares", "musicales", "esq_calle", "esq_ini"],
               "origen": {"lat": 41.3, "lon": 2.0}, "calles": salida_calles}
     (CACHE / "indice.json").write_text(json.dumps(indice, ensure_ascii=False, separators=(",", ":")))
     print(f"calles {len(salida_calles)} · rangos {len(todos_r)} · tramos usados {len(tramos)} · "

@@ -174,13 +174,88 @@ def asignar_obras(indice, hoy=None):
     indice["campos_rango"] = campos + ["obras"]
     indice["grupos_obras"] = grupos
     indice["obras"] = [None] * len(usadas)
+    a_wgs = Transformer.from_crs("EPSG:25831", "EPSG:4326", always_xy=True)
     for o, j in usadas.items():
         rec, geom, ini, fin = vig[o]
+        lon_o, lat_o = a_wgs.transform(geom.centroid.x, geom.centroid.y)
         indice["obras"][j] = {"suma": geom.area <= mod_obras.AREA_MAX_EFECTO, "titulo": rec["titol"], "tipo": rec["tipusobra"], "inicio": ini.isoformat(), "fin": fin.isoformat(),
-                              "estado": rec["estat"], "lugar": (rec.get("ubicacio") or "").strip(), "url": rec.get("url_web_obres") or ""}
+                              "estado": rec["estat"], "lugar": (rec.get("ubicacio") or "").strip(), "url": rec.get("url_web_obres") or "",
+                              "lat": round(lat_o, 5), "lon": round(lon_o, 5)}
     indice["obras_fecha"] = hoy.isoformat()
     indice["obras_radio_efecto"] = mod_obras.RADIO_EFECTO
     return len(usadas), sum(1 for lst in nuevos.values() for _, i in lst if i >= 0)
+
+
+def asignar_plantas(indice, radio=10):
+    """Plantas del edificio de cada portal: la parte de edificio más alta del Catastro a menos de `radio` m del punto
+    del rango (piloto/datos/edificios_catastro.json.gz, ver alturas.py). Añade 'plantas' (-1 si no se sabe)."""
+    import gzip
+    from pyproj import Transformer
+    from scipy.spatial import cKDTree
+    f = AQUI / "datos" / "edificios_catastro.json.gz"
+    campos = indice["campos_rango"]
+    n = len(campos)
+    puntos = [(c, k) for c, (_, pl) in enumerate(indice["calles"]) for k in range(0, len(pl), n)]
+    plantas = np.full(len(puntos), -1)
+    if f.exists():
+        ed = np.array(json.loads(gzip.open(f, "rt", encoding="utf-8").read()), dtype=float)
+        ilat, ilon = campos.index("lat_e5"), campos.index("lon_e5")
+        t = Transformer.from_crs("EPSG:4326", "EPSG:25831", always_xy=True)
+        x, y = t.transform([2.0 + indice["calles"][c][1][k + ilon] / 1e5 for c, k in puntos],
+                           [41.3 + indice["calles"][c][1][k + ilat] / 1e5 for c, k in puntos])
+        arbol = cKDTree(ed[:, :2])
+        rmax = ed[:, 2].max()
+        for i, cerca in enumerate(arbol.query_ball_point(np.c_[x, y], radio + rmax)):
+            if not cerca:
+                continue
+            d = np.hypot(ed[cerca, 0] - x[i], ed[cerca, 1] - y[i]) - ed[cerca, 2]
+            ok = np.array(cerca)[d <= radio]
+            if len(ok):
+                plantas[i] = int(ed[ok, 3].max())
+    nuevos = {}
+    for (c, k), p in zip(puntos, plantas):
+        nuevos.setdefault(c, []).append((k, int(p)))
+    for c, lst in nuevos.items():
+        pl = indice["calles"][c][1]
+        out = []
+        for k, p in lst:
+            out += pl[k:k + n] + [p]
+        indice["calles"][c][1] = out
+    indice["campos_rango"] = campos + ["plantas"]
+    return int((plantas >= 0).sum()), len(plantas)
+
+
+def capas_mapa(origen):
+    """Puntos para el mapa de la zona (lat y lon en cienmilésimas desde el origen del índice): bares, bares musicales y
+    discotecas (censo de locales) y quejas por ruido en la calle (IRIS 2025). Salen de la caché de indice.py."""
+    def puntos(nombre, lat, lon):
+        f = CACHE_DIR / f"{nombre}.json"
+        if not f.exists():
+            return []
+        out = []
+        for r in json.loads(f.read_text()):
+            try:
+                out += [round((float(r[lat]) - origen["lat"]) * 1e5), round((float(r[lon]) - origen["lon"]) * 1e5)]
+            except (TypeError, ValueError, KeyError):
+                pass
+        return out
+    return {"bares": puntos("cens_solo_bares", "Latitud", "Longitud"), "musicales": puntos("cens_musicales", "Latitud", "Longitud"),
+            "quejas": puntos("iris2025_soroll", "LATITUD", "LONGITUD")}
+
+
+def margen_medido(perfiles):
+    """Margen de error (dB) donde manda un sensor: diferencia entre dos sensores de la misma calle a menos de 120 m
+    (la que no se supera en 2 de cada 3 pares)."""
+    dif = {f: [] for f in "DEN"}
+    def leq(s, f):
+        return 10 * math.log10(np.mean([10 ** (s["db"][d][h] / 10) for d in range(7) for h in modelo.HORAS[f]]))
+    for i, a in enumerate(perfiles):
+        for b in perfiles[i + 1:]:
+            if math.hypot((a["lon"] - b["lon"]) * 83300, (a["lat"] - b["lat"]) * 110540) <= 120 and nucleo_calle(a["calle"]) \
+                    and nucleo_calle(a["calle"]) == nucleo_calle(b["calle"]):
+                for f in "DEN":
+                    dif[f].append(abs(leq(a, f) - leq(b, f)))
+    return {f: round(float(np.percentile(dif[f], 68)), 1) if dif[f] else 2.5 for f in "DEN"}
 
 
 def obra_activa(indice, grupo, hoy=None):
@@ -192,6 +267,9 @@ def obra_activa(indice, grupo, hoy=None):
     hoy = (hoy or dt.date.today()).isoformat()
     return any(d <= mod_obras.RADIO_EFECTO and indice["obras"][o]["suma"] and indice["obras"][o]["estado"] != "Aturada"
                and indice["obras"][o]["inicio"] <= hoy <= indice["obras"][o]["fin"] for o, d in indice["grupos_obras"][grupo])
+
+
+CACHE_DIR = AQUI / "cache"
 
 
 def redondear(x):
@@ -211,7 +289,12 @@ def main():
     print(f"rangos con medición de sensor: {anclar_sensores(indice, perfiles)}")
     print(f"rangos con ajuste por horarios de locales: {ajustar_noches(indice)}")
     print("obras vigentes cerca de algún portal: {} · rangos con obras a menos de 100 m: {}".format(*asignar_obras(indice)))
+    print("rangos con altura del edificio (Catastro): {} de {}".format(*asignar_plantas(indice)))
+    print("rangos en esquina (portal de otra calle a menos de 20 m): {} de {}".format(
+        sum(1 for _, pl in indice["calles"] for k in range(indice["campos_rango"].index("esq_calle"), len(pl), len(indice["campos_rango"])) if pl[k] >= 0),
+        sum(len(pl) // len(indice["campos_rango"]) for _, pl in indice["calles"])))
     campos = indice["campos_rango"]
+    margen_sensor = margen_medido(perfiles)
     filas = []
     for info in leer_direcciones():
         calle, numero = info["direccion"].rsplit(" ", 1)
@@ -249,6 +332,8 @@ def main():
             "solo_bares_100m": v["solo_bares"], "musicales_100m": v["musicales"],
             "ancho_m": v["ancho_m"], "quejas_recogida_100m": v["quejas_recogida"],
             "picos_nocturnos": modelo.aviso_picos(v["ancho_m"], v["quejas_recogida"], v["turisticos"]),
+            "nota_min": redondear(modelo.entre(res["global"], modelo.margen_puntos(margen_sensor if medido is not None else modelo.INCERTIDUMBRE))[0]),
+            "nota_max": redondear(modelo.entre(res["global"], modelo.margen_puntos(margen_sensor if medido is not None else modelo.INCERTIDUMBRE))[1]),
             "obra_activa_25m": "sí" if obra else "",
             "obras_100m": len(indice["grupos_obras"][v["obras"]]) if v["obras"] >= 0 else 0,
             **{f"noche_{d}": n for d, n in noches.items()},
@@ -260,6 +345,13 @@ def main():
         w.writerows(filas)
     escribir_tabla_md(filas)
     construir_visor(indice, perfiles)
+    # Casos de la corrección por planta para la prueba de paridad con JavaScript (pruebas/paridad.mjs).
+    casos = [[p, pe, an] for p in [None, 0, 1, 2, 3, 5, 8, 12, "atico"] for pe in [-1, 2, 5, 8, 12] for an in [-1, 6, 12, 25, 60]]
+    margenes = [modelo.INCERTIDUMBRE, {"D": 2.7, "E": 2.3, "N": 2.0}, {"D": 0, "E": 10, "N": 1.5}]
+    casos_margen = [[m, f] for m in margenes for f in [None, "D", "E", "N"]]
+    (AQUI / "pruebas" / "planta_python.json").write_text(json.dumps({"casos": casos, "db": [modelo.correccion_planta(*c) for c in casos],
+        "casos_margen": casos_margen, "margen": [modelo.margen_puntos(m, f) for m, f in casos_margen],
+        "esquina": [[50, 60, 70], [55, 58, 75], modelo.combinar_esquina([50, 60, 70], [55, 58, 75])]}))
 
     for r in sorted(filas, key=lambda r: -r["nota_global"]):
         print(f'{r["nota_global"]:>3}  D{r["nota_dia"]:>3} T{r["nota_tarde"]:>3} N{r["nota_noche"]:>3}  int {str(r["nota_global_interior"]):>3}  '
@@ -270,7 +362,7 @@ def distribucion_ciudad(indice, perfiles):
     """Percentiles 0-100 de la nota global exterior (media de todos los días) de todos los portales de la ciudad.
     Cada rango pesa por su número de portales. Sirve para "más ruidosa que el X % de los portales de Barcelona"."""
     campos, n = indice["campos_rango"], len(indice["campos_rango"])
-    notas, pesos, cache = [], [], {}
+    notas, pesos, barrios, cache = [], [], [], {}
     for _, planos in indice["calles"]:
         for r in rangos(planos, n):
             v = dict(zip(campos, r))
@@ -281,6 +373,7 @@ def distribucion_ciudad(indice, perfiles):
                 cache[clave] = modelo.calcular(mapa_tramo(indice, v["tramo"]), medido=medido, locales=locales)["global"]
             notas.append(cache[clave])
             pesos.append(max(1, (v["fin"] - v["ini"]) // 2 + 1))
+            barrios.append(v["barrio"])
     orden = sorted(range(len(notas)), key=notas.__getitem__)
     total, acum, k, cortes = sum(pesos), 0, 0, []
     for p in range(101):
@@ -288,14 +381,24 @@ def distribucion_ciudad(indice, perfiles):
             acum += pesos[orden[k]]
             k += 1
         cortes.append(round(notas[orden[k]], 2))
-    return cortes
+    # Media de cada barrio (ponderada por portales), para comparar la calle con su barrio.
+    suma, peso = {}, {}
+    for nota, w, b in zip(notas, pesos, barrios):
+        suma[b] = suma.get(b, 0) + nota * w
+        peso[b] = peso.get(b, 0) + w
+    medias = {str(b): round(suma[b] / peso[b], 1) for b in suma}
+    return cortes, medias, round(sum(n * w for n, w in zip(notas, pesos)) / sum(pesos), 1)
 
 
 def construir_visor(indice, perfiles):
     piloto = [{"direccion": d["direccion"], "grupo": d["grupo"], "aviso": d["aviso"]} for d in leer_direcciones()]
-    sensores = [{"calle": p["calle"], "tipo": p["tipo"], "dias": p["dias"], "db": p["db"]} for p in perfiles]
+    sensores = [{"calle": p["calle"], "tipo": p["tipo"], "dias": p["dias"], "db": p["db"], "lat": p["lat"], "lon": p["lon"]} for p in perfiles]
+    cortes, medias_barrio, media_ciudad = distribucion_ciudad(indice, perfiles)
     datos = json.dumps({"indice": indice, "piloto": piloto, "perfiles": modelo.PERFILES, "sensores": sensores,
-                        "coef_locales": modelo.COEF_LOCALES, "percentiles_ciudad": distribucion_ciudad(indice, perfiles)},
+                        "coef_locales": modelo.COEF_LOCALES, "percentiles_ciudad": cortes,
+                        "medias_barrio": medias_barrio, "media_ciudad": media_ciudad,
+                        "incertidumbre": {"estimado_db": modelo.INCERTIDUMBRE, "medido_db": margen_medido(perfiles)},
+                        "capas": capas_mapa(indice["origen"])},
                        ensure_ascii=False, separators=(",", ":"))
     motor = (AQUI / "motor.js").read_text(encoding="utf-8")
     html = (AQUI / "visor_plantilla.html").read_text(encoding="utf-8").replace("/*DATOS*/null", datos).replace("/*MOTOR*/", motor)

@@ -75,6 +75,63 @@ def suma_obra(db, dia):
             db[h] += extra
 
 
+# Planta del piso. ESTIMACIÓN a partir de estudios de ruido en calles; aún sin medir en Barcelona.
+# El mapa oficial calcula el ruido a 4 m de altura (más o menos un 1.º). En calles estrechas entre edificios altos el
+# sonido rebota y casi no baja con la altura; en calles anchas baja de forma progresiva. El ático retirado de la
+# fachada gana la pantalla del pretil y los bajos están pegados al tráfico y a la gente.
+PLANTA_ALTURA_M = 3.0      # altura de cada planta
+PLANTA_BAJA_DB = 1.0       # bajos y entresuelos
+ATICO_DB = -3.0            # ático retirado de la fachada
+PLANTA_MAX_DB = 8.0        # como mucho, 8 dB menos que en el 1.º
+
+
+def correccion_planta(planta, plantas_edificio=-1, ancho_m=-1):
+    """dB que se suman a la fachada a la calle según la planta.
+
+    planta: 0 = bajo o entresuelo, 1, 2, 3... = número de planta, "atico" = ático. None o 1 = sin corrección.
+    plantas_edificio: plantas sobre rasante del edificio (Catastro), -1 si no se sabe.
+    ancho_m: anchura de la calle entre fachadas, -1 si no se sabe.
+    """
+    if planta is None or planta == 1:
+        return 0.0
+    if planta == 0:
+        return PLANTA_BAJA_DB
+    alto = PLANTA_ALTURA_M * plantas_edificio + 1 if plantas_edificio > 0 else 20.0
+    ancho = ancho_m if ancho_m >= 3 else 20.0
+    pendiente = 0.4 * (1 - min(alto / ancho, 1.0))   # dB por metro: 0 en calle estrecha y alta, 0,4 en calle muy abierta
+    extra = 0.0
+    if planta == "atico":
+        planta, extra = (plantas_edificio if plantas_edificio > 1 else 7), ATICO_DB
+    altura = 4 + PLANTA_ALTURA_M * (planta - 1)
+    return -min(PLANTA_MAX_DB, pendiente * max(0.0, altura - 4)) + extra
+
+
+# Margen de error, en dB por franja (incertidumbre.json, de ocio_oculto.py): el error que no se supera en 2 de cada 3
+# sensores en calles sin sensor. Donde manda un sensor, calcular_nota.py pasa uno menor (dos sensores de la misma calle).
+try:
+    INCERTIDUMBRE = _json.loads(_Path(__file__).with_name("incertidumbre.json").read_text())["estimado_db"]
+except FileNotFoundError:
+    INCERTIDUMBRE = {"D": 5.0, "E": 6.0, "N": 4.5}
+PUNTOS_POR_DB = {f: 100 / (ESCALA[f][1] - ESCALA[f][0]) for f in "DEN"}
+
+
+def margen_puntos(margen_db, franja=None):
+    """Margen en puntos de nota: de una franja ('D', 'E', 'N') o de la nota global (franja=None)."""
+    if franja:
+        return margen_db[franja] * PUNTOS_POR_DB[franja]
+    return sum(PESOS[f] * margen_db[f] * PUNTOS_POR_DB[f] for f in "DEN")
+
+
+def entre(nota, margen):
+    """Rango "entre X y Y" de una nota, sin salir de 0-100."""
+    return max(0.0, nota - margen), min(100.0, nota + margen)
+
+
+def combinar_esquina(db1, db2):
+    """Piso en esquina: da a dos calles; cada hora manda la fachada más ruidosa."""
+    return [max(a, b) for a, b in zip(db1, db2)]
+
+
 def correccion_locales(bares, musicales):
     """dB a sumar por franja según bares y bares musicales/discotecas a menos de 100 m."""
     return {f: c["bares"] * math.log1p(bares) + c["musicales"] * math.log1p(musicales) for f, c in COEF_LOCALES.items()}
@@ -178,13 +235,13 @@ def ajuste_noches(carga):
     return [round(10 * math.log10(x / mg), 1) for x in g]
 
 
-def calcular(mapa, focos=None, dia=None, medido=None, locales=None, ajuste_noche=None, obra=False):
+def calcular(mapa, focos=None, dia=None, medido=None, locales=None, ajuste_noche=None, obra=False, planta_db=0.0):
     # focos: se mantiene por compatibilidad; ya no suma puntos. Todo pasa por los dB (validado con sensores).
     """mapa: {'TOTAL_D':banda,...,'TRANSIT_N':banda,'OCI_N':banda} (texto de banda o dB); dia: 0-6 o None (media anual).
     medido: perfil de un sensor municipal cercano (7 x 24 dB). Si se da, sustituye al mapa y no se suman focos,
     porque la medición ya los incluye."""
     if medido is not None:
-        db = perfil_medido(medido, dia)
+        db = [v + planta_db for v in perfil_medido(medido, dia)]
         if obra:
             suma_obra(db, dia)
         notas = notas_horarias(db, dia)
@@ -199,6 +256,7 @@ def calcular(mapa, focos=None, dia=None, medido=None, locales=None, ajuste_noche
     if ajuste_noche is not None and dia is not None:
         for h in HORAS["N"]:
             db[h] += ajuste_noche[dia]
+    db = [v + planta_db for v in db]
     if obra:
         suma_obra(db, dia)
     notas = notas_horarias(db, dia)

@@ -92,6 +92,27 @@ function sumaObra(db, dia) {
   const extra = dia != null ? OBRA_DB : 10 * Math.log10((5 * Math.pow(10, OBRA_DB / 10) + 2) / 7);
   if (dia == null || dia < 5) for (let h = 8; h < 18; h++) db[h] += extra;
 }
+// Planta del piso. ESTIMACIÓN a partir de estudios de ruido en calles; aún sin medir en Barcelona (copia de modelo.py).
+function correccionPlanta(planta, plantasEdificio = -1, anchoM = -1) {
+  if (planta == null || planta === 1) return 0;
+  if (planta === 0) return 1.0;
+  const alto = plantasEdificio > 0 ? 3.0 * plantasEdificio + 1 : 20.0;
+  const ancho = anchoM >= 3 ? anchoM : 20.0;
+  const pendiente = 0.4 * (1 - Math.min(alto / ancho, 1));
+  let extra = 0;
+  if (planta === "atico") { planta = plantasEdificio > 1 ? plantasEdificio : 7; extra = -3.0; }
+  const altura = 4 + 3.0 * (planta - 1);
+  return -Math.min(8.0, pendiente * Math.max(0, altura - 4)) + extra;
+}
+// Margen de error (copia de modelo.py): en dB por franja; en puntos para una franja o para la nota global.
+const PUNTOS_POR_DB = { D: 100 / (ESCALA.D[1] - ESCALA.D[0]), E: 100 / (ESCALA.E[1] - ESCALA.E[0]), N: 100 / (ESCALA.N[1] - ESCALA.N[0]) };
+function margenPuntos(margenDb, franja = null) {
+  if (franja) return margenDb[franja] * PUNTOS_POR_DB[franja];
+  return PESOS.D * margenDb.D * PUNTOS_POR_DB.D + PESOS.E * margenDb.E * PUNTOS_POR_DB.E + PESOS.N * margenDb.N * PUNTOS_POR_DB.N;
+}
+const entre = (nota, margen) => [Math.max(0, nota - margen), Math.min(100, nota + margen)];
+// Piso en esquina o con dos fachadas a la calle: cada hora manda la fachada más ruidosa.
+const combinarEsquina = (db1, db2) => db1.map((v, h) => Math.max(v, db2[h]));
 function avisoPicos(anchoM, quejas, turisticos = 0) {
   const estrecha = anchoM >= 0 && anchoM < 12;
   // Pisos turísticos: llegadas y salidas a deshoras; 20 o más a menos de 100 m cuentan como foco.
@@ -139,20 +160,31 @@ const HOY = new Date().toLocaleDateString("sv-SE");  // AAAA-MM-DD en la hora lo
 const obrasCerca = r => (r.obras >= 0 ? IX.grupos_obras[r.obras] : []).map(([o, d]) => ({ ...IX.obras[o], d }));
 const obraEnCurso = o => o.estado !== "Aturada" && o.inicio <= HOY && HOY <= o.fin;
 const obraSuma = r => obrasCerca(r).some(o => o.d <= IX.obras_radio_efecto && o.suma && obraEnCurso(o));
-function calcular(r, dia = null) {
-  const clave = r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.musicales + "|" + r.obras + "|" + r.noches + "|" + dia;
+// La otra calle de un portal de esquina (calcular_nota.py: esq_calle, esq_ini), o null.
+function rangoEsquina(r) {
+  if (!(r.esq_calle >= 0)) return null;
+  return CALLES[r.esq_calle].rangos.find(x => x.ini === r.esq_ini) || null;
+}
+function calcular(r, dia = null, planta = null, esquina = false) {
+  const clave = planta + "|" + esquina + "|" + r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.musicales + "|" + r.obras + "|" + r.noches + "|" + dia;
   if (cacheCalc.has(clave)) return cacheCalc.get(clave);
   const t = IX.tramos[r.tramo];
   const b = k => bandaDb(+t[IX.campos_tramo.indexOf(k)]);
   const sensor = r.sensor >= 0 ? DATOS.sensores[r.sensor] : null;
   const zb = correccionLocales(r);
   const dbExt = sensor ? perfilMedido(sensor.db, dia) : perfilHorario({ D: b("TOTAL_D") + zb.D, E: b("TOTAL_E") + zb.E, N: b("TOTAL_N") + zb.N }, { D: b("TRANSIT_D"), E: b("TRANSIT_E"), N: b("TRANSIT_N") }, b("OCI_N"), dia);
+  // Planta del piso (estimación): mismo desplazamiento en todas las horas de la fachada a la calle.
+  const dPlanta = correccionPlanta(planta, r.plantas, r.ancho_m);
+  if (dPlanta) for (let h = 0; h < 24; h++) dbExt[h] += dPlanta;
   // Horarios de los locales de noche cercanos: más ruido las noches en que abren de madrugada (no si hay sensor).
   if (!sensor && r.noches >= 0 && dia != null) HORAS.N.forEach(h => (dbExt[h] += IX.ajustes_noche[r.noches][dia]));
   // Obra pública en curso a menos de 25 m: ruido extra temporal de día laborable (también si hay sensor: la medición es de 2023).
   const obra = obraSuma(r);
   const globalSinObra = obra ? resumen(notasHorarias(dbExt)).global : null;
   if (obra) sumaObra(dbExt, dia);
+  // Esquina: si el piso también da a la otra calle, cada hora cuenta la fachada más ruidosa.
+  const r2 = esquina ? rangoEsquina(r) : null;
+  if (r2) { const otra = calcular(r2, dia, planta).exterior.db; combinarEsquina(dbExt, otra).forEach((v, h) => (dbExt[h] = v)); }
   const notasExt = notasHorarias(dbExt);
   const ext = { db: dbExt, nota: notasExt, ...resumen(notasExt), mapa: { D: IX.bandas[+t[0]], E: IX.bandas[+t[1]], N: IX.bandas[+t[2]] } };
   let int = null;
@@ -162,7 +194,9 @@ function calcular(r, dia = null) {
     const notasInt = notasHorarias(dbInt);
     int = { db: dbInt, nota: notasInt, ...resumen(notasInt), mapa: { D: IX.bandas[+p[0]], E: IX.bandas[+p[1]], N: IX.bandas[+p[2]] } };
   }
-  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor, locales: zb, obra, globalSinObra,
+  const res = { exterior: ext, interior: int, trafico: IX.bandas[+t[5]], ocioMapa: IX.bandas[+t[6]], sensor, locales: zb, obra, globalSinObra, dPlanta,
+    esquina: r2 ? { calle: CALLES[r.esq_calle].nombre, ini: r2.ini, fin: r2.fin } : null,
+    margenDb: sensor ? DATOS.incertidumbre.medido_db : DATOS.incertidumbre.estimado_db,
     ajusteNoches: !sensor && r.noches >= 0 ? IX.ajustes_noche[r.noches] : null };
   cacheCalc.set(clave, res);
   return res;
@@ -306,10 +340,10 @@ function nivelTexto(s) {
 
 // ---------- API pública (la usan el visor y la web) ----------
 // Resultado listo para pintar, sin depender de la página que lo use.
-function informe(ci, r, dia = null) {
-  const res = calcular(r, dia);
+function informe(ci, r, dia = null, planta = null, esquina = false) {
+  const res = calcular(r, dia, planta, esquina);
   const ext = res.exterior;
-  const noches = DIAS.map((_, d) => calcular(r, d).exterior.franjas.N);
+  const noches = DIAS.map((_, d) => calcular(r, d, planta, esquina).exterior.franjas.N);
   return {
     calle: CALLES[ci].nombre, portales: [r.ini, r.fin], barrio: IX.barrios[r.barrio] || "",
     nota: ext.global, etiqueta: nivelTexto(ext.global), percentil: percentilCiudad(calcular(r, null).exterior.global),
@@ -317,6 +351,10 @@ function informe(ci, r, dia = null) {
     interior: res.interior ? { nota: res.interior.global, franjas: res.interior.franjas, horas: res.interior.nota, db: res.interior.db } : null,
     sensor: res.sensor ? res.sensor.calle : null, obraSuma: res.obra, obras: obrasCerca(r),
     picos: avisoPicos(r.ancho_m, r.quejas_recogida, r.turisticos), mapa: ext.mapa,
+    plantasEdificio: r.plantas, planta, correccionPlantaDb: res.dPlanta,
+    margen: entre(ext.global, margenPuntos(res.margenDb)), margenDb: res.margenDb,
+    esquina: res.esquina, otraCalle: rangoEsquina(r) ? CALLES[r.esq_calle].nombre : null,
+    mediaBarrio: DATOS.medias_barrio[String(r.barrio)] ?? null, mediaCiudad: DATOS.media_ciudad,
   };
 }
 // Texto, dirección o enlace de Google Maps -> { tipo: "ok" | "varias" | "aviso" | "sin_resultado" | "fuera" | "vacio", ... }
@@ -341,5 +379,5 @@ function elegirCalle(ci, numero) {
   const { r, exacto, sinNumero } = rangoDeNumero(CALLES[ci], numero);
   return { tipo: "ok", ci, r, numero: sinNumero ? null : numero, exacto: exacto && !sinNumero, sinNumero: !!sinNumero, informe: informe(ci, r) };
 }
-const DecibHello = { buscar, elegirCalle, informe, calcular, sugerencias: (texto, max = 8) => buscarCalles(analizarTexto(texto), max).map(x => ({ ci: x.i, calle: CALLES[x.i].nombre })),
+const DecibHello = { buscar, elegirCalle, informe, calcular, correccionPlanta, margenPuntos, entre, combinarEsquina, rangoEsquina, sugerencias: (texto, max = 8) => buscarCalles(analizarTexto(texto), max).map(x => ({ ci: x.i, calle: CALLES[x.i].nombre })),
   CALLES, DIAS, HORAS, FRANJA, nivelTexto, percentilCiudad, fechaDatos: { obras: IX.obras_fecha } };

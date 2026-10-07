@@ -10,6 +10,7 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Tramo silencioso de Travessera de Gràcia**: número o cruce.
 - [ ] **Anchura de Travessera de Gràcia 150**: confirmar si ≈ 8 m es razonable.
 - [ ] **Solicitud de información pública** al Ajuntament (contenedores, rutas y horarios de recogida, calendario de muebles, limpieza nocturna). Borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.13.
+- [ ] **Solicitudes de transparencia al Ayuntamiento de Madrid** (dos: datos por hora de las 31 estaciones de ruido, y horarios de recogida y limpieza). Borrador del agente 5 en `investigacion/solicitud-transparencia-madrid.md` (rama `agente/siguiente-ciudad`).
 - [ ] **Solicitud de información pública sobre obras privadas** (licencias de obras mayores y permisos de andamios, grúas y contenedores desde 2024). Borrador en el apartado 2.15.
 - [ ] **Decidir cómo tratar los anuncios** (Idealista, Fotocasa…): pedir la calle (ahora), extensión de navegador o acuerdos con portales.
 - [ ] **Decisiones abiertas**: idiomas (castellano, catalán, inglés), nombre y dominio.
@@ -27,23 +28,24 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Ocio infravalorado de noche**: ninguna pista pública lo predice (probado con bares, terrazas, quejas por motivo, pisos turísticos, plazas). Solo se resuelve midiendo: mediciones con el móvil, opiniones de vecinos, más sensores.
 - [ ] **Validación sobre el terreno**: medir con sonómetro o móvil en 20–30 portales, de día y de noche, entre semana y en fin de semana, y comparar con la nota. Sin esto no podemos decir cuánto acierta.
 - [ ] **Mapa de ruido 2022**: pasar del de 2017 (por tramo) al ráster de 2022, para recoger cambios como los ejes verdes (Consell de Cent).
-- [ ] **Explicar la incertidumbre**: mostrar un margen ("entre 70 y 80") además de la cifra.
+- [x] **Margen de error** (7 oct): el visor dice "entre X y Y". Sin sensor: ±4,9 dB de día, ±6,1 de tarde y ±4,6 de noche (el error que no se supera en 2 de cada 3 sensores, validado por distritos; ≈ ±15 puntos en la nota del día). Con sensor en la calle: ±2–3 dB (≈ ±7 puntos).
 
 ### 2. Lo que más le importa a quien alquila o compra
-- [ ] **Planta del piso**: un primero y un ático en la misma fachada no suenan igual. Pedir la planta y corregir.
-- [ ] **Orientación del piso**: exterior, interior o esquina (que da a dos calles).
+- [x] **Planta del piso** (estimación, 7 oct): selector en el visor, de bajo a ático. Usa las plantas del edificio (Catastro) y la anchura de la calle: en calles estrechas y altas casi no cambia; en calles anchas baja con la altura (Diagonal 500, 6.º: −3,9 dB); ático −3 dB; bajo +1 dB.
+- [ ] **Medir la planta**: con el sonómetro, medir a la vez en varias plantas del mismo edificio, en una calle estrecha y en una ancha, y ajustar las cifras.
+- [x] **Orientación del piso** (7 oct): exterior, interior (patio) y esquina. La esquina se marca a mano ("también da a Carrer X") y cada hora cuenta la fachada más ruidosa.
 - [ ] **Ruido del propio edificio**: bar o local en los bajos, ascensor, aire acondicionado de vecinos. Hoy no lo cubrimos y es de lo que más molesta.
 - [ ] **Estacionalidad**: verano (ventanas abiertas, terrazas) frente a invierno.
 - [x] **Obras públicas**: las obras en curso a menos de 25 m suman +2 dB de día laborable mientras duran (validado con sensores); el visor lista las obras a menos de 100 m con sus fechas (`piloto/obras_validacion.md`).
 - [ ] **Obras privadas** (rehabilitación de edificios, derribos, obra nueva): no hay datos públicos de licencias. Las grandes con andamio o grúa en la calle ya están en las obras públicas. Pedir licencias y permisos de andamios y grúas por transparencia (borrador en `decibhello-fuentes-datos-barcelona.md`, apartado 2.15).
 - [x] **Obras al día**: una tarea programada regenera y republica el visor de lunes a viernes (6:47) con las obras del día.
 - [ ] **Otros avisos temporales**: fiestas mayores, conciertos.
-- [ ] **Comparar**: dos o tres pisos lado a lado, y la calle frente a la media del barrio y de la ciudad.
+- [x] **Comparar** (7 oct): hasta 3 pisos lado a lado (con su planta, lado y esquina), y la calle frente a la media de su barrio y de Barcelona.
 
 ### 3. Producto usable por cualquiera
 - [ ] **Portal independiente propio**: DecibHello como web con marca, dominio y alojamiento propios, que funcione por sí sola (buscador, informe, mapa) sin depender de los portales inmobiliarios. La extensión de Chrome y los acuerdos con portales son vías de entrada a este portal, no lo sustituyen. Hoy es un prototipo privado: falta dominio, alojamiento, que cargue rápido en el móvil y que los datos se actualicen solos.
-- [ ] **Mapa** con la calle y los focos (bares, sensores, quejas) alrededor.
-- [ ] **Informe para guardar o enviar** (PDF o enlace) por dirección.
+- [x] **Mapa de la zona** (7 oct): 200 m alrededor, con la nota de cada tramo, bares, bares musicales y discotecas, quejas por ruido, sensores y obras. Dibujado por nosotros (sin mapa base de calles).
+- [x] **Informe para guardar o enviar** (7 oct): botón "Descargar informe" (un fichero que se abre en cualquier navegador) e "Imprimir o guardar en PDF".
 - [ ] **Extensión de Chrome**: al abrir un anuncio (Idealista, Fotocasa, Habitaclia…), lee la zona o calle que la página ya muestra al usuario y enseña la nota de DecibHello en el propio anuncio, con enlace al informe completo. Revisar antes las condiciones de uso de cada portal y las normas de la Chrome Web Store (permisos mínimos, privacidad).
 - [ ] **Acuerdos con portales inmobiliarios** para mostrar la nota en sus anuncios.
 - [ ] **Textos claros y aviso legal**: dejar claro que es una estimación, no una medición del piso.
@@ -57,7 +59,8 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Validar que la gente lo quiere**: 10–15 entrevistas y una página con lista de espera.
 - [ ] **Modelo de ingresos**: informe gratuito básico y completo de pago; licencia para inmobiliarias y portales.
 - [ ] **Mantenimiento de datos**: actualizar quejas, locales, pisos turísticos y sensores cada mes o trimestre de forma automática.
-- [ ] **Siguiente ciudad**: área metropolitana de Barcelona; después Madrid o Valencia.
+- [x] **Siguiente ciudad: Madrid** (confirmado el 6 de octubre de 2026). Datos de 0 a 10: Barcelona 9,5 · Madrid 8 · Valencia 5 · L'Hospitalet + Badalona 3,5 · Sant Cugat 1. Informes en `investigacion/` (rama `agente/siguiente-ciudad`). El área metropolitana, como ampliación de Barcelona más adelante.
+- [ ] **Piloto de Madrid** (en espera: Pablo prefiere terminar antes Barcelona, 6 oct): unas 3–4 semanas. Mapa 2021 en dB exactos cada 5 m, censo de locales con horarios, portales con coordenadas. Falta: sensores por hora (transparencia), ocio en el mapa (recalibrar con pocas estaciones) y situar en el mapa las quejas y los pisos turísticos.
 
 ### 6. Venta a portales y empresas (cuando haya portal público y validación)
 - [ ] **Estrategia extensión vs. portales**: la extensión sirve para medir interés, no para presionar. En la web de un portal que integre la nota, la extensión deja de mostrarse. El portal propio sigue siendo el centro.
