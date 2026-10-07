@@ -36,6 +36,8 @@ RES_CENS_2024 = "38babeec-5c47-43d3-84e7-b13a4b89004f"
 RES_IRIS_2025 = "efc9fd4d-a812-427c-846d-a086d22012a4"
 RES_IRIS = {2023: "1ff71f84-20dc-4fc0-9f83-01eecabea330", 2024: "3e988471-ee40-4431-9095-8081fdd651ff",
             2025: "efc9fd4d-a812-427c-846d-a086d22012a4", 2026: "eae9a19a-4543-45db-bc13-3e3073b58324"}
+SEM_TERRAZAS_REF = "2024_2S"   # semestre de terrazas más cercano al censo de locales de 2024
+RADIO_TERRAZA = 20           # m entre un local y su terraza
 RES_HUT = "b32fa7f6-d464-403b-8a02-0292a64883bf"
 RES_SENSORS = "f4562942-1fd8-48fb-9e9d-d41088f97a03"
 RES_ADRECES = "661fe190-67c8-423a-b8eb-8140f547fde2"
@@ -138,6 +140,13 @@ def main():
     hut = puntos(sql("hut", f'SELECT "LATITUD_Y","LONGITUD_X" FROM "{RES_HUT}"'), "LATITUD_Y", "LONGITUD_X")
     recogida = np.vstack([puntos(sql(f"iris{a}_recogida", f'SELECT "LATITUD","LONGITUD" FROM "{r}" WHERE "DETALL"=\'Serveis neteja i recollida\''), "LATITUD", "LONGITUD")
                           for a, r in RES_IRIS.items()])
+    # Terrazas con licencia: el semestre de referencia (cuando se hizo el censo de 2024) y el más reciente.
+    # Sirven para saber qué bares del censo siguen abiertos y dónde hay hostelería nueva (no suman a la nota).
+    recursos_terr = {r["name"][:7]: r["id"] for r in get_json(API + "package_show?id=terrasses-comercos-vigents")["result"]["resources"]
+                     if r.get("datastore_active")}
+    sem_ultimo = max(recursos_terr)
+    terr_ref = puntos(todo(f"terrazas_{SEM_TERRAZAS_REF}", recursos_terr[SEM_TERRAZAS_REF], ["LATITUD", "LONGITUD"]), "LATITUD", "LONGITUD")
+    terr_ult = puntos(todo(f"terrazas_{sem_ultimo}", recursos_terr[sem_ultimo], ["LATITUD", "LONGITUD"]), "LATITUD", "LONGITUD")
     sensors = puntos(sql("sensors_actius", f'SELECT "Latitud","Longitud" FROM "{RES_SENSORS}" WHERE "Data_DesInstalacio" IS NULL'), "Latitud", "Longitud")
     print(f"tramos {len(tramer)} · portales {len(adreces)} · calles {len(carrerer)} · quejas recogida {len(recogida)}")
 
@@ -291,7 +300,19 @@ def main():
     n_oci, n_bar, n_quej, n_hut = contar(oci), contar(bars), contar(queixes), contar(hut)
     n_recog = contar(recogida)
     n_solo_bares = contar(solo_bares)
-    n_musicales = contar(musicales)  # bares musicales, pubs y discotecas  # solo bares (sin restaurantes): la pista validada para la "zona de bares"
+    n_musicales = contar(musicales)
+    # Bares (sin restaurantes) y musicales del censo: ¿tienen terraza vigente en el último semestre? ¿la perdieron?
+    from scipy.spatial import cKDTree as _Arbol
+    def con_terraza(locales, terrazas):
+        return np.array([len(x) > 0 for x in _Arbol(terrazas).query_ball_point(locales, RADIO_TERRAZA)]) if len(locales) else np.zeros(0, bool)
+    bares_todos = np.vstack([solo_bares, musicales])
+    t_ult, t_ref = con_terraza(bares_todos, terr_ult), con_terraza(bares_todos, terr_ref)
+    n_bares_abiertos = contar(bares_todos[t_ult])
+    n_posibles_cierres = contar(bares_todos[t_ref & ~t_ult])
+    nuevas = ~con_terraza(terr_ult, bars) & ~con_terraza(terr_ult, terr_ref)
+    n_posibles_aperturas = contar(terr_ult[nuevas])
+    print(f"terrazas {SEM_TERRAZAS_REF}: {len(terr_ref)} · {sem_ultimo}: {len(terr_ult)} · bares del censo con terraza vigente: {t_ult.sum()} de {len(bares_todos)} · "
+          f"posibles cierres: {(t_ref & ~t_ult).sum()} · terrazas nuevas sin local en el censo: {nuevas.sum()}")  # bares musicales, pubs y discotecas  # solo bares (sin restaurantes): la pista validada para la "zona de bares"
     d_sens = np.min(np.hypot(centros[:, None, 0] - sensors[None, :, 0], centros[:, None, 1] - sensors[None, :, 1]), axis=1)
     lon, lat = a_wgs.transform(centros[:, 0], centros[:, 1])
 
@@ -305,7 +326,8 @@ def main():
                        int(round((lat[k] - 41.3) * 1e5)), int(round((lon[k] - 2.0) * 1e5)),
                        int(round(float(np.median([a for a in r["ancho"] if a >= 0])))) if any(a >= 0 for a in r["ancho"]) else -1,
                        int(n_recog[k]), int(n_solo_bares[k]), int(n_musicales[k]),
-                       *(esquina[(c_sal, k_r)][1:] if (c_sal, k_r) in esquina else (-1, -1))]
+                       *(esquina[(c_sal, k_r)][1:] if (c_sal, k_r) in esquina else (-1, -1)),
+                       int(n_bares_abiertos[k]), int(n_posibles_cierres[k]), int(n_posibles_aperturas[k])]
             k += 1
         salida_calles.append([nombres[codi], planos])
 
@@ -314,7 +336,8 @@ def main():
         tramos[j] = "".join(str(BANDAS.index(tramer[i][c])) for c in CAMPOS_TRAMO)
 
     indice = {"bandas": BANDAS, "campos_tramo": CAMPOS_TRAMO, "tramos": tramos, "barrios": barrios,
-              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida", "solo_bares", "musicales", "esq_calle", "esq_ini"],
+              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida", "solo_bares", "musicales", "esq_calle", "esq_ini", "bares_abiertos", "posibles_cierres", "posibles_aperturas"],
+              "terrazas": {"referencia": SEM_TERRAZAS_REF, "ultimo": sem_ultimo},
               "origen": {"lat": 41.3, "lon": 2.0}, "calles": salida_calles}
     (CACHE / "indice.json").write_text(json.dumps(indice, ensure_ascii=False, separators=(",", ":")))
     print(f"calles {len(salida_calles)} · rangos {len(todos_r)} · tramos usados {len(tramos)} · "

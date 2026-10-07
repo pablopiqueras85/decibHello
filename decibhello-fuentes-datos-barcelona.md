@@ -197,6 +197,13 @@ Borrador de solicitud (por el Portal de Transparencia del Ajuntament):
 - **Uso**: `piloto/alturas.py` lo resume en `piloto/datos/edificios_catastro.json.gz` (1,7 MB, en el repositorio). Cada portal toma la parte más alta a menos de 10 m: el 82 % de los tramos tiene altura.
 - **Mapa de fachadas 2017** (Open Data BCN, `facanes-mapa-estrategic-soroll`): da el ruido por edificio, pero un solo valor por fachada, sin altura. No sirve para la planta.
 
+### 2.17 ¿Siguen abiertos los locales? (terrazas con licencia)
+
+- **Problema**: el censo de locales es de 2024 (publicado en febrero de 2025) y el de espacios de música y copas, de octubre de 2023.
+- **Comprobación con terrazas** (`terrasses-comercos-vigents`, semestral, API del datastore): se cruza cada bar del censo con las terrazas a menos de 20 m, en el semestre del censo (2024, segundo semestre) y en el último publicado (2026, primer semestre).
+- **Resultado (octubre de 2026)**: de 3.037 bares y bares musicales del censo, 1.924 tienen terraza vigente en 2026 (siguen abiertos); 44 la perdieron (posibles cierres, 1,5 %); hay 184 terrazas nuevas sin local de hostelería en el censo (posibles aperturas de bar o restaurante). El censo sigue siendo fiel en un 97–98 %.
+- **Uso**: se muestra en "Por qué suena así" de cada calle. No cambia la nota: las terrazas no dicen si un local es bar o restaurante, y los restaurantes no suman. `indice.py` toma siempre el último semestre publicado.
+
 ## 3. Cómo se accede a los datos
 
 - **Ficheros tabulares (CSV)**: se leen sin problema por la API del portal (`datastore_search` y `datastore_search_sql`), con consultas y filtros. Así funcionan el MES por tramo, el censo de locales, los pisos turísticos, IRIS y la lista de sensores.

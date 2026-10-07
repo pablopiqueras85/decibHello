@@ -378,6 +378,7 @@ function pintarPlanta(r, res) {
   $("nota-planta").textContent = estado.lado === "interior" ? "La planta solo se aplica a la fachada a la calle."
     : `${d ? (d > 0 ? "+" : "−") + fmtDb(Math.abs(d)) + " dB respecto al 1.º" : estado.planta === 1 ? "Referencia: el mapa oficial calcula el ruido a la altura de un 1.º" : "Igual que un 1.º: en una calle estrecha entre edificios altos el sonido rebota y apenas baja con la altura"} · ${edificio}, ${calle}. Estimación según estudios de calles; aún sin medir en Barcelona.`;
 }
+const semestreTxt = s => (s && s.length >= 7 ? `${s[5] === "1" ? "el primer" : "el segundo"} semestre de ${s.slice(0, 4)}` : s);
 const fechaTxt = iso => iso.split("-").reverse().join("/");
 function pintarObras(r, res) {
   const lista = obrasCerca(r);
@@ -507,6 +508,8 @@ function pintarDetalle() {
     ["Origen del dato", res.sensor ? `medición del sensor de ${res.sensor.calle} (${res.sensor.dias} días de 2023)` : r.solo_bares + r.musicales > 0 ? "mapa oficial 2017 + modelo + suma por bares cercanos" : "mapa oficial 2017 + modelo"],
     ["Bares (sin restaurantes) · 100 m", r.solo_bares],
     ["Bares musicales y discotecas · 100 m", r.musicales],
+    ["Siguen abiertos (terraza vigente) · 100 m", r.solo_bares + r.musicales ? `${r.bares_abiertos} de ${r.solo_bares + r.musicales} bares del censo de 2024 tienen terraza en ${semestreTxt(IX.terrazas.ultimo)}; el resto, sin terraza, no se puede comprobar` : "no hay bares del censo cerca"],
+    ["Cambios desde el censo · 100 m", `${r.posibles_cierres ? r.posibles_cierres + " posible" + (r.posibles_cierres > 1 ? "s cierres" : " cierre") + " (perdió la terraza)" : "ningún posible cierre"} · ${r.posibles_aperturas ? r.posibles_aperturas + " terraza" + (r.posibles_aperturas > 1 ? "s nuevas" : " nueva") + " sin local en el censo (posible apertura de bar o restaurante)" : "ninguna terraza nueva"}. No cambia la nota.`],
     ["Suma por bares cercanos", res.sensor ? "incluida en la medición" : `+${fmtDb(res.locales.D)} dB de día · +${fmtDb(res.locales.E)} tarde · +${fmtDb(res.locales.N)} noche`],
     ["Locales de noche a 150 m (horarios)", res.ajusteNoches ? (DIAS.filter((_, d) => res.ajusteNoches[d] >= 1).length ? "noches más ruidosas: " + DIAS.filter((_, d) => res.ajusteNoches[d] >= 1).join(", ") : "hay locales cerca, sin noches destacadas") : res.sensor ? "incluido en la medición" : "ninguno"],
     ["Obras públicas · 100 m", r.obras >= 0 ? IX.grupos_obras[r.obras].length : 0],
