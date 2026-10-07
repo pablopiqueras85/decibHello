@@ -204,6 +204,16 @@ Borrador de solicitud (por el Portal de Transparencia del Ajuntament):
 - **Resultado (octubre de 2026)**: de 3.037 bares y bares musicales del censo, 1.924 tienen terraza vigente en 2026 (siguen abiertos); 44 la perdieron (posibles cierres, 1,5 %); hay 184 terrazas nuevas sin local de hostelería en el censo (posibles aperturas de bar o restaurante). El censo sigue siendo fiel en un 97–98 %.
 - **Uso**: se muestra en "Por qué suena así" de cada calle. No cambia la nota: las terrazas no dicen si un local es bar o restaurante, y los restaurantes no suman. `indice.py` toma siempre el último semestre publicado.
 
+### 2.18 Negocios al día: Overture Maps y Google (estudio, 7 de octubre de 2026)
+
+**Overture Maps (lugares)**: base abierta de negocios de todo el mundo, de Meta, Microsoft, Foursquare y otros. Se publica cada mes en ficheros que se descargan sin registro (`s3://overturemaps-us-west-2/release/…/theme=places`). Licencia CDLA-Permissive 2.0 (lo de Foursquare, Apache 2.0): se puede guardar y usar en un producto comercial citando la fuente.
+- Barcelona, versión del 23 de septiembre de 2026: 91.061 negocios; 5.628 bares y locales de noche (bar, tapas, coctelería, pub, discoteca, sala de música…). El 96 % actualizados en 2026. La mayoría salen de páginas de Meta.
+- Coincide poco en el sitio con el censo: el 45 % de los bares del censo tienen uno de Overture a menos de 15 m. Overture tiene más locales (incluye bares de tapas que el censo puede contar como restaurantes) y puede guardar páginas de locales ya cerrados; casi nunca marca si un local está cerrado.
+- **Prueba con los sensores** (validación dejando fuera cada distrito, 140 sensores), error medio de la suma por bares: censo 2024 → día 4,33 · tarde 4,88 · noche 4,12 dB; Overture con confianza ≥ 0,7 → 4,34 · 4,81 · 4,10 dB. **Predice igual de bien que el censo** y se actualiza cada mes.
+- Scripts: `piloto/estudios/overture_descarga.py` y `piloto/estudios/overture_validacion.py` (DuckDB).
+
+**Google Places**: el más al día, pero sus condiciones no dejan guardar los datos de los negocios (solo el identificador del lugar, y las coordenadas 30 días como mucho), y se deben enseñar con atribución de Google. No sirve para el índice de toda la ciudad. Sí podría servir, en el portal, para consultar en directo los negocios alrededor de una dirección concreta. Precio de la búsqueda de lugares cercanos (Nearby Search Pro): 5.000 consultas gratis al mes y después unos 32 $ por cada 1.000 consultas.
+
 ## 3. Cómo se accede a los datos
 
 - **Ficheros tabulares (CSV)**: se leen sin problema por la API del portal (`datastore_search` y `datastore_search_sql`), con consultas y filtros. Así funcionan el MES por tramo, el censo de locales, los pisos turísticos, IRIS y la lista de sensores.

@@ -59,7 +59,7 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Validar que la gente lo quiere**: 10–15 entrevistas y una página con lista de espera.
 - [ ] **Modelo de ingresos**: informe gratuito básico y completo de pago; licencia para inmobiliarias y portales.
 - [x] **¿Siguen abiertos los bares?** (7 oct): cruce del censo de 2024 con las terrazas del último semestre. 1,5 % de posibles cierres y 184 terrazas nuevas sin local en el censo. Se muestra en cada calle; no cambia la nota.
-- [ ] **Locales más al día**: probar fuentes abiertas de comercios que se actualicen cada mes (en estudio, 7 oct).
+- [ ] **Locales más al día**: Overture Maps (abierto, mensual) predice el ruido igual de bien que el censo de 2024 (apartado 2.18 de fuentes). Decidir si sustituye al censo, se combina con él o solo avisa de aperturas. Google Places, solo para consultas en directo en el portal (no se puede guardar).
 - [ ] **Mantenimiento de datos**: actualizar quejas, locales, pisos turísticos y sensores cada mes o trimestre de forma automática.
 - [x] **Siguiente ciudad: Madrid** (confirmado el 6 de octubre de 2026). Datos de 0 a 10: Barcelona 9,5 · Madrid 8 · Valencia 5 · L'Hospitalet + Badalona 3,5 · Sant Cugat 1. Informes en `investigacion/` (rama `agente/siguiente-ciudad`). El área metropolitana, como ampliación de Barcelona más adelante.
 - [ ] **Piloto de Madrid** (en espera: Pablo prefiere terminar antes Barcelona, 6 oct): unas 3–4 semanas. Mapa 2021 en dB exactos cada 5 m, censo de locales con horarios, portales con coordenadas. Falta: sensores por hora (transparencia), ocio en el mapa (recalibrar con pocas estaciones) y situar en el mapa las quejas y los pisos turísticos.
