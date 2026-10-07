@@ -23,6 +23,7 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 - Franjas: día 7–19, tarde 19–23, noche 23–7. Nota global = 30 % día + 20 % tarde + 50 % noche. El "día" va de 7:00 a 7:00.
 - Nada suma "puntos" sueltos: todo entra como dB validados con los sensores municipales, dejando fuera cada distrito (validación cruzada). Si una pista no mejora frente a los sensores, se muestra como explicación o aviso, pero no suma.
 - Ya incluido: mapa estratégico de ruido 2017 por tramo, perfiles horarios y por día medidos con sensores, sensores de la misma calle (≤ 120 m), suma proporcional por bares y bares musicales/discotecas, horarios de los locales de noche, obras públicas en curso a menos de 25 m (+2 dB de día laborable), exterior frente a interior (patio), aviso de picos nocturnos (calle estrecha, quejas de recogida, pisos turísticos).
+- Excepción acordada: la **planta del piso** es una estimación a partir de estudios de calles (calle estrecha y alta: casi igual en todas las plantas; calle ancha: baja con la altura; ático −3 dB; bajo +1 dB), con la altura del edificio del Catastro y la anchura de la calle. Se muestra como estimación hasta medirla con el sonómetro en varias plantas.
 - Validador humano: el usuario vive cerca de Tuset / Travessera de Gràcia. Tuset de jueves a sábado de madrugada = 100; un domingo a las 15:00 no es ruidoso; Tuset, Travessera y Balmes son ruidosas en hora punta.
 
 ## Cómo trabajar

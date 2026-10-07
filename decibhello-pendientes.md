@@ -31,7 +31,8 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 - [ ] **Explicar la incertidumbre**: mostrar un margen ("entre 70 y 80") además de la cifra.
 
 ### 2. Lo que más le importa a quien alquila o compra
-- [ ] **Planta del piso**: un primero y un ático en la misma fachada no suenan igual. Pedir la planta y corregir.
+- [x] **Planta del piso** (estimación, 7 oct): selector en el visor, de bajo a ático. Usa las plantas del edificio (Catastro) y la anchura de la calle: en calles estrechas y altas casi no cambia; en calles anchas baja con la altura (Diagonal 500, 6.º: −3,9 dB); ático −3 dB; bajo +1 dB.
+- [ ] **Medir la planta**: con el sonómetro, medir a la vez en varias plantas del mismo edificio, en una calle estrecha y en una ancha, y ajustar las cifras.
 - [ ] **Orientación del piso**: exterior, interior o esquina (que da a dos calles).
 - [ ] **Ruido del propio edificio**: bar o local en los bajos, ascensor, aire acondicionado de vecinos. Hoy no lo cubrimos y es de lo que más molesta.
 - [ ] **Estacionalidad**: verano (ventanas abiertas, terrazas) frente a invierno.

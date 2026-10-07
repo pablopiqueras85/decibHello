@@ -50,7 +50,11 @@ for (const [d, nota, noches] of paquete) {
 }
 const extra = await q.evaluate(() => [DecibHello.buscar("https://www.google.com/maps/@41.3953,2.1500,17z").tipo, DecibHello.buscar("https://www.idealista.com/inmueble/123/").tipo, DecibHello.buscar("Carrer Xqzwkt 5").tipo, DecibHello.buscar("40.4168,-3.7038").tipo]);
 if (extra.join() !== "ok,aviso,sin_resultado,fuera") { difPaquete++; console.log("paquete, casos especiales:", extra); }
-console.log(`paquete decibhello.js: ${difPaquete} diferencias`);
+// Corrección por planta: la misma en JavaScript que en Python (tabla escrita por calcular_nota.py).
+const tabla = JSON.parse(fs.readFileSync(path.join(piloto, "pruebas", "planta_python.json"), "utf8"));
+const js_planta = await q.evaluate(t => t.map(([p, pe, an]) => DecibHello.correccionPlanta(p, pe, an)), tabla.casos);
+tabla.casos.forEach((c, i) => { if (Math.abs(js_planta[i] - tabla.db[i]) > 1e-9) { difPaquete++; console.log("planta", c, tabla.db[i], js_planta[i]); } });
+console.log(`paquete decibhello.js: ${difPaquete} diferencias (incluye ${tabla.casos.length} casos de planta)`);
 dif += difPaquete;
 if (errores.length) console.log("errores de la página:", errores);
 await navegador.close();

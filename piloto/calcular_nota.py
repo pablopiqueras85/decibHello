@@ -183,6 +183,45 @@ def asignar_obras(indice, hoy=None):
     return len(usadas), sum(1 for lst in nuevos.values() for _, i in lst if i >= 0)
 
 
+def asignar_plantas(indice, radio=10):
+    """Plantas del edificio de cada portal: la parte de edificio más alta del Catastro a menos de `radio` m del punto
+    del rango (piloto/datos/edificios_catastro.json.gz, ver alturas.py). Añade 'plantas' (-1 si no se sabe)."""
+    import gzip
+    from pyproj import Transformer
+    from scipy.spatial import cKDTree
+    f = AQUI / "datos" / "edificios_catastro.json.gz"
+    campos = indice["campos_rango"]
+    n = len(campos)
+    puntos = [(c, k) for c, (_, pl) in enumerate(indice["calles"]) for k in range(0, len(pl), n)]
+    plantas = np.full(len(puntos), -1)
+    if f.exists():
+        ed = np.array(json.loads(gzip.open(f, "rt", encoding="utf-8").read()), dtype=float)
+        ilat, ilon = campos.index("lat_e5"), campos.index("lon_e5")
+        t = Transformer.from_crs("EPSG:4326", "EPSG:25831", always_xy=True)
+        x, y = t.transform([2.0 + indice["calles"][c][1][k + ilon] / 1e5 for c, k in puntos],
+                           [41.3 + indice["calles"][c][1][k + ilat] / 1e5 for c, k in puntos])
+        arbol = cKDTree(ed[:, :2])
+        rmax = ed[:, 2].max()
+        for i, cerca in enumerate(arbol.query_ball_point(np.c_[x, y], radio + rmax)):
+            if not cerca:
+                continue
+            d = np.hypot(ed[cerca, 0] - x[i], ed[cerca, 1] - y[i]) - ed[cerca, 2]
+            ok = np.array(cerca)[d <= radio]
+            if len(ok):
+                plantas[i] = int(ed[ok, 3].max())
+    nuevos = {}
+    for (c, k), p in zip(puntos, plantas):
+        nuevos.setdefault(c, []).append((k, int(p)))
+    for c, lst in nuevos.items():
+        pl = indice["calles"][c][1]
+        out = []
+        for k, p in lst:
+            out += pl[k:k + n] + [p]
+        indice["calles"][c][1] = out
+    indice["campos_rango"] = campos + ["plantas"]
+    return int((plantas >= 0).sum()), len(plantas)
+
+
 def obra_activa(indice, grupo, hoy=None):
     """True si una obra en curso (no parada, no un gran proyecto) está a menos de obras.RADIO_EFECTO m en la fecha `hoy`."""
     import datetime as dt
@@ -211,6 +250,7 @@ def main():
     print(f"rangos con medición de sensor: {anclar_sensores(indice, perfiles)}")
     print(f"rangos con ajuste por horarios de locales: {ajustar_noches(indice)}")
     print("obras vigentes cerca de algún portal: {} · rangos con obras a menos de 100 m: {}".format(*asignar_obras(indice)))
+    print("rangos con altura del edificio (Catastro): {} de {}".format(*asignar_plantas(indice)))
     campos = indice["campos_rango"]
     filas = []
     for info in leer_direcciones():
@@ -260,6 +300,9 @@ def main():
         w.writerows(filas)
     escribir_tabla_md(filas)
     construir_visor(indice, perfiles)
+    # Casos de la corrección por planta para la prueba de paridad con JavaScript (pruebas/paridad.mjs).
+    casos = [[p, pe, an] for p in [None, 0, 1, 2, 3, 5, 8, 12, "atico"] for pe in [-1, 2, 5, 8, 12] for an in [-1, 6, 12, 25, 60]]
+    (AQUI / "pruebas" / "planta_python.json").write_text(json.dumps({"casos": casos, "db": [modelo.correccion_planta(*c) for c in casos]}))
 
     for r in sorted(filas, key=lambda r: -r["nota_global"]):
         print(f'{r["nota_global"]:>3}  D{r["nota_dia"]:>3} T{r["nota_tarde"]:>3} N{r["nota_noche"]:>3}  int {str(r["nota_global_interior"]):>3}  '

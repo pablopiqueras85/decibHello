@@ -190,6 +190,13 @@ Borrador de solicitud (por el Portal de Transparencia del Ajuntament):
 >
 > No solicito datos personales de los titulares. La finalidad es elaborar un servicio informativo sobre el ruido urbano para la ciudadanía. Solicito además, si es posible, que esta información se publique en Open Data BCN.
 
+### 2.16 Altura de los edificios (Catastro)
+
+- **Fuente**: Dirección General del Catastro, conjunto INSPIRE de edificios de Barcelona: https://www.catastro.hacienda.gob.es/INSPIRE/Buildings/08/08900-BARCELONA/A.ES.SDGC.BU.08900.zip (50 MB, descarga directa sin verificación anti-robots). Uso libre citando la fuente.
+- **Qué da**: la planta de cada parte de edificio con su número de plantas sobre rasante (276.506 partes; mediana de 4 plantas, el 10 % con 8 o más).
+- **Uso**: `piloto/alturas.py` lo resume en `piloto/datos/edificios_catastro.json.gz` (1,7 MB, en el repositorio). Cada portal toma la parte más alta a menos de 10 m: el 82 % de los tramos tiene altura.
+- **Mapa de fachadas 2017** (Open Data BCN, `facanes-mapa-estrategic-soroll`): da el ruido por edificio, pero un solo valor por fachada, sin altura. No sirve para la planta.
+
 ## 3. Cómo se accede a los datos
 
 - **Ficheros tabulares (CSV)**: se leen sin problema por la API del portal (`datastore_search` y `datastore_search_sql`), con consultas y filtros. Así funcionan el MES por tramo, el censo de locales, los pisos turísticos, IRIS y la lista de sensores.

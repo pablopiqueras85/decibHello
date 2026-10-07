@@ -88,3 +88,11 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - **Web** (agente 1): landing con vídeo, historia con datos reales del piloto, buscador de calles, votación de la próxima ciudad y lista de espera. https://claude.ai/artifact/KrBrXRxafoU2cScYv55FjD
 - **Motor común**: el modelo y el buscador en JavaScript están en `piloto/motor.js`. El visor y la web usan la misma pieza (`piloto/paquete/decibhello.js`), así que dan la misma nota.
 - **Siguiente ciudad: Madrid** (agente 5, confirmado por Pablo). Tiene mejor mapa (2021, dB exactos cada 5 m) y mejor censo de locales que Barcelona. Le faltan sensores por hora: hay que pedirlos por transparencia (borrador listo).
+
+## Actualización del 7 de octubre: planta del piso
+
+- **Nuevo selector "Planta"** en el visor: bajo, 1.º, 2.º… hasta la última planta del edificio, y ático.
+- **Cómo se calcula** (estimación a partir de estudios de calles, aún sin medir en Barcelona): el mapa oficial calcula a la altura de un 1.º. En una calle estrecha entre edificios altos el sonido rebota y casi no cambia con la altura. En una calle ancha baja poco a poco. El ático retirado gana unos 3 dB por la pantalla del pretil, y el bajo suma 1 dB.
+- **Datos**: las plantas de cada edificio salen del Catastro y la anchura de la calle, del índice.
+- **Ejemplos**: Diagonal 500, 6.º: −3,9 dB (nota 71). Tuset 20, 8.º: igual que un 1.º (calle de 23 m con edificios de 10 plantas). Tuset 20, ático: −3 dB. Verdi 20, bajo: +1 dB.
+- **También**: arreglado un recuadro de obras vacío que salía en calles sin obras.

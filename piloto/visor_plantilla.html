@@ -85,6 +85,10 @@ button, input { font: inherit; color: inherit; }
 .seg button[aria-pressed="true"] { background: var(--sel-bg); color: var(--sel-fg); }
 .seg button[aria-pressed="true"] small { color: inherit; opacity: 0.75; }
 .seg button:disabled { opacity: 0.45; cursor: not-allowed; }
+[hidden] { display: none !important; }
+.sel-planta { font: inherit; font-size: 0.9rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line-2); border-radius: 8px; padding: 7px 10px; min-width: 9.5rem; }
+.sel-planta:disabled { opacity: 0.45; }
+.nota-planta { font-size: 0.78rem; color: var(--muted); max-width: 22rem; }
 
 .lectura { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 20px; align-items: end; }
 .cifra { font-family: var(--f-display); font-weight: 700; font-size: clamp(4rem, 3rem + 5vw, 6.2rem); line-height: 0.85; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; display: flex; align-items: flex-end; gap: 10px; }
@@ -188,6 +192,11 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
           </div>
         </div>
         <div class="grupo-ctl">
+          <label class="etq" for="planta">Planta</label>
+          <select id="planta" class="sel-planta"></select>
+          <span class="nota-planta" id="nota-planta"></span>
+        </div>
+        <div class="grupo-ctl">
           <span class="etq" id="etq-dia">Día de la semana</span>
           <div class="seg" role="group" aria-labelledby="etq-dia">
             <button type="button" data-dia="" aria-pressed="true">Media</button>
@@ -283,7 +292,7 @@ const DATOS = /*DATOS*/null;
 
 /*MOTOR*/
 // ---------- Estado y pintado ----------
-const estado = { ci: 0, r: null, numero: null, origen: "", lado: "exterior", modo: "hora", hora: 1, franja: "N", dia: null, grupo: null, aviso: "" };
+const estado = { ci: 0, r: null, numero: null, origen: "", lado: "exterior", planta: 1, modo: "hora", hora: 1, franja: "N", dia: null, grupo: null, aviso: "" };
 // El eje del día va de las 7:00 a las 7:00 del día siguiente: la noche pertenece al día en que empieza.
 const ORDEN = Array.from({ length: 24 }, (_, i) => (i + 7) % 24);
 const posicion = h => (h + 17) % 24;
@@ -303,6 +312,22 @@ const NOMBRE_FRANJA = { D: "Día (7–19 h)", E: "Tarde (19–23 h)", N: "Noche 
 const GRUPOS = [["control", "Calles de control"], ["ruidosa", "Ruidosas"], ["intermedia", "Intermedias"], ["tranquila", "Tranquilas"]];
 const NOMBRE_GRUPO = { control: "piloto · control", ruidosa: "piloto · hipótesis ruidosa", intermedia: "piloto · hipótesis intermedia", tranquila: "piloto · hipótesis tranquila" };
 
+// Selector de planta: bajo, 1.º… hasta la última del edificio (Catastro) y ático. Estimación, no medición.
+const nombrePlanta = p => p === 0 ? "Bajo o entresuelo" : p === "atico" ? "Ático" : p + ".º";
+const topePlanta = r => (r.plantas > 1 ? r.plantas - 1 : 8);
+function ajustarPlanta(r) { if (estado.planta !== "atico" && estado.planta > topePlanta(r)) estado.planta = topePlanta(r); }
+function pintarPlanta(r, res) {
+  const sel = $("planta");
+  const tope = topePlanta(r);
+  const opciones = [0, ...Array.from({ length: tope }, (_, i) => i + 1), "atico"];
+  sel.replaceChildren(...opciones.map(p => { const o = document.createElement("option"); o.value = String(p); o.textContent = nombrePlanta(p); o.selected = p === estado.planta; return o; }));
+  sel.disabled = estado.lado === "interior";
+  const edificio = r.plantas > 0 ? `edificio de ${r.plantas} plantas (Catastro)` : "altura del edificio desconocida";
+  const calle = r.ancho_m > 0 ? `calle de ≈ ${r.ancho_m} m` : "anchura de la calle desconocida";
+  const d = res.dPlanta || 0;
+  $("nota-planta").textContent = estado.lado === "interior" ? "La planta solo se aplica a la fachada a la calle."
+    : `${d ? (d > 0 ? "+" : "−") + fmtDb(Math.abs(d)) + " dB respecto al 1.º" : estado.planta === 1 ? "Referencia: el mapa oficial calcula el ruido a la altura de un 1.º" : "Igual que un 1.º: en una calle estrecha entre edificios altos el sonido rebota y apenas baja con la altura"} · ${edificio}, ${calle}. Estimación según estudios de calles; aún sin medir en Barcelona.`;
+}
 const fechaTxt = iso => iso.split("-").reverse().join("/");
 function pintarObras(r, res) {
   const lista = obrasCerca(r);
@@ -359,7 +384,8 @@ function confianza(r, exacto, distancia) {
 
 function pintarDetalle() {
   const c = CALLES[estado.ci], r = estado.r;
-  const res = calcular(r, estado.dia);
+  ajustarPlanta(r);
+  const res = calcular(r, estado.dia, estado.planta);
   const s = ladoDe(res);
   $("calle-titulo").textContent = c.nombre + (estado.numero != null ? " " + estado.numero : "");
   $("barrio").textContent = IX.barrios[r.barrio] || "";
@@ -374,6 +400,7 @@ function pintarDetalle() {
   if (sinPatio && estado.lado === "interior") estado.lado = "exterior";
   $("lado-interior").disabled = sinPatio;
   $("lado-interior").title = sinPatio ? "No hay datos de patio interior para este portal" : "";
+  pintarPlanta(r, res);
   $("lado-exterior").setAttribute("aria-pressed", estado.lado === "exterior");
   $("lado-interior").setAttribute("aria-pressed", estado.lado === "interior");
   document.querySelectorAll("[data-franja]").forEach(b => b.setAttribute("aria-pressed", estado.modo === "franja" && b.dataset.franja === estado.franja));
@@ -525,7 +552,7 @@ function pintarTira() {
     el("line", { x1: l, x2: w - rgt, y1: y0 + carril, y2: y0 + carril, style: "stroke: var(--line-2); stroke-width: 1" }, svg);
     texto(svg, l - 8, y0 + carril - 4, nombre, "end");
     for (const r of c.rangos.filter(r => r.ini % 2 === par && r.ini <= maxN)) {
-      const res = calcular(r, estado.dia);
+      const res = calcular(r, estado.dia, estado.planta);
       const s = lado === "interior" && res.interior ? res.interior : res.exterior;
       const v = estado.modo === "franja" ? s.franjas[estado.franja] : s.nota[estado.hora];
       const x0 = xn(r.ini), x1 = Math.max(x0 + 3, xn(r.fin + 2) - 1);
@@ -673,6 +700,7 @@ $("hora").addEventListener("input", e => { estado.modo = "hora"; estado.hora = O
 document.querySelectorAll("[data-dia]").forEach(b => b.addEventListener("click", () => { estado.dia = b.dataset.dia === "" ? null : +b.dataset.dia; pintarTodo(); }));
 $("lado-exterior").addEventListener("click", () => { estado.lado = "exterior"; pintarTodo(); });
 $("lado-interior").addEventListener("click", () => { estado.lado = "interior"; pintarTodo(); });
+$("planta").addEventListener("change", e => { const v = e.target.value; estado.planta = v === "atico" ? "atico" : +v; pintarTodo(); });
 document.querySelectorAll("[data-franja]").forEach(b => b.addEventListener("click", () => {
   estado.modo = "franja"; estado.franja = b.dataset.franja; estado.hora = { D: 13, E: 21, N: 1 }[estado.franja];
   pintarTodo();
