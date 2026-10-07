@@ -269,6 +269,14 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
 .otra-ciudad { max-width: 52rem; margin: .8rem auto 0; display: flex; gap: .5rem; flex-wrap: wrap; }
 .otra-ciudad input { flex: 1 1 14rem; min-width: 0; font: 1rem var(--body); padding: .65rem .8rem; border: 1px solid var(--tinta2); background: transparent; color: var(--tinta); border-radius: 0; }
 .voto-estado { max-width: 52rem; margin: 1rem auto 0; font-size: .95rem; color: var(--tinta); text-align: center; }
+
+.opciones-piso { display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; align-items: center; }
+.campo-piso { display: grid; gap: .3rem; }
+.campo-piso select { font: 1rem var(--body); padding: .5rem .6rem; border: 1px solid var(--papel-tinta); background: #fff; color: var(--papel-tinta); border-radius: 0; min-width: 11rem; }
+.margen { font-size: .95rem; margin: 0; }
+.medias { font-family: var(--mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--papel-gris); margin: 0; }
+.regla .banda { position: absolute; top: -3px; height: 14px; background: rgba(21,24,29,.18); border: 1px solid rgba(21,24,29,.45); }
+.visor-enlace { display: grid; gap: .6rem; }
 @media (prefers-reduced-motion: reduce) { .frase .w, .frase .w.off { opacity: 1; filter: none; transition: none; } }
 </style>
 
@@ -415,7 +423,7 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
       <li><span class="que">Obras</span><div><h3>Obras públicas en curso</h3><p>Si hay una a menos de 25 metros, suma ruido los días laborables. Se revisa cada mañana.</p></div></li>
       <li><span class="que">Picos</span><div><h3>Calles estrechas y quejas</h3><p>El camión de madrugada apenas mueve una media, pero despierta. Lo avisamos aparte.</p></div></li>
     </ul>
-    <p class="leyenda">Es una estimación con datos públicos, no una medición de tu piso</p>
+    <p class="leyenda">Es una estimación con datos públicos, no una medición de tu piso · cada nota lleva su margen: unos ±15 puntos, o ±7 si hay un sensor en la calle</p>
   </section>
 
   <section class="bloque">
@@ -441,7 +449,8 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
       <div class="cab"><span>Informe DecibHello</span><span>Confianza: medida</span></div>
       <div class="dir">Carrer de Tuset 20</div>
       <div class="principal"><span class="cifra">75</span><div><div class="etq">Ruidoso</div><div class="sub">Más ruidosa que el 76 % de los portales de Barcelona</div></div></div>
-      <div><div class="regla" aria-hidden="true"><i style="left:75%"></i></div><div class="regla-ejes" aria-hidden="true"><span>0 muy tranquilo</span><span>100 muy ruidoso</span></div></div>
+      <p class="margen"><b>Margen habitual: entre 68 y 82.</b> Medido por un sensor de la calle.</p>
+      <div><div class="regla" aria-hidden="true"><span class="banda" style="left:68%;width:14%"></span><i style="left:75%"></i></div><div class="regla-ejes" aria-hidden="true"><span>0 muy tranquilo</span><span>100 muy ruidoso</span></div></div>
       <dl class="franjas"><div><dt>Día 7–19</dt><dd>68</dd></div><div><dt>Tarde 19–23</dt><dd>65</dd></div><div><dt>Noche 23–7</dt><dd>84</dd></div></dl>
       <ul class="lineas">
         <li><b>Exterior 75, interior 25.</b> El piso que da al patio es mucho más tranquilo.</li>
@@ -746,16 +755,43 @@ function cargarMotor() {
         b.addEventListener("click", () => mostrar(window.DecibHello.elegirCalle(o.ci, o.numero))); li.append(b); ul.append(li); });
       estado.append(ul); return;
     }
-    const x = r.informe, n = Math.round(x.nota), pc = x.percentil;
+    actual = { r, planta: 1, esquina: false };
+    pintar();
+  }
+  let actual = null;
+  function pintar(foco) {
+    const D = window.DecibHello, r = actual.r;
+    const x = D.informe(r.ci, r.r, null, actual.planta, actual.esquina), n = Math.round(x.nota), pc = x.percentil;
     const avisos = [];
     if (r.sinNumero) avisos.push("Sin número: enseñamos un tramo de la calle. Añade el número para afinar.");
     else if (!r.exacto) avisos.push(`No encuentro ese número exacto: enseñamos el tramo más cercano (portales ${x.portales[0]}–${x.portales[1]}).`);
     if (r.distancia > 60) avisos.push("El punto del mapa está algo lejos del portal más cercano: comprueba la dirección.");
     const h = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
     const cab = h("div"); cab.append(h("div", "dir", `${x.calle}${r.numero ? " " + r.numero : ""}`), h("div", "barrio", [x.barrio, `portales ${x.portales[0]}–${x.portales[1]}`].filter(Boolean).join(" · ")));
+    // Planta y esquina
+    const opciones = h("div", "opciones-piso");
+    const lp = h("label", "campo-piso"); lp.htmlFor = "busca-planta"; lp.append(h("span", "momento", "Planta"));
+    const sel = h("select"); sel.id = "busca-planta";
+    const ultima = x.plantasEdificio > 0 ? x.plantasEdificio : 8;
+    const ops = [[0, "Bajo o entresuelo"]].concat(Array.from({ length: ultima }, (_, i) => [i + 1, `${i + 1}.º`]), [["atico", "Ático"]]);
+    ops.forEach(([v, t]) => { const o = h("option", null, t); o.value = String(v); if (String(v) === String(actual.planta)) o.selected = true; sel.append(o); });
+    sel.addEventListener("change", () => { actual.planta = sel.value === "atico" ? "atico" : +sel.value; pintar("busca-planta"); });
+    lp.append(sel); opciones.append(lp);
+    if (x.otraCalle) {
+      const le = h("label", "casilla-ext"); le.htmlFor = "busca-esquina";
+      const cb = h("input"); cb.type = "checkbox"; cb.id = "busca-esquina"; cb.checked = actual.esquina;
+      cb.addEventListener("change", () => { actual.esquina = cb.checked; pintar("busca-esquina"); });
+      le.append(cb, h("span", null, `Esquina: también da a ${x.otraCalle}`)); opciones.append(le);
+    }
+    const notaPlanta = h("p", "busca-ayuda", "La planta es una estimación según estudios de calles; aún sin medir en Barcelona." + (x.plantasEdificio > 0 ? ` El edificio tiene ${x.plantasEdificio} plantas según el Catastro.` : ""));
     const pri = h("div", "principal"); const tx = h("div"); tx.append(h("div", "etq", x.etiqueta), h("div", "sub", pc >= 50 ? `Más ruidosa que el ${pc} % de los portales de Barcelona` : `Más tranquila que el ${100 - pc} % de los portales de Barcelona`));
     pri.append(h("span", "cifra", n), tx);
-    const regla = h("div"); const rg = h("div", "regla"); const mk = h("i"); mk.style.left = n + "%"; rg.append(mk); const ej = h("div", "regla-ejes"); ej.append(h("span", null, "0 muy tranquilo"), h("span", null, "100 muy ruidoso")); regla.append(rg, ej);
+    const [m0, m1] = x.margen.map(Math.round);
+    const margen = h("p", "margen"); margen.append(h("b", null, `Margen habitual: entre ${m0} y ${m1}.`), " " + (x.sensor ? "Medido por un sensor de la calle." : "2 de cada 3 calles comprobadas con sensores caen dentro."));
+    const medias = h("p", "medias", [x.mediaBarrio != null ? `Media del barrio: ${Math.round(x.mediaBarrio)}` : null, `Media de Barcelona: ${Math.round(x.mediaCiudad)}`].filter(Boolean).join(" · "));
+    const regla = h("div"); const rg = h("div", "regla");
+    const banda = h("span", "banda"); banda.style.left = m0 + "%"; banda.style.width = Math.max(1, m1 - m0) + "%"; rg.append(banda);
+    const mk = h("i"); mk.style.left = n + "%"; rg.append(mk); const ej = h("div", "regla-ejes"); ej.append(h("span", null, "0 muy tranquilo"), h("span", null, "100 muy ruidoso")); regla.append(rg, ej);
     const fr = h("dl", "franjas"); [["Día 7–19", "D"], ["Tarde 19–23", "E"], ["Noche 23–7", "N"]].forEach(([t, k]) => { const d = h("div"); d.append(h("dt", null, t), h("dd", null, Math.round(x.franjas[k]))); fr.append(d); });
     const noc = h("div"); noc.append(h("div", "momento", "Noches de la semana")); const mb = h("div", "mini-noches"); mb.setAttribute("role", "img");
     mb.setAttribute("aria-label", "Nota de la noche de lunes a domingo: " + x.noches.map(Math.round).join(", "));
@@ -771,9 +807,12 @@ function cargarMotor() {
     li("Obras públicas:", x.obraSuma ? "hay una en curso a menos de 25 m y suma ruido de día laborable." : obras ? `${obras} a menos de 100 m (ninguna suma ahora).` : "ninguna a menos de 100 m.");
     li("Origen:", x.sensor ? `sensor municipal de ${x.sensor} (2023).` : `mapa oficial de ruido (noche ${x.mapa.N}) y modelo DecibHello.`);
     const extra = avisos.length ? h("p", "busca-ayuda", avisos.join(" ")) : null;
-    const a = h("a", "boton", "Informe completo en el visor →"); a.href = "https://claude.ai/artifact/AoLUjYUaWy6arbZLiL9vje"; a.target = "_blank"; a.rel = "noopener";
-    out.replaceChildren(...[cab, extra, pri, regla, fr, noc, ul, a].filter(Boolean));
+    const pie = h("div", "visor-enlace");
+    pie.append(h("p", "busca-ayuda", "En el visor: el mapa de la zona, la curva de 24 horas, comparar varios pisos y descargar el informe."));
+    const a = h("a", "boton", "Abrir en el visor →"); a.href = "https://claude.ai/artifact/AoLUjYUaWy6arbZLiL9vje"; a.target = "_blank"; a.rel = "noopener"; pie.append(a);
+    out.replaceChildren(...[cab, extra, opciones, notaPlanta, pri, margen, medias, regla, fr, noc, ul, pie].filter(Boolean));
     out.hidden = false;
+    if (foco) document.getElementById(foco)?.focus();
   }
 })();
 
