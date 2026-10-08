@@ -4,12 +4,16 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 
 ## Qué hay
 
+Repositorio `pablopiqueras85/decibhello`, rama principal `main`. La portada (`README.md`) tiene el mapa completo.
+
 - `docs/concepto.md`: idea, escala, competencia y modelo de negocio.
 - `docs/fuentes-datos-barcelona.md`: fuentes de datos, cómo se accede y borradores de solicitudes de transparencia (2.13 recogida de basuras, 2.15 obras privadas).
 - `docs/pendientes.md`: pendientes y hoja de ruta. **Léelo antes de empezar** y márcalo al terminar algo. Arriba está "Ahora mismo", la lista corta de lo abierto: es lo primero que se lee tras un resumen de la conversación, y se actualiza cada vez que algo se abre o se cierra.
 - `docs/agentes.md`: equipo de agentes (sesiones, ramas, carpetas) y cómo se les despierta.
 - `docs/actualizaciones.md`: registro de cambios para el usuario, por fechas. Añade una sección cuando cambies algo que él note.
-- `piloto/`: el prototipo de Barcelona (ver `piloto/README.md`). `servicios-ia-y-skool.md` es de otro proyecto: no lo toques.
+- `docs/direcciones-piloto.md`: las direcciones del piloto y lo que se esperaba de cada una.
+- `piloto/`: el prototipo de Barcelona (ver `piloto/README.md`).
+- `web/`: la web con lista de espera (agente 1). `investigacion/`: el estudio de la siguiente ciudad (agente 5).
 
 ## El producto hoy
 
@@ -40,6 +44,6 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 - Datos: API del datastore de Open Data BCN (`datastore_search`, `datastore_search_sql`). Las descargas directas de ficheros piden verificación anti-robots: **nunca la saltes**; pide al usuario que los descargue.
 - Los CSV de sensores de 2023 (`piloto/sensores/`, ~50 MB) no están en el repositorio. Solo hacen falta para `sensores.py`, `ocio_oculto.py` y `obras.py`; si los necesitas, pídeselos al usuario.
 - Sensores: de 7:00 a 23:59 la fecha registrada es la del día siguiente (`sensores.py` lo corrige).
-- Rama de trabajo actual: `claude/keen-bohr-5oenpq`. Si trabajas en paralelo con otro agente, usa una rama propia y no toquéis los mismos ficheros a la vez (sobre todo `modelo.py`, `motor.js`, `visor_plantilla.html` y `calcular_nota.py`).
-- No abras pull requests salvo que el usuario lo pida.
+- Ramas: el director trabaja en `main`. Cada agente trabaja en su rama `agente/<nombre>`, sacada de `main`. Integrar es hacer merge a `main` cuando Pablo lo aprueba. No toquéis los mismos ficheros a la vez (sobre todo `modelo.py`, `motor.js`, `visor_plantilla.html` y `calcular_nota.py`).
+- No abras pull requests salvo que Pablo lo pida.
 - Memoria de cada agente: `<su carpeta>/ESTADO.md`, en su rama (encargo, qué está hecho, qué falta, decisiones de Pablo, enlaces). Léelo al empezar y actualízalo y súbelo al terminar: la conversación puede resumirse o perderse, el fichero no. El director hace lo mismo con `docs/pendientes.md` y `docs/agentes.md`.

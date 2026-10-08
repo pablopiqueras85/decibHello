@@ -117,3 +117,11 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 
 - Página nueva con el equipo de un vistazo: https://claude.ai/artifact/HwD9FCVjj4BNHn5BHUGc2h
 - Muestra quién hace qué (tú, el director, la tarea diaria y los 6 agentes con su estado), en qué rama y carpeta guarda cada uno su trabajo, qué está publicado, qué no se guarda en el repositorio y cómo llega un encargo al producto.
+
+## Actualización del 8 de octubre: repositorio propio
+
+- DecibHello tiene ya su propio repositorio privado en GitHub: `pablopiqueras85/decibhello`, con la rama principal `main`.
+- Dentro están el piloto, la web con la lista de espera y el estudio de la siguiente ciudad, con toda su historia.
+- Los documentos están ahora en la carpeta `docs/`, y la portada del repositorio (`README.md`) explica qué hay y dónde.
+- Los agentes trabajarán aquí, cada uno en su rama. Las ramas antiguas se quedan en el repositorio Ideas como archivo.
+- El visor y la web siguen en los mismos enlaces.

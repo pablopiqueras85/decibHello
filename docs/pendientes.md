@@ -8,15 +8,13 @@ Lo abierto en este momento. El director la mantiene al día y la copia en su lis
 
 Decide Pablo:
 1. **Overture Maps**: sustituir el censo, combinarlo con él (recomendado) o solo avisar de aperturas.
-2. **Agentes 1 y 5**: ¿se despiertan un momento para que escriban su `ESTADO.md`? (Nunca el 3.)
-3. **Integrar** la web (`web/`, agente 1) y el estudio de ciudades (`investigacion/`, agente 5) en la rama principal.
-4. **Nombre, dominio e idiomas**, y cómo tratar los anuncios.
+2. **Nombre, dominio e idiomas**, y cómo tratar los anuncios.
 
 Trae Pablo:
-5. **Calles de control**: notas a ciegas, tramo silencioso de Travessera y anchura de Travessera 150.
-6. **Descargas**: sensores minuto a minuto y mapa de ruido 2022 (piden verificación anti-robots).
-7. **Cuatro solicitudes de transparencia**: dos a Barcelona (2.13 y 2.15) y dos a Madrid.
-8. **Material para la web**: guiones de los vídeos, su vídeo con sonido y foto del área metropolitana.
+3. **Calles de control**: notas a ciegas, tramo silencioso de Travessera y anchura de Travessera 150.
+4. **Descargas**: sensores minuto a minuto y mapa de ruido 2022 (piden verificación anti-robots).
+5. **Cuatro solicitudes de transparencia**: dos a Barcelona (2.13 y 2.15) y dos a Madrid.
+6. **Material para la web**: guiones de los vídeos, su vídeo con sonido y foto del área metropolitana.
 
 En marcha solo: tarea programada de obras (lunes a viernes, 6:47). Dormidos: agentes 2, 3, 4 y 6.
 
@@ -28,7 +26,7 @@ En marcha solo: tarea programada de obras (lunes a viernes, 6:47). Dormidos: age
 - [ ] **Tramo silencioso de Travessera de Gràcia**: número o cruce.
 - [ ] **Anchura de Travessera de Gràcia 150**: confirmar si ≈ 8 m es razonable.
 - [ ] **Solicitud de información pública** al Ajuntament (contenedores, rutas y horarios de recogida, calendario de muebles, limpieza nocturna). Borrador en [fuentes-datos-barcelona.md](fuentes-datos-barcelona.md), apartado 2.13.
-- [ ] **Solicitudes de transparencia al Ayuntamiento de Madrid** (dos: datos por hora de las 31 estaciones de ruido, y horarios de recogida y limpieza). Borrador del agente 5 en `investigacion/solicitud-transparencia-madrid.md` (rama `agente/siguiente-ciudad`).
+- [ ] **Solicitudes de transparencia al Ayuntamiento de Madrid** (dos: datos por hora de las 31 estaciones de ruido, y horarios de recogida y limpieza). Borrador del agente 5 en [investigacion/solicitud-transparencia-madrid.md](../investigacion/solicitud-transparencia-madrid.md).
 - [ ] **Solicitud de información pública sobre obras privadas** (licencias de obras mayores y permisos de andamios, grúas y contenedores desde 2024). Borrador en el apartado 2.15.
 - [ ] **Decidir cómo tratar los anuncios** (Idealista, Fotocasa…): pedir la calle (ahora), extensión de navegador o acuerdos con portales.
 - [ ] **Decisiones abiertas**: idiomas (castellano, catalán, inglés), nombre y dominio.
@@ -79,7 +77,7 @@ En marcha solo: tarea programada de obras (lunes a viernes, 6:47). Dormidos: age
 - [x] **¿Siguen abiertos los bares?** (7 oct): cruce del censo de 2024 con las terrazas del último semestre. 1,5 % de posibles cierres y 184 terrazas nuevas sin local en el censo. Se muestra en cada calle; no cambia la nota.
 - [ ] **Locales más al día**: Overture Maps (abierto, mensual) predice el ruido igual de bien que el censo de 2024 (apartado 2.18 de fuentes). Decidir si sustituye al censo, se combina con él o solo avisa de aperturas. Google Places, solo para consultas en directo en el portal (no se puede guardar).
 - [ ] **Mantenimiento de datos**: actualizar quejas, locales, pisos turísticos y sensores cada mes o trimestre de forma automática.
-- [x] **Siguiente ciudad: Madrid** (confirmado el 6 de octubre de 2026). Datos de 0 a 10: Barcelona 9,5 · Madrid 8 · Valencia 5 · L'Hospitalet + Badalona 3,5 · Sant Cugat 1. Informes en `investigacion/` (rama `agente/siguiente-ciudad`). El área metropolitana, como ampliación de Barcelona más adelante.
+- [x] **Siguiente ciudad: Madrid** (confirmado el 6 de octubre de 2026). Datos de 0 a 10: Barcelona 9,5 · Madrid 8 · Valencia 5 · L'Hospitalet + Badalona 3,5 · Sant Cugat 1. Informes en [investigacion/](../investigacion/). El área metropolitana, como ampliación de Barcelona más adelante.
 - [ ] **Piloto de Madrid** (en espera: Pablo prefiere terminar antes Barcelona, 6 oct): unas 3–4 semanas. Mapa 2021 en dB exactos cada 5 m, censo de locales con horarios, portales con coordenadas. Falta: sensores por hora (transparencia), ocio en el mapa (recalibrar con pocas estaciones) y situar en el mapa las quejas y los pisos turísticos.
 
 ### 6. Venta a portales y empresas (cuando haya portal público y validación)
