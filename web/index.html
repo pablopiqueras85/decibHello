@@ -261,7 +261,6 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
 .ciudad .peg { position: absolute; top: .7rem; left: .7rem; z-index: 1; }
 .ciudad.activa { grid-column: 1 / -1; min-height: 13rem; }
 .ciudad.activa .nombre { font-size: clamp(2.2rem, 7vw, 3.6rem); }
-.ciudad.metro { background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.18) 1px, transparent 1.5px), linear-gradient(135deg, #3A4A63, #1E2635); background-size: 7px 7px, cover; }
 .ciudad.otra { background: transparent; border: 1.5px dashed color-mix(in srgb, var(--tinta) 55%, transparent); color: var(--tinta); }
 .ciudad.otra::before { display: none; }
 .ciudad.otra .sub, .ciudad.otra .cuenta { color: var(--tinta2); }
@@ -519,7 +518,7 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
     <div class="texto" style="margin-top:2rem"><p>Hoy DecibHello solo funciona en Barcelona. Vota dónde quieres que abramos después. Basta un toque y no hace falta correo.</p></div>
     <div class="ciudades" id="lista-ciudades">
       <button type="button" class="ciudad activa" data-ciudad="barcelona" style="background-image:url('media/ciudad-barcelona.jpg')"><span class="peg verde">Activa</span><span><span class="nombre">Barcelona</span><span class="sub">172.000 portales con nota</span><span class="cuenta">Buscar una calle →</span></span></button>
-      <button type="button" class="ciudad metro" data-ciudad="area-metropolitana" aria-pressed="false"><span><span class="nombre">Área metropolitana</span><span class="sub">L'Hospitalet, Badalona, Sant Cugat…</span><span class="cuenta" data-cuenta="area-metropolitana">Votar</span></span></button>
+      <button type="button" class="ciudad" data-ciudad="area-metropolitana" aria-pressed="false" style="background-image:url('media/ciudad-area-metropolitana.jpg')"><span><span class="nombre">Área metropolitana</span><span class="sub">L'Hospitalet, Badalona, Sant Cugat…</span><span class="cuenta" data-cuenta="area-metropolitana">Votar</span></span></button>
       <button type="button" class="ciudad" data-ciudad="madrid" aria-pressed="false" style="background-image:url('media/ciudad-madrid.jpg')"><span><span class="nombre">Madrid</span><span class="cuenta" data-cuenta="madrid">Votar</span></span></button>
       <button type="button" class="ciudad" data-ciudad="valencia" aria-pressed="false" style="background-image:url('media/ciudad-valencia.jpg')"><span><span class="nombre">Valencia</span><span class="cuenta" data-cuenta="valencia">Votar</span></span></button>
       <button type="button" class="ciudad otra" data-ciudad="otra" aria-pressed="false" aria-controls="otra-ciudad"><span><span class="nombre">Otra ciudad</span><span class="sub">Escríbela tú</span><span class="cuenta" data-cuenta="otra">Votar</span></span></button>
@@ -536,7 +535,7 @@ footer .mono { font-family: var(--mono); font-size: .66rem; letter-spacing: .12e
 <footer>
   <div class="marca-pie">DecibHello</div>
   <p>Datos: Ajuntament de Barcelona, <a href="https://opendata-ajuntament.barcelona.cat/" target="_blank" rel="noopener">Open Data BCN</a> (mapa estratégico de ruido 2017, sensores de ruido 2023, locales de ocio, obras públicas y quejas IRIS) y Overture Maps (bares y locales de noche, CDLA-Permissive 2.0). Elaboración propia. Las notas son estimaciones del piloto, no mediciones de cada vivienda.</p>
-  <p>Vídeo de la portada: plaça de Catalunya, Barcelona (Coverr, licencia Coverr). Fotos de ciudades en Wikimedia Commons: Barcelona, Chris Koerner (CC BY 2.0); Madrid, Barcex (CC BY-SA 3.0); Valencia, Francesc Fort (CC BY-SA 4.0).</p>
+  <p>Vídeo de la portada: plaça de Catalunya, Barcelona (Coverr, licencia Coverr). Fotos de ciudades en Wikimedia Commons: Barcelona, Chris Koerner (CC BY 2.0); área metropolitana (L'Hospitalet de Llobregat), Jorge Franganillo (CC BY 2.0, recortada); Madrid, Barcex (CC BY-SA 3.0); Valencia, Francesc Fort (CC BY-SA 4.0).</p>
   <p class="mono">© 2026 DecibHello · Barcelona</p>
 </footer>
 

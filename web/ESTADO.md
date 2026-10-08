@@ -20,7 +20,9 @@ Borrador del director (8 oct 2026); el agente lo revisa y completa al despertar.
 
 ## Falta
 
-- De Pablo: guiones de los vídeos de plastilina, su vídeo con sonido y una foto del área metropolitana (L'Hospitalet o Badalona, con licencia CC, o suya).
+- Foto del área metropolitana: puesta (8 oct; L'Hospitalet, Jorge Franganillo, CC BY 2.0).
+- Guiones de los vídeos de plastilina: borrador en [GUIONES-VIDEOS.md](GUIONES-VIDEOS.md) (8 oct), pendiente de que Pablo los apruebe.
+- De Pablo: su vídeo con sonido.
 - Ideas abiertas del guion: páginas por ciudad, dónde va el recuadro de la extensión, avisos del marcador, ritmo de los bloques, el mismo viaje en Pomaret 20 e idiomas.
 - Abrir la lista de espera al público: hoy solo funciona para personas invitadas. Hace falta dominio propio y un formulario.
 - Revisar y completar este borrador.

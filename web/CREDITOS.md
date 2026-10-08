@@ -20,7 +20,9 @@
 - Madrid: "Madrid - Madrid skyline - 140314 195825", Barcex, CC BY-SA 3.0. https://commons.wikimedia.org/wiki/File:Madrid_-_Madrid_skyline_-_140314_195825.jpg → `media/ciudad-madrid.jpg`
 - Valencia: "Skyline València", Francesc Fort, CC BY-SA 4.0. https://commons.wikimedia.org/wiki/File:Skyline_Val%C3%A8ncia.jpg → `media/ciudad-valencia.jpg`
 - Reducidas a 900 px de ancho, sin otros cambios. El crédito va en el pie de la página.
-- Área metropolitana: sin foto todavía (Commons limitó las descargas). Fondo propio de puntos. Pendiente: una foto de L'Hospitalet o Badalona con licencia CC, o una de Pablo.
+- Área metropolitana: "L'Hospitalet de Llobregat (52755824399)", Jorge Franganillo, CC BY 2.0. https://commons.wikimedia.org/wiki/File:L%27Hospitalet_de_Llobregat_%2852755824399%29.jpg → `media/ciudad-area-metropolitana.jpg`
+  - Vista de L'Hospitalet de Llobregat al anochecer, tomada el 18 de marzo de 2023. Licencia: https://creativecommons.org/licenses/by/2.0/ (uso comercial permitido, con crédito). Commons la marca como revisada (FlickreviewR 2).
+  - Cambios: recortada (franja 5:2, sin la parte de abajo) y reducida a 900 × 360 px, 70 KB. Se partió de la miniatura de 1280 px de Commons, porque Commons frenó la descarga del original (5910 × 3546 px). El pie de la página dice "recortada".
 
 ## Buscador
 - `decibhello.js` es `piloto/paquete/decibhello.js` (motor común que genera `piloto/calcular_nota.py`). La web lo publica junto a la página y lo carga solo al acercarse al buscador.

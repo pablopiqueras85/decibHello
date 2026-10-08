@@ -492,7 +492,7 @@ function pintarDetalle() {
   const nivelPicos = avisoPicos(r.ancho_m, r.quejas_recogida, r.turisticos);
   $("picos-nivel").textContent = "Picos nocturnos: " + nivelPicos;
   $("picos-punto").style.background = `var(--st-${nivelPicos})`;
-  const anchoTxt = r.ancho_m < 0 ? "anchura desconocida" : r.ancho_m < 12 ? `calle estrecha (≈ ${r.ancho_m} m entre fachadas): el ruido rebota` : `calle de ≈ ${r.ancho_m} m entre fachadas`;
+  const anchoTxt = r.ancho_m < 0 ? "anchura desconocida" : r.ancho_m < 12 ? `calle estrecha (≈ ${r.ancho_m} m de portal a portal): el ruido rebota` : `calle de ≈ ${r.ancho_m} m de portal a portal`;
   const quejasTxt = r.quejas_recogida ? `${r.quejas_recogida} queja${r.quejas_recogida > 1 ? "s" : ""} por ruido de limpieza y recogida a menos de 100 m (2023–2026)` : "sin quejas por ruido de limpieza y recogida a menos de 100 m (2023–2026)";
   const turTxt = r.turisticos >= 20 ? ` · ${r.turisticos} pisos turísticos a menos de 100 m (llegadas y salidas a deshoras)` : "";
   $("picos-motivo").textContent = `${anchoTxt} · ${quejasTxt}${turTxt}.`;

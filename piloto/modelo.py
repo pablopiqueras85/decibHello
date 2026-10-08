@@ -92,7 +92,7 @@ def correccion_planta(planta, plantas_edificio=-1, ancho_m=-1):
 
     planta: 0 = bajo o entresuelo, 1, 2, 3... = número de planta, "atico" = ático. None o 1 = sin corrección.
     plantas_edificio: plantas sobre rasante del edificio (Catastro), -1 si no se sabe.
-    ancho_m: anchura de la calle entre fachadas, -1 si no se sabe.
+    ancho_m: anchura de la calle medida de portal a portal (unos 2 m más que entre fachadas), -1 si no se sabe.
     """
     if planta is None or planta == 1:
         return 0.0
