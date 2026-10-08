@@ -7,14 +7,13 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 Lo abierto en este momento. El director la mantiene al día y la copia en su lista de tareas de la sesión. El detalle está más abajo.
 
 Decide Pablo:
-1. **Publicar la nota con censo + Overture**: hecha y comprobada en la rama `overture-censo`; espera su visto bueno.
-2. **Nombre, dominio e idiomas**, y cómo tratar los anuncios.
+1. **Nombre, dominio e idiomas**, y cómo tratar los anuncios.
 
 Trae Pablo:
-3. **Calles de control**: notas a ciegas, tramo silencioso de Travessera y anchura de Travessera 150.
-4. **Descargas**: sensores minuto a minuto y mapa de ruido 2022 (piden verificación anti-robots).
-5. **Cuatro solicitudes de transparencia**: dos a Barcelona (2.13 y 2.15) y dos a Madrid.
-6. **Material para la web**: guiones de los vídeos, su vídeo con sonido y foto del área metropolitana.
+2. **Calles de control**: notas a ciegas, tramo silencioso de Travessera y anchura de Travessera 150.
+3. **Descargas**: sensores minuto a minuto y mapa de ruido 2022 (piden verificación anti-robots).
+4. **Cuatro solicitudes de transparencia**: dos a Barcelona (2.13 y 2.15) y dos a Madrid.
+5. **Material para la web**: guiones de los vídeos, su vídeo con sonido y foto del área metropolitana.
 
 En marcha solo: tarea programada de obras (lunes a viernes, 6:47). Dormidos: agentes 2, 3, 4 y 6.
 
