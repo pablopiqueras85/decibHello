@@ -4,11 +4,11 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 
 ## Qué hay
 
-- `decibhello-concepto.md`: idea, escala, competencia y modelo de negocio.
-- `decibhello-fuentes-datos-barcelona.md`: fuentes de datos, cómo se accede y borradores de solicitudes de transparencia (2.13 recogida de basuras, 2.15 obras privadas).
-- `decibhello-pendientes.md`: pendientes y hoja de ruta. **Léelo antes de empezar** y márcalo al terminar algo. Arriba está "Ahora mismo", la lista corta de lo abierto: es lo primero que se lee tras un resumen de la conversación, y se actualiza cada vez que algo se abre o se cierra.
-- `decibhello-agentes.md`: equipo de agentes (sesiones, ramas, carpetas) y cómo se les despierta.
-- `decibhello-actualizacion.md`: registro de cambios para el usuario, por fechas. Añade una sección cuando cambies algo que él note.
+- `docs/concepto.md`: idea, escala, competencia y modelo de negocio.
+- `docs/fuentes-datos-barcelona.md`: fuentes de datos, cómo se accede y borradores de solicitudes de transparencia (2.13 recogida de basuras, 2.15 obras privadas).
+- `docs/pendientes.md`: pendientes y hoja de ruta. **Léelo antes de empezar** y márcalo al terminar algo. Arriba está "Ahora mismo", la lista corta de lo abierto: es lo primero que se lee tras un resumen de la conversación, y se actualiza cada vez que algo se abre o se cierra.
+- `docs/agentes.md`: equipo de agentes (sesiones, ramas, carpetas) y cómo se les despierta.
+- `docs/actualizaciones.md`: registro de cambios para el usuario, por fechas. Añade una sección cuando cambies algo que él note.
 - `piloto/`: el prototipo de Barcelona (ver `piloto/README.md`). `servicios-ia-y-skool.md` es de otro proyecto: no lo toques.
 
 ## El producto hoy
@@ -42,4 +42,4 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 - Sensores: de 7:00 a 23:59 la fecha registrada es la del día siguiente (`sensores.py` lo corrige).
 - Rama de trabajo actual: `claude/keen-bohr-5oenpq`. Si trabajas en paralelo con otro agente, usa una rama propia y no toquéis los mismos ficheros a la vez (sobre todo `modelo.py`, `motor.js`, `visor_plantilla.html` y `calcular_nota.py`).
 - No abras pull requests salvo que el usuario lo pida.
-- Memoria de cada agente: `<su carpeta>/ESTADO.md`, en su rama (encargo, qué está hecho, qué falta, decisiones de Pablo, enlaces). Léelo al empezar y actualízalo y súbelo al terminar: la conversación puede resumirse o perderse, el fichero no. El director hace lo mismo con `decibhello-pendientes.md` y `decibhello-agentes.md`.
+- Memoria de cada agente: `<su carpeta>/ESTADO.md`, en su rama (encargo, qué está hecho, qué falta, decisiones de Pablo, enlaces). Léelo al empezar y actualízalo y súbelo al terminar: la conversación puede resumirse o perderse, el fichero no. El director hace lo mismo con `docs/pendientes.md` y `docs/agentes.md`.
