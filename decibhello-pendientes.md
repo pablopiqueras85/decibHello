@@ -2,6 +2,24 @@
 
 Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact privado).
 
+## Ahora mismo (lista corta; léela primero)
+
+Lo abierto en este momento. El director la mantiene al día y la copia en su lista de tareas de la sesión. El detalle está más abajo.
+
+Decide Pablo:
+1. **Overture Maps**: sustituir el censo, combinarlo con él (recomendado) o solo avisar de aperturas.
+2. **Agentes 1 y 5**: ¿se despiertan un momento para que escriban su `ESTADO.md`? (Nunca el 3.)
+3. **Integrar** la web (`web/`, agente 1) y el estudio de ciudades (`investigacion/`, agente 5) en la rama principal.
+4. **Nombre, dominio e idiomas**, y cómo tratar los anuncios.
+
+Trae Pablo:
+5. **Calles de control**: notas a ciegas, tramo silencioso de Travessera y anchura de Travessera 150.
+6. **Descargas**: sensores minuto a minuto y mapa de ruido 2022 (piden verificación anti-robots).
+7. **Cuatro solicitudes de transparencia**: dos a Barcelona (2.13 y 2.15) y dos a Madrid.
+8. **Material para la web**: guiones de los vídeos, su vídeo con sonido y foto del área metropolitana.
+
+En marcha solo: tarea programada de obras (lunes a viernes, 6:47). Dormidos: agentes 2, 3, 4 y 6.
+
 ## Pendientes tuyos
 
 - [x] **Datos de los sensores por hora (2023)**: recibidos y analizados (octubre de 2026).
