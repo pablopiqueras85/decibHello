@@ -11,7 +11,7 @@ Decide Pablo:
 
 Trae Pablo:
 2. **Calles de control**: notas a ciegas, tramo silencioso de Travessera y anchura de Travessera 150.
-3. **Descargas**: sensores minuto a minuto y mapa de ruido 2022 (piden verificación anti-robots).
+3. **Descargas** (piden verificación anti-robots, las hace Pablo). Sensores minuto a minuto: `2025_07Jul_XarxaSoroll_EqMonitor_Dades_1Min.zip` y `2025_10Oct_XarxaSoroll_EqMonitor_Dades_1Min.zip` (unos 58 MB cada uno). Mapa 2022: `2022_Raster_Total_Dia_…`, `…_Total_Vespre_…` y `…_Total_Nit_Mapa_Estrategic_Soroll_BCN.gpkg` (unos 97 MB cada uno). Se pasan adjuntos al chat o con un enlace de Dropbox o Google Drive.
 4. **Cuatro solicitudes de transparencia**: dos a Barcelona (2.13 y 2.15) y dos a Madrid.
 5. **Material para la web**: guiones de los vídeos, su vídeo con sonido y foto del área metropolitana.
 
