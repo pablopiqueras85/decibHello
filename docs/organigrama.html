@@ -1,0 +1,339 @@
+<title>Organigrama DecibHello</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Organigrama de arriba abajo (Pablo → director → seis agentes); en pantallas estrechas, árbol sangrado.
+   Debajo, el repositorio como árbol de carpetas, el camino de un encargo y lo que vive fuera.
+   Colores y letras del visor de DecibHello. Fuente: docs/organigrama.html del repositorio. */
+:root {
+  --bg: #f2f4f6;
+  --surface: #ffffff;
+  --ink: #12161b;
+  --ink-2: #48515b;
+  --muted: #6f7883;
+  --line: #dce1e6;
+  --wire: #b9c2cb;
+  --band: #e9edf1;
+  --accent: #2a78d6;
+  --accent-soft: #e3eefb;
+  --ok: #17803d;
+  --ok-soft: #e2f3e7;
+  --stop: #b83535;
+  --stop-soft: #fbe5e5;
+  --sleep: #5d6773;
+  --sleep-soft: #e9edf1;
+  --boss: #12161b;
+  --boss-ink: #ffffff;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --g: 12px;
+  --tallo: 26px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317; --surface: #191c21; --ink: #f1f3f5; --ink-2: #c2c8cf; --muted: #8b949e;
+    --line: #2a2f36; --wire: #46505b; --band: #20242a; --accent: #5a9ef0; --accent-soft: #1b2a3d;
+    --ok: #4cc276; --ok-soft: #16291d; --stop: #ef7a7a; --stop-soft: #351a1a;
+    --sleep: #a3acb7; --sleep-soft: #23272d; --boss: #f1f3f5; --boss-ink: #12161b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111317; --surface: #191c21; --ink: #f1f3f5; --ink-2: #c2c8cf; --muted: #8b949e;
+  --line: #2a2f36; --wire: #46505b; --band: #20242a; --accent: #5a9ef0; --accent-soft: #1b2a3d;
+  --ok: #4cc276; --ok-soft: #16291d; --stop: #ef7a7a; --stop-soft: #351a1a;
+  --sleep: #a3acb7; --sleep-soft: #23272d; --boss: #f1f3f5; --boss-ink: #12161b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+code, .mono { font-family: var(--f-mono); font-size: 0.86em; }
+h1, h2, h3 { text-wrap: balance; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 64px; display: grid; gap: 56px; }
+
+/* Cabecera */
+.cabecera { display: grid; gap: 12px; }
+.cabecera h1 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: clamp(1.8rem, 4.2vw, 2.6rem); letter-spacing: -0.02em; line-height: 1.05; }
+.cabecera p { margin: 0; color: var(--ink-2); max-width: 62ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font-size: 0.86rem; color: var(--muted); }
+.repo { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 0.82rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; text-decoration: none; }
+.repo b { font-weight: 500; color: var(--accent); }
+.leyenda { display: flex; flex-wrap: wrap; gap: 8px 12px; }
+
+/* Estados */
+.estado { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 0.76rem; font-weight: 600; white-space: nowrap; line-height: 1.5; }
+.estado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.estado.diario { color: var(--accent); background: var(--accent-soft); }
+.estado.hecho { color: var(--ok); background: var(--ok-soft); }
+.estado.dormido { color: var(--sleep); background: var(--sleep-soft); }
+.estado.parado { color: var(--stop); background: var(--stop-soft); }
+
+/* Secciones */
+.seccion { display: grid; gap: 20px; }
+.seccion > header { display: grid; gap: 4px; }
+.seccion h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 1.4rem; letter-spacing: -0.01em; }
+.seccion > header p { margin: 0; color: var(--ink-2); max-width: 64ch; }
+
+/* Organigrama */
+.arbol { display: grid; justify-items: center; }
+.linea { width: 2px; height: var(--tallo); background: var(--wire); }
+.nodo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
+.nodo .rol { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.nodo h3 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.12rem; letter-spacing: -0.005em; line-height: 1.2; }
+.nodo p { margin: 0; color: var(--ink-2); font-size: 0.9rem; }
+.pablo { width: min(100%, 360px); background: var(--boss); border-color: var(--boss); color: var(--boss-ink); text-align: center; }
+.pablo .rol, .pablo p { color: inherit; opacity: 0.75; }
+.director { width: min(100%, 520px); border-color: var(--accent); box-shadow: 0 1px 0 var(--line); }
+.director .pie { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 0.84rem; color: var(--muted); }
+.rutina { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; border-top: 1px dashed var(--line); padding-top: 10px; font-size: 0.86rem; color: var(--ink-2); }
+
+.agentes { list-style: none; margin: 0; padding: var(--tallo) 0 0; width: 100%; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--g); position: relative; }
+.agentes::before { content: ""; position: absolute; top: 0; height: 2px; background: var(--wire); left: calc((100% - 5 * var(--g)) / 12); right: calc((100% - 5 * var(--g)) / 12); }
+.agente { position: relative; display: grid; }
+.agente::before { content: ""; position: absolute; top: calc(-1 * var(--tallo)); left: calc(50% - 1px); width: 2px; height: var(--tallo); background: var(--wire); }
+.agente a.nodo { text-decoration: none; color: inherit; align-content: start; gap: 8px; transition: border-color 0.15s; }
+.agente a.nodo:hover { border-color: var(--wire); }
+.agente .num { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
+.agente .carpeta { font-family: var(--f-mono); font-size: 0.8rem; color: var(--ink); }
+.agente .que { font-size: 0.84rem; }
+.agente.fantasma .nodo { background: transparent; border-style: dashed; }
+
+@media (max-width: 1000px) {
+  .arbol { justify-items: start; }
+  .linea { margin-left: 15px; }
+  .pablo { text-align: left; }
+  .agentes { grid-template-columns: minmax(0, 1fr); padding: var(--g) 0 0 36px; }
+  .agentes::before { display: none; }
+  .agente::before { top: 24px; left: -20px; width: 20px; height: 2px; }
+  .agente::after { content: ""; position: absolute; left: -21px; width: 2px; top: calc(-1 * var(--g)); bottom: 0; background: var(--wire); }
+  .agente:last-child::after { bottom: auto; height: calc(24px + var(--g) + 2px); }
+  .agente a.nodo { grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 12px; row-gap: 2px; align-items: baseline; }
+  .agente .num { grid-row: 1 / span 2; }
+  .agente .que { grid-column: 2 / -1; }
+}
+
+/* Repositorio */
+.repo-caja { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.repo-cab { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--band); border-bottom: 1px solid var(--line); }
+.repo-cab .nombre { font-family: var(--f-mono); font-weight: 500; font-size: 0.92rem; }
+.repo-cab .rama { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); }
+.ficheros { list-style: none; margin: 0; padding: 6px 0; }
+.fila { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) auto; gap: 4px 16px; align-items: baseline; padding: 9px 16px; }
+.fila + .fila { border-top: 1px solid var(--line); }
+.fila .ruta { font-family: var(--f-mono); font-size: 0.86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fila .ruta i { font-style: normal; color: var(--wire); margin-right: 6px; }
+.fila .desc { color: var(--ink-2); font-size: 0.9rem; min-width: 0; }
+.dueno { font-size: 0.76rem; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--band); color: var(--ink-2); white-space: nowrap; }
+.dueno.dir { background: var(--accent-soft); color: var(--accent); }
+.fila.fantasma .ruta, .fila.fantasma .desc { color: var(--muted); }
+.fila.fantasma .ruta { white-space: normal; }
+.ramas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--g); }
+.rama-caja { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.rama-caja code { font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+.rama-caja p { margin: 0; color: var(--ink-2); font-size: 0.9rem; }
+@media (max-width: 700px) {
+  .fila { grid-template-columns: minmax(0, 1fr) auto; }
+  .fila .desc { grid-column: 1 / -1; grid-row: 2; }
+  .ramas { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Encargo */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--g); counter-reset: paso; }
+.paso { counter-increment: paso; display: grid; gap: 6px; align-content: start; padding: 14px 16px; border-top: 3px solid var(--accent); background: var(--surface); border-radius: 0 0 12px 12px; }
+.paso.tuyo { border-top-color: var(--boss); }
+.paso::before { content: counter(paso); font-family: var(--f-display); font-weight: 700; font-size: 1.5rem; line-height: 1; color: var(--muted); }
+.paso .quien { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.paso p { margin: 0; font-size: 0.92rem; }
+@media (max-width: 900px) { .pasos { grid-template-columns: minmax(0, 1fr); } .paso { grid-template-columns: 2rem minmax(0, 1fr); column-gap: 10px; } .paso::before { grid-row: 1 / span 2; } }
+
+/* Fuera del repositorio */
+.fuera { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--g); }
+.fuera section { display: grid; gap: 10px; align-content: start; }
+.fuera h3 { margin: 0; font-size: 0.78rem; font-family: var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.fuera ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fuera li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; }
+.fuera li span { color: var(--ink-2); font-size: 0.88rem; grid-column: 1 / -1; }
+.fuera .peso { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) { .fuera { grid-template-columns: minmax(0, 1fr); } }
+
+.pie-pagina { color: var(--muted); font-size: 0.86rem; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header class="cabecera">
+    <h1>Organigrama DecibHello</h1>
+    <p>Quién hace qué, dónde se guarda cada cosa y cómo llega un encargo al producto.</p>
+    <div class="meta">
+      <a class="repo" href="https://github.com/pablopiqueras85/decibhello">github.com/pablopiqueras85/<b>decibhello</b></a>
+      <span>Actualizado el 8 de octubre de 2026</span>
+    </div>
+    <div class="leyenda" aria-label="Leyenda de estados">
+      <span class="estado diario">Trabaja a diario</span>
+      <span class="estado hecho">Hecho</span>
+      <span class="estado dormido">Dormido</span>
+      <span class="estado parado">No despertar por ahora</span>
+    </div>
+  </header>
+
+  <section class="seccion" aria-labelledby="t-equipo">
+    <header>
+      <h2 id="t-equipo">Equipo</h2>
+      <p>Los agentes duermen hasta que tú pides algo. Dormidos no gastan uso del plan. Cada tarjeta abre la sesión del agente.</p>
+    </header>
+
+    <div class="arbol">
+      <div class="nodo pablo">
+        <span class="rol">Decide y valida</span>
+        <h3>Pablo</h3>
+      </div>
+      <div class="linea" aria-hidden="true"></div>
+      <div class="nodo director">
+        <span class="rol">Director · Claude</span>
+        <h3><a href="https://claude.ai/code/session_01HxV4sthgtcPLuFdi5VXPWp">Sesión principal</a></h3>
+        <p>Mantiene el modelo, el visor y los documentos. Despierta a los agentes, revisa su trabajo y lo junta en <code>main</code>.</p>
+        <div class="rutina">
+          <span class="estado diario">Lunes a viernes, 6:47</span>
+          <span>Tarea programada: regenera el visor con las obras del día y lo republica.</span>
+        </div>
+      </div>
+      <div class="linea" aria-hidden="true"></div>
+
+      <ol class="agentes">
+        <li class="agente">
+          <a class="nodo" href="https://claude.ai/code/session_01AKVCMzunJ9suXjcJRcHFEd">
+            <span class="num">1</span>
+            <h3>Web y lista de espera</h3>
+            <span><span class="estado hecho">Hecho</span></span>
+            <span class="carpeta">web/</span>
+            <p class="que">Landing con vídeo, buscador y lista de espera. Falta tu material.</p>
+          </a>
+        </li>
+        <li class="agente">
+          <a class="nodo" href="https://claude.ai/code/session_01VAn9UEcGXw6tfhhJ4Vu2Eg">
+            <span class="num">2</span>
+            <h3>Extensión de Chrome</h3>
+            <span><span class="estado dormido">Dormido</span></span>
+            <span class="carpeta">extension/</span>
+            <p class="que">La nota dentro de los anuncios de los portales.</p>
+          </a>
+        </li>
+        <li class="agente">
+          <a class="nodo" href="https://claude.ai/code/session_01TP2VCShQMuQCnyVzeHegj7">
+            <span class="num">3</span>
+            <h3>Sonómetro web</h3>
+            <span><span class="estado parado">No despertar</span></span>
+            <span class="carpeta">sonometro/</span>
+            <p class="que">Medir con el móvil. En pausa por decisión tuya.</p>
+          </a>
+        </li>
+        <li class="agente">
+          <a class="nodo" href="https://claude.ai/code/session_015Fobjtmy4viNvwbz6ecU7i">
+            <span class="num">4</span>
+            <h3>Entrevistas de validación</h3>
+            <span><span class="estado dormido">Dormido</span></span>
+            <span class="carpeta">negocio/</span>
+            <p class="que">Guion y análisis de 10 a 15 entrevistas.</p>
+          </a>
+        </li>
+        <li class="agente">
+          <a class="nodo" href="https://claude.ai/code/session_01FjeojmRJDgrrT1p1TLiUH7">
+            <span class="num">5</span>
+            <h3>Siguiente ciudad</h3>
+            <span><span class="estado hecho">Hecho</span></span>
+            <span class="carpeta">investigacion/</span>
+            <p class="que">Recomienda Madrid. El piloto espera a terminar Barcelona.</p>
+          </a>
+        </li>
+        <li class="agente">
+          <a class="nodo" href="https://claude.ai/code/session_0145ccAQynYUi5LEEFvuqGkW">
+            <span class="num">6</span>
+            <h3>Textos legales</h3>
+            <span><span class="estado dormido">Dormido</span></span>
+            <span class="carpeta">legal/</span>
+            <p class="que">Aviso legal, privacidad y condiciones.</p>
+          </a>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="seccion" aria-labelledby="t-repo">
+    <header>
+      <h2 id="t-repo">Repositorio</h2>
+      <p>Todo DecibHello vive en un solo repositorio privado. Cada carpeta tiene un responsable, y cada agente apunta su estado en un <code>ESTADO.md</code> dentro de su carpeta.</p>
+    </header>
+
+    <div class="repo-caja">
+      <div class="repo-cab">
+        <a class="nombre" href="https://github.com/pablopiqueras85/decibhello">pablopiqueras85/decibhello</a>
+        <span class="rama">rama principal: main</span>
+      </div>
+      <ul class="ficheros">
+        <li class="fila"><span class="ruta"><i>├─</i>README.md</span><span class="desc">Portada: qué es y qué hay en cada carpeta.</span><span></span></li>
+        <li class="fila"><span class="ruta"><i>├─</i>CLAUDE.md</span><span class="desc">Instrucciones que leen todos los agentes: reglas del modelo y cómo trabajar.</span><span></span></li>
+        <li class="fila"><span class="ruta"><i>├─</i>docs/</span><span class="desc">Concepto, fuentes de datos, pendientes, equipo, actualizaciones y este organigrama.</span><span class="dueno dir">Director</span></li>
+        <li class="fila"><span class="ruta"><i>├─</i>piloto/</span><span class="desc">Modelo, visor, datos y prueba de paridad.</span><span class="dueno dir">Director y tarea diaria</span></li>
+        <li class="fila"><span class="ruta"><i>├─</i>web/</span><span class="desc">Web de presentación y lista de espera.</span><span class="dueno">Agente 1</span></li>
+        <li class="fila"><span class="ruta"><i>├─</i>investigacion/</span><span class="desc">Estudio de la siguiente ciudad y solicitudes a Madrid.</span><span class="dueno">Agente 5</span></li>
+        <li class="fila fantasma"><span class="ruta"><i>└─</i>extension/ sonometro/ negocio/ legal/</span><span class="desc">Se crean cuando trabajen los agentes 2, 3, 4 y 6.</span><span class="dueno">Agentes 2, 3, 4 y 6</span></li>
+      </ul>
+    </div>
+
+    <div class="ramas">
+      <div class="rama-caja">
+        <code>main</code>
+        <p>Todo lo aprobado. Es lo que ves al abrir el repositorio.</p>
+      </div>
+      <div class="rama-caja">
+        <code>agente/&lt;nombre&gt;</code>
+        <p>Una por agente mientras trabaja. Se junta con main cuando lo apruebas.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion" aria-labelledby="t-encargo">
+    <header>
+      <h2 id="t-encargo">Cómo llega un encargo al producto</h2>
+    </header>
+    <ol class="pasos">
+      <li class="paso tuyo"><span class="quien">Pablo</span><p>Pides algo al director.</p></li>
+      <li class="paso"><span class="quien">Director</span><p>Despierta al agente con el encargo por escrito.</p></li>
+      <li class="paso"><span class="quien">Agente</span><p>Trabaja en su rama, actualiza su <code>ESTADO.md</code> y lo sube.</p></li>
+      <li class="paso"><span class="quien">Director</span><p>Revisa el resultado y te lo resume.</p></li>
+      <li class="paso tuyo"><span class="quien">Pablo</span><p>Lo apruebas y el director lo junta en <code>main</code>.</p></li>
+    </ol>
+  </section>
+
+  <section class="seccion" aria-labelledby="t-fuera">
+    <header>
+      <h2 id="t-fuera">Fuera del repositorio</h2>
+    </header>
+    <div class="fuera">
+      <section>
+        <h3>Publicado, privado</h3>
+        <ul>
+          <li><a href="https://claude.ai/artifact/AoLUjYUaWy6arbZLiL9vje">Visor</a><span>Buscador y nota de cada portal. Se renueva cada mañana laborable.</span></li>
+          <li><a href="https://claude.ai/artifact/KrBrXRxafoU2cScYv55FjD">Web</a><span>Presentación con vídeo y lista de espera.</span></li>
+        </ul>
+      </section>
+      <section>
+        <h3>No se guarda en el repositorio</h3>
+        <ul>
+          <li><code>piloto/cache/</code><b class="peso">889 MB</b><span>Descargas de Open Data BCN y el Catastro. Se vuelven a bajar solas.</span></li>
+          <li><code>piloto/sensores/</code><b class="peso">49 MB</b><span>Datos de los sensores de 2023. Los pasas tú cuando hacen falta.</span></li>
+          <li>Conversaciones de los agentes<span>Viven en sus sesiones. Lo importante queda en su <code>ESTADO.md</code>.</span></li>
+        </ul>
+      </section>
+    </div>
+  </section>
+
+  <p class="pie-pagina">La versión escrita del equipo está en <code>docs/agentes.md</code>. Si cambia el equipo, se actualizan las dos.</p>
+
+</div>
