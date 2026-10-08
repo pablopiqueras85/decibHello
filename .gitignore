@@ -1,0 +1,10 @@
+# Datos que se descargan en local y no van al repositorio
+piloto/cache/
+piloto/sensores/
+
+# Python y Node
+__pycache__/
+node_modules/
+
+# Sistema
+.DS_Store
