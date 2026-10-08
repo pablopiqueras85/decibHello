@@ -15,6 +15,7 @@ El director del proyecto es la sesión principal de Claude (la que habla con Pab
 
 Cómo funciona:
 - **Despertar**: el director envía el encargo a la sesión (`send_message`). El agente trabaja, hace push a su rama y termina con un resumen.
+- **Memoria**: cada agente guarda su estado en `<su carpeta>/ESTADO.md` de su rama. Lo lee al despertar y lo actualiza y sube al terminar. El director se lo recuerda en cada encargo (las ramas de los agentes tienen un `CLAUDE.md` anterior a esta regla).
 - **Seguimiento**: los agentes no pueden escribir al director; el director lee su resultado en la sesión (`list_events`) y se lo resume a Pablo.
 - **Integrar**: cuando Pablo da por bueno un trabajo, el director lo trae a la rama principal del proyecto.
 - Cada agente gasta uso del plan solo mientras trabaja. Dormido no gasta nada.

@@ -42,3 +42,4 @@ Plataforma para consultar el ruido de una calle o portal antes de alquilar o com
 - Sensores: de 7:00 a 23:59 la fecha registrada es la del día siguiente (`sensores.py` lo corrige).
 - Rama de trabajo actual: `claude/keen-bohr-5oenpq`. Si trabajas en paralelo con otro agente, usa una rama propia y no toquéis los mismos ficheros a la vez (sobre todo `modelo.py`, `motor.js`, `visor_plantilla.html` y `calcular_nota.py`).
 - No abras pull requests salvo que el usuario lo pida.
+- Memoria de cada agente: `<su carpeta>/ESTADO.md`, en su rama (encargo, qué está hecho, qué falta, decisiones de Pablo, enlaces). Léelo al empezar y actualízalo y súbelo al terminar: la conversación puede resumirse o perderse, el fichero no. El director hace lo mismo con `decibhello-pendientes.md` y `decibhello-agentes.md`.
