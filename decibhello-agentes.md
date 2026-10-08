@@ -1,5 +1,7 @@
 # DecibHello — Equipo de agentes
 
+Organigrama visual (privado): https://claude.ai/artifact/HwD9FCVjj4BNHn5BHUGc2h. Si cambia el equipo, actualiza las dos cosas.
+
 El director del proyecto es la sesión principal de Claude (la que habla con Pablo). Cada agente es una sesión aparte en claude.ai/code, con este repositorio, su propia rama y su encargo escrito en sus instrucciones. Están **dormidos**: solo empiezan cuando Pablo lo pide y el director les envía el mensaje. Ninguno toca `piloto/` (el modelo y el visor los mantiene el director).
 
 | # | Agente | Sesión | Rama | Carpeta | Estado |

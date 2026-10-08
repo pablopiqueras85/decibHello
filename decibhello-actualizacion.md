@@ -112,3 +112,8 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - El censo de locales es de 2024. Lo he cruzado con las terrazas con licencia del primer semestre de 2026.
 - De 3.037 bares y bares musicales del censo, 1.924 tienen terraza vigente (siguen abiertos), 44 la perdieron (posibles cierres) y hay 184 terrazas nuevas sin local en el censo (posibles aperturas).
 - El censo sigue siendo fiel en un 97–98 %. Se ve en "Por qué suena así" de cada calle; no cambia la nota.
+
+## Actualización del 8 de octubre: organigrama
+
+- Página nueva con el equipo de un vistazo: https://claude.ai/artifact/HwD9FCVjj4BNHn5BHUGc2h
+- Muestra quién hace qué (tú, el director, la tarea diaria y los 6 agentes con su estado), en qué rama y carpeta guarda cada uno su trabajo, qué está publicado, qué no se guarda en el repositorio y cómo llega un encargo al producto.
