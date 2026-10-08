@@ -149,10 +149,11 @@ const CALLES = IX.calles.map(([nombre, planos]) => {
 });
 const cacheCalc = new Map();
 // Corrección proporcional por bares y bares musicales/discotecas (dB por log(1+n)), validada con sensores por distritos.
+// Censo de 2024 y Overture Maps valen la mitad cada uno: media de log(1+n) de las dos fuentes.
 const CL = DATOS.coef_locales;
 function correccionLocales(r) {
   const c = {};
-  for (const f of ["D", "E", "N"]) c[f] = r.sensor >= 0 ? 0 : CL[f].bares * Math.log1p(r.solo_bares) + CL[f].musicales * Math.log1p(r.musicales);
+  for (const f of ["D", "E", "N"]) c[f] = r.sensor >= 0 ? 0 : CL[f].bares * (Math.log1p(r.solo_bares) + Math.log1p(r.ov_bares)) / 2 + CL[f].musicales * (Math.log1p(r.musicales) + Math.log1p(r.ov_noche)) / 2;
   return c;
 }
 const fmtDb = x => x.toFixed(1).replace(".", ",");
@@ -166,7 +167,7 @@ function rangoEsquina(r) {
   return CALLES[r.esq_calle].rangos.find(x => x.ini === r.esq_ini) || null;
 }
 function calcular(r, dia = null, planta = null, esquina = false) {
-  const clave = planta + "|" + esquina + "|" + r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.musicales + "|" + r.obras + "|" + r.noches + "|" + dia;
+  const clave = planta + "|" + esquina + "|" + r.tramo + "|" + r.patio + "|" + r.ocio + "|" + r.bares + "|" + r.quejas + "|" + r.turisticos + "|" + r.sensor + "|" + r.solo_bares + "|" + r.musicales + "|" + r.ov_bares + "|" + r.ov_noche + "|" + r.obras + "|" + r.noches + "|" + dia;
   if (cacheCalc.has(clave)) return cacheCalc.get(clave);
   const t = IX.tramos[r.tramo];
   const b = k => bandaDb(+t[IX.campos_tramo.indexOf(k)]);

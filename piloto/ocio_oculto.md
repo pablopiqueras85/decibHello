@@ -12,9 +12,9 @@ Validación: se deja fuera un distrito cada vez (10 rondas); el modelo nunca ha 
 |---|---|---|---|---|---|
 | Solo el mapa (sin corrección) | 3.0 dB | 4.5 dB | 51% | 66% | 11.7 dB (24 sensores) |
 | Corrección constante (mediana) | 3.4 dB | 4.7 dB | 40% | 64% | 10.9 dB (24 sensores) |
-| Ridge (lineal) | 2.9 dB | 3.3 dB | 52% | 78% | 5.2 dB (24 sensores) |
-| Árboles (gradient boosting) | 2.7 dB | 3.2 dB | 56% | 76% | 5.2 dB (24 sensores) |
-| Bosque aleatorio | 2.5 dB | 3.0 dB | 59% | 81% | 6.3 dB (24 sensores) |
+| Ridge (lineal) | 3.0 dB | 3.3 dB | 50% | 76% | 5.1 dB (24 sensores) |
+| Árboles (gradient boosting) | 2.8 dB | 3.2 dB | 55% | 79% | 5.3 dB (24 sensores) |
+| Bosque aleatorio | 2.3 dB | 3.0 dB | 58% | 81% | 6.2 dB (24 sensores) |
 
 ## Tarde (19-23 h)
 
@@ -22,9 +22,9 @@ Validación: se deja fuera un distrito cada vez (10 rondas); el modelo nunca ha 
 |---|---|---|---|---|---|
 | Solo el mapa (sin corrección) | 4.3 dB | 5.9 dB | 40% | 56% | 12.8 dB (39 sensores) |
 | Corrección constante (mediana) | 4.5 dB | 5.6 dB | 34% | 56% | 10.5 dB (39 sensores) |
-| Ridge (lineal) | 3.0 dB | 3.5 dB | 49% | 78% | 4.3 dB (39 sensores) |
-| Árboles (gradient boosting) | 3.2 dB | 3.8 dB | 46% | 70% | 5.2 dB (39 sensores) |
-| Bosque aleatorio | 3.1 dB | 3.7 dB | 48% | 77% | 6.2 dB (39 sensores) |
+| Ridge (lineal) | 3.2 dB | 3.6 dB | 47% | 75% | 4.3 dB (39 sensores) |
+| Árboles (gradient boosting) | 3.0 dB | 3.7 dB | 50% | 69% | 5.1 dB (39 sensores) |
+| Bosque aleatorio | 2.9 dB | 3.7 dB | 51% | 76% | 6.1 dB (39 sensores) |
 
 ## Noche (23-7 h)
 
@@ -32,17 +32,17 @@ Validación: se deja fuera un distrito cada vez (10 rondas); el modelo nunca ha 
 |---|---|---|---|---|---|
 | Solo el mapa (sin corrección) | 2.9 dB | 4.3 dB | 52% | 71% | 14.0 dB (20 sensores) |
 | Corrección constante (mediana) | 2.6 dB | 4.1 dB | 58% | 71% | 12.5 dB (20 sensores) |
-| Ridge (lineal) | 2.7 dB | 3.5 dB | 56% | 78% | 6.8 dB (20 sensores) |
-| Árboles (gradient boosting) | 3.2 dB | 3.7 dB | 49% | 76% | 7.5 dB (20 sensores) |
-| Bosque aleatorio | 2.8 dB | 3.6 dB | 52% | 76% | 8.6 dB (20 sensores) |
+| Ridge (lineal) | 2.6 dB | 3.4 dB | 54% | 79% | 6.7 dB (20 sensores) |
+| Árboles (gradient boosting) | 3.0 dB | 3.7 dB | 50% | 73% | 7.4 dB (20 sensores) |
+| Bosque aleatorio | 2.7 dB | 3.5 dB | 55% | 76% | 8.5 dB (20 sensores) |
 
 ## La trampa: de dónde sale la mejora
 
 | Franja | Solo el mapa | Modelo con todo | Solo el nivel del mapa | Solo pistas de ocio (sin intercepto) |
 |---|---|---|---|---|
-| D | 4.5 dB | 3.3 dB | 4.1 dB | 4.1 dB |
-| E | 5.9 dB | 3.5 dB | 4.8 dB | 4.6 dB |
-| N | 4.3 dB | 3.5 dB | 3.2 dB | 4.6 dB |
+| D | 4.5 dB | 3.3 dB | 4.1 dB | 4.2 dB |
+| E | 5.9 dB | 3.6 dB | 4.8 dB | 4.5 dB |
+| N | 4.3 dB | 3.4 dB | 3.2 dB | 4.6 dB |
 
 Error del mapa de noche según lo que dice el propio mapa:
 
@@ -73,17 +73,17 @@ De noche ninguna pista supera claramente el azar. Por la tarde, el número de ba
 
 ## Corrección adoptada: proporcional al número de bares y discotecas
 
-Suma en dB = a · log(1 + bares) + b · log(1 + bares musicales y discotecas) + c · log(1 + pisos turísticos), con a, b, c ≥ 0 y sin término fijo (una calle sin locales no suma nada). Bares sin contar restaurantes; todo a menos de 100 m. Ajustado por mínimos cuadrados no negativos y validado dejando fuera cada distrito.
+Suma en dB = a · log(1 + bares) + b · log(1 + bares musicales y discotecas) + c · log(1 + pisos turísticos), con a, b, c ≥ 0 y sin término fijo (una calle sin locales no suma nada). Bares sin contar restaurantes; todo a menos de 100 m. Los bares y los locales de noche se cuentan con dos fuentes, el censo de 2024 y Overture Maps, y cada una vale la mitad: log(1 + bares) es la media de log(1 + bares del censo) y log(1 + bares de Overture). Acierta más que cualquiera de las dos sola (`estudios/combinado_validacion.py`). Ajustado por mínimos cuadrados no negativos y validado dejando fuera cada distrito.
 
 | Franja | Bares (a) | Musicales y discotecas (b) | Pisos turísticos (c) | Error medio, solo mapa → con corrección (validado por distritos) |
 |---|---|---|---|---|
-| D | 1.32 | 1.68 | 0.00 | 4.47 → 4.43 dB |
-| E | 2.90 | 0.72 | 0.00 | 5.91 → 4.99 dB |
-| N | 1.93 | 0.00 | 0.00 | 4.33 → 4.16 dB |
+| D | 1.47 | 1.13 | 0.00 | 4.47 → 4.33 dB |
+| E | 3.23 | 0.05 | 0.00 | 5.91 → 4.75 dB |
+| N | 1.97 | 0.00 | 0.00 | 4.33 → 4.09 dB |
 
-**Margen de error de una calle sin sensor** (error que no se supera en 2 de cada 3 sensores): D ±4.9 dB, E ±6.1 dB, N ±4.6 dB. Se guarda en `incertidumbre.json` y el visor lo muestra como "entre X y Y".
+**Margen de error de una calle sin sensor** (error que no se supera en 2 de cada 3 sensores): D ±5.0 dB, E ±5.4 dB, N ±4.4 dB. Se guarda en `incertidumbre.json` y el visor lo muestra como "entre X y Y".
 
-Los coeficientes se usan tal cual en `modelo.py` (`COEF_LOCALES`). Ejemplos de día / tarde / noche: 10 bares ≈ +3,2 / +7,0 / +4,6 dB; 10 bares y 5 musicales ≈ +6,2 / +8,2 / +4,6 dB.
+Los coeficientes se usan tal cual en `modelo.py` (`COEF_LOCALES`). Ejemplos de día / tarde / noche, con las mismas cuentas en las dos fuentes: 10 bares ≈ +3,5 / +7,8 / +4,7 dB; 10 bares y 5 musicales ≈ +5,6 / +7,9 / +4,7 dB.
 Los pisos turísticos salen con coeficiente 0 en todas las franjas: no suben el nivel medio de la hora que miden los sensores. Sí cuentan en el aviso de picos nocturnos (20 o más a menos de 100 m: llegadas y salidas a deshoras).
 Donde hay sensor no se aplica: la medición ya lo recoge.
 

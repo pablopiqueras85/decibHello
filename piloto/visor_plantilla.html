@@ -333,7 +333,7 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 
   <footer class="pie">
     <p><strong>Cómo se calcula.</strong> Toda nota sale de la misma forma: el nivel de ruido en decibelios de cada hora, convertido a 0–100 con una única fórmula (de noche el mismo ruido puntúa más, como en el indicador europeo Lden). Donde hay un sensor municipal en el tramo o en la misma calle, ese nivel es el medido en 2023, día a día y hora a hora. En el resto se estima con el mapa estratégico de ruido de 2017 y patrones medidos por los sensores (forma de cada hora y de cada día de la semana), más dos correcciones validadas con ellos: zonas con muchos bares (de día y tarde) y noches en que abren los locales cercanos. Cada día va de las 7:00 a las 7:00 del siguiente. "Interior" usa la fachada al patio de manzana.</p>
-    <p>Cubre Barcelona ciudad. Datos: Open Data BCN (Ajuntament de Barcelona, CC BY 4.0): mapa de ruido, portales y calles, censo de locales, quejas IRIS, pisos turísticos y sensores. Es una estimación para validar, no una medición del piso.</p>
+    <p>Cubre Barcelona ciudad. Datos: Open Data BCN (Ajuntament de Barcelona, CC BY 4.0): mapa de ruido, portales y calles, censo de locales, quejas IRIS, pisos turísticos y sensores. Bares y locales de noche también de Overture Maps (CDLA-Permissive 2.0). Es una estimación para validar, no una medición del piso.</p>
   </footer>
 </div>
 
@@ -505,9 +505,9 @@ function pintarDetalle() {
     ["Bares y restaurantes · 100 m", r.bares],
     ["Quejas por ruido 2025 · 100 m", r.quejas],
     ["Pisos turísticos · 100 m", r.turisticos],
-    ["Origen del dato", res.sensor ? `medición del sensor de ${res.sensor.calle} (${res.sensor.dias} días de 2023)` : r.solo_bares + r.musicales > 0 ? "mapa oficial 2017 + modelo + suma por bares cercanos" : "mapa oficial 2017 + modelo"],
-    ["Bares (sin restaurantes) · 100 m", r.solo_bares],
-    ["Bares musicales y discotecas · 100 m", r.musicales],
+    ["Origen del dato", res.sensor ? `medición del sensor de ${res.sensor.calle} (${res.sensor.dias} días de 2023)` : r.solo_bares + r.musicales + r.ov_bares + r.ov_noche > 0 ? "mapa oficial 2017 + modelo + suma por bares cercanos" : "mapa oficial 2017 + modelo"],
+    ["Bares (sin restaurantes) · 100 m", `${r.solo_bares} en el censo del Ajuntament · ${r.ov_bares} en Overture Maps`],
+    ["Bares musicales, discotecas y locales de noche · 100 m", `${r.musicales} en el censo del Ajuntament · ${r.ov_noche} en Overture Maps`],
     ["Siguen abiertos (terraza vigente) · 100 m", r.solo_bares + r.musicales ? `${r.bares_abiertos} de ${r.solo_bares + r.musicales} bares del censo de 2024 tienen terraza en ${semestreTxt(IX.terrazas.ultimo)}; el resto, sin terraza, no se puede comprobar` : "no hay bares del censo cerca"],
     ["Cambios desde el censo · 100 m", `${r.posibles_cierres ? r.posibles_cierres + " posible" + (r.posibles_cierres > 1 ? "s cierres" : " cierre") + " (perdió la terraza)" : "ningún posible cierre"} · ${r.posibles_aperturas ? r.posibles_aperturas + " terraza" + (r.posibles_aperturas > 1 ? "s nuevas" : " nueva") + " sin local en el censo (posible apertura de bar o restaurante)" : "ninguna terraza nueva"}. No cambia la nota.`],
     ["Suma por bares cercanos", res.sensor ? "incluida en la medición" : `+${fmtDb(res.locales.D)} dB de día · +${fmtDb(res.locales.E)} tarde · +${fmtDb(res.locales.N)} noche`],

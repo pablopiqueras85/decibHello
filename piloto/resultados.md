@@ -36,27 +36,27 @@ El visor interactivo (`visor.html`) tiene un buscador para cualquier portal de B
 <!-- tabla:inicio -->
 | Nota | Día | Tarde | Noche | Interior | Dirección | Hipótesis | Ruido noche (mapa) | Ocio / bares / quejas / HUT (100 m) | Confianza |
 |---|---|---|---|---|---|---|---|---|---|
-| 99 | 100 | 100 | 99 | — | Carrer de Sants 100 | intermedia | 65–70 | 0 / 17 / 4 / 4 | media |
+| 99 | 100 | 100 | 98 | — | Carrer de Sants 100 | intermedia | 65–70 | 0 / 17 / 4 / 4 | media |
 | 99 | 100 | 100 | 97 | 45 | Travessera de Gràcia 81 | control | 65–70 | 1 / 13 / 8 / 4 | alta |
 | 98 | 100 | 100 | 97 | 19 | Gran Via de les Corts Catalanes 600 | ruidosa | 65–70 | 0 / 21 / 0 / 43 | media |
 | 97 | 97 | 97 | 97 | 61 | Carrer d'Aragó 300 | ruidosa | 65–70 | 0 / 7 / 1 / 5 | medida |
-| 95 | 95 | 97 | 95 | 25 | Ronda del General Mitre 150 | ruidosa | 65–70 | 0 / 2 / 2 / 2 | media |
-| 95 | 100 | 99 | 91 | 3 | Travessera de Gràcia 150 | control | 60–65 | 1 / 29 / 3 / 50 | alta |
-| 86 | 85 | 89 | 85 | 6 | Travessera de Gràcia 300 | control | 60–65 | 0 / 7 / 0 / 25 | media |
+| 97 | 97 | 99 | 96 | 25 | Ronda del General Mitre 150 | ruidosa | 65–70 | 0 / 2 / 2 / 2 | media |
+| 95 | 100 | 98 | 91 | 3 | Travessera de Gràcia 150 | control | 60–65 | 1 / 29 / 3 / 50 | alta |
 | 84 | 78 | 73 | 92 | 10 | Carrer d'Escudellers 20 | ruidosa | 65–70 | 3 / 45 / 12 / 43 | medida |
-| 79 | 60 | 83 | 88 | 3 | Carrer de Verdi 20 | ruidosa | 60–65 | 0 / 35 / 8 / 26 | alta |
-| 79 | 79 | 84 | 77 | 3 | Carrer de Martínez de la Rosa 20 | control | 55–60 | 3 / 27 / 5 / 57 | media |
-| 78 | 71 | 67 | 86 | 3 | Carrer Nou de la Rambla 30 | ruidosa | 60–65 | 1 / 21 / 5 / 44 | media |
+| 83 | 82 | 85 | 83 | 6 | Travessera de Gràcia 300 | control | 60–65 | 0 / 7 / 0 / 25 | media |
+| 79 | 60 | 84 | 89 | 3 | Carrer de Verdi 20 | ruidosa | 60–65 | 0 / 35 / 8 / 26 | alta |
+| 78 | 73 | 67 | 86 | 3 | Carrer Nou de la Rambla 30 | ruidosa | 60–65 | 1 / 21 / 5 / 44 | media |
+| 77 | 76 | 81 | 76 | 3 | Carrer de Martínez de la Rosa 20 | control | 55–60 | 3 / 27 / 5 / 57 | media |
 | 76 | 75 | 88 | 71 | 3 | Carrer de Blai 20 | ruidosa | 60–65 | 0 / 31 / 4 / 51 | medida |
 | 75 | 68 | 65 | 84 | 25 | Carrer de Tuset 20 | control | 65–70 | 7 / 26 / 3 / 4 | medida |
 | 73 | 71 | 82 | 70 | 3 | Rambla del Poblenou 60 | intermedia | 55–60 | 0 / 12 / 6 / 5 | medida |
 | 70 | 70 | 75 | 68 | 25 | Carrer del Parlament 30 | intermedia | 55–60 | 0 / 25 / 5 / 57 | medida |
 | 69 | 67 | 66 | 72 | 14 | Carrer del Consell de Cent 250 | intermedia | 65–70 | 0 / 14 / 0 / 18 | medida |
 | 68 | 58 | 87 | 66 | 20 | Plaça del Sol 12 | ruidosa | 65–70 | 3 / 29 / 2 / 16 | medida |
+| 68 | 78 | 63 | 65 | 41 | Carrer Gran de Sant Andreu 200 | intermedia | 55–60 | 0 / 2 / 5 / 0 | media |
 | 67 | 63 | 66 | 70 | 14 | Carrer d'Enric Granados 50 | intermedia | 60–65 | 0 / 13 / 1 / 53 | medida |
-| 66 | 75 | 60 | 63 | 41 | Carrer Gran de Sant Andreu 200 | intermedia | 55–60 | 0 / 2 / 5 / 0 | media |
 | 61 | 58 | 58 | 63 | 19 | Carrer de la Mare de Déu del Coll 50 | tranquila | 55–60 | 0 / 0 / 2 / 3 | media |
-| 53 | 48 | 54 | 56 | — | Passeig de Joan de Borbó Comte de Barcelona 50 | ruidosa | 50–55 | 0 / 15 / 13 / 10 | media |
+| 56 | 50 | 59 | 59 | — | Passeig de Joan de Borbó Comte de Barcelona 50 | ruidosa | 50–55 | 0 / 15 / 13 / 10 | media |
 | 50 | 58 | 43 | 49 | — | Carrer de Campoamor 30 | tranquila | 50–55 | 0 / 0 / 0 / 0 | media |
 | 45 | 42 | 41 | 49 | — | Carrer de Pere II de Montcada 10 | tranquila | 50–55 | 0 / 0 / 0 / 0 | media |
 | 45 | 42 | 41 | 49 | — | Carrer de les Agudes 20 | tranquila | 50–55 | 0 / 0 / 1 / 0 | media |
@@ -74,27 +74,27 @@ Nota media de la noche (23–7 h) que empieza cada día: la del viernes va del v
 | Carrer d'Enric Granados 50 | 60 | 65 | 66 | 72 | 78 | 74 | 60 | +18 |
 | Plaça del Sol 12 | 57 | 54 | 63 | 63 | 73 | 69 | 57 | +16 |
 | Carrer Nou de la Rambla 30 | 77 | 79 | 82 | 88 | 93 | 92 | 77 | +16 |
-| Carrer de Verdi 20 | 78 | 79 | 86 | 89 | 93 | 93 | 81 | +15 |
+| Carrer de Verdi 20 | 79 | 79 | 87 | 89 | 94 | 93 | 82 | +15 |
 | Rambla del Poblenou 60 | 60 | 63 | 65 | 65 | 74 | 77 | 64 | +14 |
 | Carrer d'Escudellers 20 | 84 | 86 | 89 | 91 | 96 | 97 | 85 | +12 |
 | Carrer de Blai 20 | 64 | 63 | 67 | 64 | 76 | 74 | 63 | +12 |
-| Travessera de Gràcia 81 | 89 | 90 | 98 | 99 | 100 | 99 | 96 | +11 |
-| Travessera de Gràcia 150 | 86 | 87 | 91 | 93 | 96 | 94 | 86 | +10 |
-| Carrer de Martínez de la Rosa 20 | 73 | 75 | 76 | 78 | 82 | 80 | 73 | +9 |
+| Travessera de Gràcia 81 | 88 | 89 | 98 | 98 | 100 | 99 | 96 | +12 |
+| Travessera de Gràcia 150 | 85 | 86 | 91 | 92 | 95 | 94 | 85 | +10 |
 | Carrer del Consell de Cent 250 | 67 | 70 | 71 | 72 | 75 | 74 | 66 | +8 |
-| Carrer Gran de Sant Andreu 200 | 60 | 61 | 62 | 64 | 67 | 65 | 59 | +7 |
+| Carrer de Martínez de la Rosa 20 | 72 | 73 | 75 | 77 | 80 | 78 | 72 | +8 |
+| Carrer Gran de Sant Andreu 200 | 62 | 63 | 64 | 66 | 69 | 67 | 61 | +7 |
 | Carrer de Pomaret 20 | 17 | 18 | 19 | 20 | 24 | 22 | 16 | +7 |
-| Passeig de Joan de Borbó Comte de Barcelona 50 | 54 | 55 | 56 | 57 | 60 | 58 | 54 | +6 |
+| Passeig de Joan de Borbó Comte de Barcelona 50 | 56 | 57 | 58 | 59 | 62 | 60 | 56 | +6 |
 | Carrer de Pere II de Montcada 10 | 46 | 47 | 48 | 49 | 52 | 50 | 46 | +6 |
 | Carrer de Campoamor 30 | 46 | 47 | 48 | 49 | 52 | 50 | 46 | +6 |
 | Carrer de les Agudes 20 | 46 | 47 | 48 | 49 | 52 | 50 | 46 | +6 |
 | Carrer del Parlament 30 | 66 | 65 | 64 | 66 | 71 | 71 | 61 | +5 |
+| Carrer de Sants 100 | 95 | 96 | 97 | 98 | 100 | 99 | 95 | +5 |
 | Carrer de la Mare de Déu del Coll 50 | 61 | 61 | 62 | 63 | 66 | 64 | 60 | +5 |
-| Travessera de Gràcia 300 | 83 | 84 | 85 | 86 | 88 | 86 | 82 | +5 |
+| Travessera de Gràcia 300 | 81 | 82 | 83 | 84 | 86 | 84 | 81 | +5 |
 | Carrer d'Aragó 300 | 95 | 95 | 97 | 97 | 99 | 99 | 96 | +4 |
 | Gran Via de les Corts Catalanes 600 | 95 | 96 | 96 | 97 | 99 | 97 | 95 | +4 |
-| Ronda del General Mitre 150 | 92 | 93 | 94 | 95 | 96 | 95 | 92 | +4 |
-| Carrer de Sants 100 | 97 | 98 | 98 | 99 | 100 | 99 | 97 | +3 |
+| Ronda del General Mitre 150 | 94 | 95 | 96 | 96 | 98 | 97 | 94 | +4 |
 <!-- semana:fin -->
 
 ## Picos nocturnos: camiones de recogida y limpieza

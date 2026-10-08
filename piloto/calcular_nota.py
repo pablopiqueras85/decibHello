@@ -8,6 +8,7 @@ Uso: python3 piloto/indice.py  (una vez, descarga datos)  y después  python3 pi
 """
 
 import csv
+import gzip
 import json
 import math
 import re
@@ -15,6 +16,7 @@ import unicodedata
 from pathlib import Path
 
 import numpy as np
+from scipy.spatial import cKDTree
 
 import modelo
 
@@ -227,7 +229,8 @@ def asignar_plantas(indice, radio=10):
 
 def capas_mapa(origen):
     """Puntos para el mapa de la zona (lat y lon en cienmilésimas desde el origen del índice): bares, bares musicales y
-    discotecas (censo de locales) y quejas por ruido en la calle (IRIS 2025). Salen de la caché de indice.py."""
+    discotecas (censo de locales y Overture Maps) y quejas por ruido en la calle (IRIS 2025). Salen de la caché de indice.py
+    y de datos/overture_locales.json.gz."""
     def puntos(nombre, lat, lon):
         f = CACHE_DIR / f"{nombre}.json"
         if not f.exists():
@@ -239,7 +242,15 @@ def capas_mapa(origen):
             except (TypeError, ValueError, KeyError):
                 pass
         return out
-    return {"bares": puntos("cens_solo_bares", "Latitud", "Longitud"), "musicales": puntos("cens_musicales", "Latitud", "Longitud"),
+    def overture(clave, censo):
+        """Locales de Overture sin ninguno del censo a menos de 15 m, para no pintar dos veces el mismo local."""
+        datos = json.loads(gzip.open(AQUI / "datos" / "overture_locales.json.gz", "rt", encoding="utf-8").read())
+        ov = np.array([[round((a - origen["lat"]) * 1e5), round((o - origen["lon"]) * 1e5)] for a, o in datos[clave]])
+        escala = np.array([1.11, 0.83])  # metros por cienmilésima de grado en Barcelona (latitud, longitud)
+        d, _ = cKDTree(np.array(censo).reshape(-1, 2) * escala).query(ov * escala, distance_upper_bound=15)
+        return ov[np.isinf(d)].ravel().tolist()
+    bares, musicales = puntos("cens_solo_bares", "Latitud", "Longitud"), puntos("cens_musicales", "Latitud", "Longitud")
+    return {"bares": bares + overture("bares", bares), "musicales": musicales + overture("noche", musicales),
             "quejas": puntos("iris2025_soroll", "LATITUD", "LONGITUD")}
 
 
@@ -302,7 +313,7 @@ def main():
         v = dict(zip(campos, r))
         mapa = mapa_tramo(indice, v["tramo"])
         medido = perfiles[v["sensor"]]["db"] if v["sensor"] >= 0 else None
-        locales = (v["solo_bares"], v["musicales"]) if medido is None else None
+        locales = (v["solo_bares"], v["musicales"], v["ov_bares"], v["ov_noche"]) if medido is None else None
         aj = indice["ajustes_noche"][v["noches"]] if v["noches"] >= 0 and medido is None else None
         obra = obra_activa(indice, v["obras"])
         res = modelo.calcular(mapa, {"ocio": v["ocio"], "bares": v["bares"], "quejas": v["quejas"], "turisticos": v["turisticos"]},
@@ -367,7 +378,7 @@ def distribucion_ciudad(indice, perfiles):
         for r in rangos(planos, n):
             v = dict(zip(campos, r))
             medido = perfiles[v["sensor"]]["db"] if v["sensor"] >= 0 else None
-            locales = (v["solo_bares"], v["musicales"]) if medido is None else None
+            locales = (v["solo_bares"], v["musicales"], v["ov_bares"], v["ov_noche"]) if medido is None else None
             clave = (v["tramo"], v["sensor"], locales)
             if clave not in cache:
                 cache[clave] = modelo.calcular(mapa_tramo(indice, v["tramo"]), medido=medido, locales=locales)["global"]

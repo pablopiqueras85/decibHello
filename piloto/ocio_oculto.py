@@ -12,6 +12,7 @@ Salidas:
 Uso: python3 piloto/ocio_oculto.py   (después de indice.py y sensores.py)
 """
 
+import gzip
 import json
 import time
 import urllib.parse
@@ -106,7 +107,11 @@ def cargar_pistas(terrazas_res):
     pi, fi = xy(iris, "LATITUD", "LONGITUD")
     det = np.array([f["DETALL"] for f in fi])
     hut, _ = xy(json.loads((CACHE / "hut.json").read_text()), "LATITUD_Y", "LONGITUD_X")
+    ov = json.loads(gzip.open(AQUI / "datos" / "overture_locales.json.gz", "rt", encoding="utf-8").read())
+    ov_bares, _ = xy([{"lat": a, "lon": o} for a, o in ov["bares"]], "lat", "lon")
+    ov_noche, _ = xy([{"lat": a, "lon": o} for a, o in ov["noche"]], "lat", "lon")
     return {
+        "ov_bares": (ov_bares, None), "ov_noche": (ov_noche, None),
         "bares": (pc[act == BAR], None), "musicales": (pc[act == MUSICAL], None),
         "restaurantes": (pc[act == "Restaurants"], None), "noche_24h": (pc[noche], None),
         "mesas": (pt, mesas), "quejas_gente": (pi[np.isin(det, QUEJAS_GENTE)], None),
@@ -194,18 +199,21 @@ def analisis_trampa(X, val, grupos):
             "## Corrección adoptada: proporcional al número de bares y discotecas", "",
             "Suma en dB = a · log(1 + bares) + b · log(1 + bares musicales y discotecas) + c · log(1 + pisos turísticos), "
             "con a, b, c ≥ 0 y sin término fijo (una calle sin locales no suma nada). Bares sin contar restaurantes; todo a menos de 100 m. "
+            "Los bares y los locales de noche se cuentan con dos fuentes, el censo de 2024 y Overture Maps, y cada una vale la mitad: "
+            "log(1 + bares) es la media de log(1 + bares del censo) y log(1 + bares de Overture). Acierta más que cualquiera de las dos "
+            "sola (`estudios/combinado_validacion.py`). "
             "Ajustado por mínimos cuadrados no negativos y validado dejando fuera cada distrito.", "",
             "| Franja | Bares (a) | Musicales y discotecas (b) | Pisos turísticos (c) | Error medio, solo mapa → con corrección (validado por distritos) |",
             "|---|---|---|---|---|"]
     from scipy.optimize import nnls
-    A = X[["bares_100", "musicales_100", "turisticos_100"]].values
-    margen = {}
+    A = np.c_[(X.bares_100 + X.ov_bares_100) / 2, (X.musicales_100 + X.ov_noche_100) / 2, X.turisticos_100]
+    margen, coefs = {}, {}
     for f in "DEN":
         y = val[f"dif_{f}"].values
         p = np.zeros(len(y))
         for tr, te in LeaveOneGroupOut().split(A, y, grupos):
             p[te] = A[te] @ nnls(A[tr], y[tr])[0]
-        coef = nnls(A, y)[0]
+        coef = coefs[f] = nnls(A, y)[0]
         out.append(f"| {f} | {coef[0]:.2f} | {coef[1]:.2f} | {coef[2]:.2f} | {np.abs(y).mean():.2f} → {np.abs(y - p).mean():.2f} dB |")
         # Margen de error de una calle sin sensor: error que no se supera en 2 de cada 3 sensores (validado por distritos).
         margen[f] = round(float(np.percentile(np.abs(y - p), 68)), 1)
@@ -213,8 +221,10 @@ def analisis_trampa(X, val, grupos):
         "nota": "Error (dB) que no se supera en 2 de cada 3 sensores, con validación dejando fuera cada distrito. Ver ocio_oculto.md."}, ensure_ascii=False, indent=1))
     out += ["", "**Margen de error de una calle sin sensor** (error que no se supera en 2 de cada 3 sensores): "
             + ", ".join(f"{f} ±{margen[f]} dB" for f in "DEN") + ". Se guarda en `incertidumbre.json` y el visor lo muestra como \"entre X y Y\"."]
-    out += ["", "Los coeficientes se usan tal cual en `modelo.py` (`COEF_LOCALES`). Ejemplos de día / tarde / noche: "
-            "10 bares ≈ +3,2 / +7,0 / +4,6 dB; 10 bares y 5 musicales ≈ +6,2 / +8,2 / +4,6 dB.",
+    def ejemplo(bares, musicales):  # mismas cuentas en el censo y en Overture
+        return " / ".join(f"+{coefs[f][0] * np.log1p(bares) + coefs[f][1] * np.log1p(musicales):.1f}".replace(".", ",") for f in "DEN")
+    out += ["", "Los coeficientes se usan tal cual en `modelo.py` (`COEF_LOCALES`). Ejemplos de día / tarde / noche, con las mismas "
+            f"cuentas en las dos fuentes: 10 bares ≈ {ejemplo(10, 0)} dB; 10 bares y 5 musicales ≈ {ejemplo(10, 5)} dB.",
             "Los pisos turísticos salen con coeficiente 0 en todas las franjas: no suben el nivel medio de la hora que miden los sensores. "
             "Sí cuentan en el aviso de picos nocturnos (20 o más a menos de 100 m: llegadas y salidas a deshoras).",
             "Donde hay sensor no se aplica: la medición ya lo recoge.", ""]

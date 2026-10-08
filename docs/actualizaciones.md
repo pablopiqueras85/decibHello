@@ -125,3 +125,13 @@ Detalle completo en `piloto/ocio_oculto.md` (script `piloto/ocio_oculto.py`).
 - Los documentos están ahora en la carpeta `docs/`, y la portada del repositorio (`README.md`) explica qué hay y dónde.
 - Los agentes trabajarán aquí, cada uno en su rama. Las ramas antiguas se quedan en el repositorio Ideas como archivo.
 - El visor y la web siguen en los mismos enlaces.
+
+## Actualización del 8 de octubre: bares con dos fuentes
+
+- Los bares y locales de noche cercanos se cuentan ahora con dos fuentes: el censo de locales del Ajuntament (2024) y Overture Maps, una base abierta de negocios que se renueva cada mes (datos de Facebook, Microsoft y otros).
+- Cada fuente vale la mitad. Así la nota acierta más que con el censo solo: el error medio frente a los sensores baja de 4,4 a 4,3 dB de día, de 5,0 a 4,8 por la tarde y de 4,2 a 4,1 de noche.
+- El margen "entre X y Y" cambia un poco: ±5,0 dB de día, ±5,4 por la tarde y ±4,4 de noche.
+- Las notas apenas cambian: en 7 de cada 10 tramos de la ciudad, 2 puntos o menos. Tuset 20 y Travessera 81 siguen igual (tienen sensor); Travessera 300 baja 3 y Martínez de la Rosa 20 baja 2.
+- En el visor, el detalle dice cuántos bares hay según cada fuente, y el mapa de la zona pinta también los de Overture (sin repetir los del censo).
+- Google Maps no se usa: no deja guardar sus datos ni copiarlos del mapa. Podrá servir más adelante para consultas en directo en el portal propio.
+

@@ -15,6 +15,7 @@ Uso: python3 piloto/indice.py   ->  piloto/cache/indice.json (lo incrusta constr
 import json
 import math
 import time
+import gzip
 import urllib.parse
 import urllib.request
 from collections import defaultdict
@@ -28,6 +29,7 @@ from shapely.strtree import STRtree
 
 AQUI = Path(__file__).parent
 CACHE = AQUI / "cache"
+OVERTURE = AQUI / "datos" / "overture_locales.json.gz"  # bares y locales de noche de Overture Maps (overture.py)
 API = "https://opendata-ajuntament.barcelona.cat/data/api/3/action/"
 UA = {"User-Agent": "DecibHello-pilot/0.1 (research)"}
 
@@ -135,6 +137,10 @@ def main():
     oci = puntos(sql("cens_oci", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "SN_Oci_Nocturn"=\'Si\''), "Latitud", "Longitud")
     musicales = puntos(sql("cens_musicales", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "Nom_Activitat" ILIKE \'Bars especials%\''), "Latitud", "Longitud")
     solo_bares = puntos(sql("cens_solo_bares", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "Nom_Activitat"=\'Bars   / CIBERCAFÈ\''), "Latitud", "Longitud")
+    # Overture Maps: segunda fuente de bares y locales de noche. Cuenta a medias con el censo (modelo.cuenta_locales).
+    overture = json.loads(gzip.open(OVERTURE, "rt", encoding="utf-8").read())
+    ov_bares = puntos([{"lat": a, "lon": o} for a, o in overture["bares"]], "lat", "lon")
+    ov_noche = puntos([{"lat": a, "lon": o} for a, o in overture["noche"]], "lat", "lon")
     bars = puntos(sql("cens_bars", f'SELECT "Latitud","Longitud" FROM "{RES_CENS_2024}" WHERE "Nom_Grup_Activitat" ILIKE \'Restaurants, bars%\''), "Latitud", "Longitud")
     queixes = puntos(sql("iris2025_soroll", f'SELECT "LATITUD","LONGITUD" FROM "{RES_IRIS_2025}" WHERE "ELEMENT"=\'Molèsties soroll a la via pública\''), "LATITUD", "LONGITUD")
     hut = puntos(sql("hut", f'SELECT "LATITUD_Y","LONGITUD_X" FROM "{RES_HUT}"'), "LATITUD_Y", "LONGITUD_X")
@@ -301,6 +307,7 @@ def main():
     n_recog = contar(recogida)
     n_solo_bares = contar(solo_bares)
     n_musicales = contar(musicales)
+    n_ov_bares, n_ov_noche = contar(ov_bares), contar(ov_noche)
     # Bares (sin restaurantes) y musicales del censo: ¿tienen terraza vigente en el último semestre? ¿la perdieron?
     from scipy.spatial import cKDTree as _Arbol
     def con_terraza(locales, terrazas):
@@ -327,7 +334,8 @@ def main():
                        int(round(float(np.median([a for a in r["ancho"] if a >= 0])))) if any(a >= 0 for a in r["ancho"]) else -1,
                        int(n_recog[k]), int(n_solo_bares[k]), int(n_musicales[k]),
                        *(esquina[(c_sal, k_r)][1:] if (c_sal, k_r) in esquina else (-1, -1)),
-                       int(n_bares_abiertos[k]), int(n_posibles_cierres[k]), int(n_posibles_aperturas[k])]
+                       int(n_bares_abiertos[k]), int(n_posibles_cierres[k]), int(n_posibles_aperturas[k]),
+                       int(n_ov_bares[k]), int(n_ov_noche[k])]
             k += 1
         salida_calles.append([nombres[codi], planos])
 
@@ -336,7 +344,8 @@ def main():
         tramos[j] = "".join(str(BANDAS.index(tramer[i][c])) for c in CAMPOS_TRAMO)
 
     indice = {"bandas": BANDAS, "campos_tramo": CAMPOS_TRAMO, "tramos": tramos, "barrios": barrios,
-              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida", "solo_bares", "musicales", "esq_calle", "esq_ini", "bares_abiertos", "posibles_cierres", "posibles_aperturas"],
+              "campos_rango": ["ini", "fin", "tramo", "patio", "barrio", "ocio", "bares", "quejas", "turisticos", "sensor_dam", "lat_e5", "lon_e5", "ancho_m", "quejas_recogida", "solo_bares", "musicales", "esq_calle", "esq_ini", "bares_abiertos", "posibles_cierres", "posibles_aperturas", "ov_bares", "ov_noche"],
+              "overture": overture["version"],
               "terrazas": {"referencia": SEM_TERRAZAS_REF, "ultimo": sem_ultimo},
               "origen": {"lat": 41.3, "lon": 2.0}, "calles": salida_calles}
     (CACHE / "indice.json").write_text(json.dumps(indice, ensure_ascii=False, separators=(",", ":")))

@@ -58,7 +58,9 @@ K_HORARIOS = 2.79
 # dB por unidad de log(1 + número a menos de 100 m), por franja. Sin locales, cero. Ajuste no negativo y sin término
 # fijo, para no subir calles sin locales. Los pisos turísticos no suben la media horaria (coeficiente 0 en los
 # sensores): cuentan en el aviso de picos nocturnos.
-COEF_LOCALES = {"D": {"bares": 1.32, "musicales": 1.68}, "E": {"bares": 2.90, "musicales": 0.72}, "N": {"bares": 1.93, "musicales": 0.0}}
+# Los locales se cuentan con dos fuentes, el censo de 2024 del Ajuntament y Overture Maps (overture.py), y cada una
+# vale la mitad: media de log(1 + n) de las dos. Acierta más que cualquiera de las dos sola (estudios/combinado_validacion.py).
+COEF_LOCALES = {"D": {"bares": 1.47, "musicales": 1.13}, "E": {"bares": 3.23, "musicales": 0.05}, "N": {"bares": 1.97, "musicales": 0.0}}
 
 
 # Obra pública activa a menos de 25 m del portal: +2 dB de 8 a 18 h, de lunes a viernes, mientras dure
@@ -132,9 +134,15 @@ def combinar_esquina(db1, db2):
     return [max(a, b) for a, b in zip(db1, db2)]
 
 
-def correccion_locales(bares, musicales):
-    """dB a sumar por franja según bares y bares musicales/discotecas a menos de 100 m."""
-    return {f: c["bares"] * math.log1p(bares) + c["musicales"] * math.log1p(musicales) for f, c in COEF_LOCALES.items()}
+def cuenta_locales(censo, overture):
+    """Locales a menos de 100 m según las dos fuentes, a medias: media de log(1 + n) del censo y de Overture."""
+    return (math.log1p(censo) + math.log1p(overture)) / 2
+
+
+def correccion_locales(bares, musicales, ov_bares, ov_noche):
+    """dB a sumar por franja según bares y bares musicales/discotecas a menos de 100 m (censo y Overture)."""
+    b, m = cuenta_locales(bares, ov_bares), cuenta_locales(musicales, ov_noche)
+    return {f: c["bares"] * b + c["musicales"] * m for f, c in COEF_LOCALES.items()}
 # Un "día" va de las 7:00 a las 7:00 del día siguiente: la noche del viernes (23-7 h) es la que empieza el viernes.
 
 
