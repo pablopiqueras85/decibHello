@@ -1,8 +1,11 @@
 import { chromium } from "playwright";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
 const p = await b.newPage();
-await p.goto("file:///home/user/Ideas/piloto/visor.html");
+await p.goto("file://" + path.join(raiz, "piloto", "visor.html"));
 await p.waitForTimeout(800);
 const out = await p.evaluate(() => {
   const pick = n => PILOTO.find(x => x.direccion === n);
@@ -15,6 +18,6 @@ const out = await p.evaluate(() => {
          interior: d.interior ? d.interior.nota.map(v=>Math.round(v)) : null })) }; };
   return ["Carrer de Tuset 20", "Carrer de Pomaret 20", "Gran Via de les Corts Catalanes 600"].map(r);
 });
-fs.writeFileSync("/home/user/Ideas/web/datos/extraccion.json", JSON.stringify(out));
+fs.writeFileSync(path.join(raiz, "web", "datos", "extraccion.json"), JSON.stringify(out));
 console.log(JSON.stringify(out.map(o => ({d:o.direccion,g:o.global,f:o.franjas,i:o.interior,pc:o.percentil,s:o.sensor,obra:o.obra,mapa:o.mapa,noches:o.dias.map(x=>x.noche), lun:o.dias[0].nota, vie:o.dias[4].nota, dbvie:o.dias[4].db}))));
 await b.close();
