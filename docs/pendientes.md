@@ -7,12 +7,12 @@ Estado a octubre de 2026. Visor: piloto/visor.html (publicado como artifact priv
 Lo abierto en este momento. El director la mantiene al día y la copia en su lista de tareas de la sesión. El detalle está más abajo.
 
 Decide Pablo:
-1. **Nombre, dominio e idiomas**, y cómo tratar los anuncios. Hoja de decisión a medias: el subagente se cortó por el límite de uso (nombre sin conflictos, salvo "Decib'Hell", app de un festival).
+1. **Nombre, dominio e idiomas**, y cómo tratar los anuncios: responder las 5 preguntas de [decision-nombre-dominio-idiomas.md](decision-nombre-dominio-idiomas.md) y mirar a mano los registros de marcas EUIPO y OEPM.
 2. **Guiones de los vídeos de plastilina**: borrador en `web/GUIONES-VIDEOS.md`.
 
 Trae Pablo:
 3. **Descargas** (piden verificación anti-robots). Mapa 2022: `2022_Raster_Total_Dia_…`, `…_Total_Vespre_…` y `…_Total_Nit_Mapa_Estrategic_Soroll_BCN.gpkg` (unos 97 MB cada uno). Sensores minuto a minuto: `2025_07Jul_XarxaSoroll_EqMonitor_Dades_1Min.zip` y `2025_10Oct_…` (unos 58 MB cada uno). Se pasan adjuntos al chat o con un enlace de Dropbox o Google Drive.
-4. **Solicitudes de transparencia**: dos a Barcelona (2.13 y 2.15) y dos a Madrid. Falta dejarlas listas para pegar (el subagente se cortó por el límite de uso).
+4. **Solicitudes y correos**: listos para pegar en [solicitudes/](solicitudes/README.md) (3 a Barcelona, 2 a Madrid, correo a Open Data BCN y a Xavecs). Pablo se identifica y los envía.
 5. **Su vídeo con sonido** para la web.
 
 Cerrado el 8 oct: calles de control (escala dada por buena; tramo silencioso descartado; Travessera 150 mide 5,5 m entre fachadas) y foto del área metropolitana en la web.
